@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           String        @id @unique @default(uuid())
+  email        String        @unique
+  createdAT    DateTime      @default(now())
+  isSubscribed Boolean      @default(false)
+  password     String
+  profileImage String?       @default("http://res.cloudinary.com/dyhllkjj1/image/upload/v1715439059/dblboyxypvtkaeebvpgr.jpg")
+  role         String        @default("user")
+  provider     String        @default("credentials")
+  username     String
+  isSubscribe Boolean?      @default(false)
+  Favorite     Favorite[]
+  Home         Home[]
+  Message      Message[]
+  Reservation  Reservation[]
+  Review       Review[]
+  Chat         Chat[]        @relation("ChatToUser")
+}
+
+model Home {
+  id           Int           @id @default(autoincrement())
+  title        String
+  description  String?
+  guests       Int
+  bedrooms     Int
+  bathrooms    Int
+  price        Float
+  category     String?
+  rating       Float?
+  longitude    Float
+  latitude     Float
+  listedAt     DateTime      @default(now())
+  userId       String
+  country      String?
+  Favorite     Favorite[]
+  User         User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Pictures     Picture[]
+  Reservations Reservation[]
+  Review       Review[]
+}
+
+model Favorite {
+  id          String   @id @default(uuid())
+  userId      String?
+  homeId      Int?
+  favoritedAt DateTime @default(now())
+  Home        Home?    @relation(fields: [homeId], references: [id], onDelete: Cascade)
+  User        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Reservation {
+  id        Int      @id @default(autoincrement())
+  startDate DateTime
+  endDate   DateTime
+  createdAt DateTime @default(now())
+  status    String   @default("pending")
+  userId    String?
+  homeId    Int?
+  Home      Home?    @relation(fields: [homeId], references: [id], onDelete: Cascade)
+  User      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  comment   String?
+  rating    Float?
+  createdAt DateTime @default(now())
+  userId    String?
+  homeId    Int?
+  Home      Home?    @relation(fields: [homeId], references: [id], onDelete: Cascade)
+  User      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Picture {
+  id        String   @id @default(uuid())
+  url       String
+  createdAt DateTime @default(now())
+  homeId    Int?
+  Home      Home?    @relation(fields: [homeId], references: [id], onDelete: Cascade)
+}
+
+model Chat {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  picture   String?
+  Messages  Message[]
+  users     User[]    @relation("ChatToUser")
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  message   String
+  createdAt DateTime @default(now())
+  chatId    String?
+  userId    String?
+  Chat      Chat?    @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  User      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

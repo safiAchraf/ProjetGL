@@ -36,11 +36,11 @@ model Salon {
   updatedAt   DateTime  @updatedAt
   rating      Float?
 
-  services     Service[]
-  bookings     Booking[]
-  reviews      Review[]
-  coupons      Coupon[]
-  points       Points[]
+  services Service[]
+  bookings Booking[]
+  reviews  Review[]
+  coupons  Coupon[]
+  points   Points[]
 }
 
 model Points {
@@ -57,14 +57,13 @@ model Points {
 }
 
 model Coupon {
-  id        String    @id @default(uuid())
-  code      String    @unique
+  id        String   @id @default(uuid())
+  code      String   @unique
   discount  Float
   salonId   String
-  salon     Salon     @relation(fields: [salonId], references: [id], onDelete: Cascade)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now())
-  bookings  Booking[]
+  salon     Salon    @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 
   @@unique([code, salonId])
 }
@@ -107,6 +106,7 @@ model Booking {
   startTime  DateTime
   endTime    DateTime
   status     BookingStatus @default(PENDING)
+  price     Float
   customerId String
   customer   User          @relation(fields: [customerId], references: [id])
   serviceId  String
@@ -115,13 +115,12 @@ model Booking {
   salon      Salon         @relation(fields: [salonId], references: [id])
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
-  coupon     Coupon?       @relation(fields: [couponId], references: [id])
-  couponId   String?
+  coupon     String?
 }
 
 enum BookingStatus {
   PENDING
-  CONFIRMED
+  PAID
   CANCELLED
   COMPLETED
 }

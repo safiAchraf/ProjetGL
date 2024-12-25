@@ -10,6 +10,11 @@ import cloudinary from "cloudinary";
 import { errorHandler, notFound } from "./middleware/error.js";
 import authRouter from "./routes/auth.js";
 import salonRouter from "./routes/salon.js";
+import chargilyRouter from "./routes/chargily.js";
+
+
+// to do : Points systesm , search with filters , reviews, coupons
+
 
 
 
@@ -46,6 +51,7 @@ app.get("/", (req, res) => {
 	res.json("Hello World");
 });
 
+app.use("/api/chargily", chargilyRouter);
 app.use("/api/auth", authRouter);
 app.use(jwtVerify);
 app.use("/api/salons", salonRouter);

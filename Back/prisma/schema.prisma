@@ -17,12 +17,10 @@ model User {
   phoneNumber String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  salonOwner Salon?
-
-  bookings Booking[]
-  reviews  Review[]
-  points   Points[]
+  salonOwner  Salon?
+  bookings    Booking[]
+  reviews     Review[]
+  points      Points[]
 }
 
 model Salon {
@@ -54,7 +52,7 @@ model Points {
   customer   User     @relation(fields: [customerId], references: [id], onDelete: Cascade)
   salonId    String
   salon      Salon    @relation(fields: [salonId], references: [id], onDelete: Cascade)
-  balance    Int      @default(0) // Current points balance
+  balance    Int      @default(0) 
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   @@unique([customerId, salonId])

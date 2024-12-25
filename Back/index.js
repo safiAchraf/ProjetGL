@@ -1,25 +1,20 @@
 import express from "express";
 import dotenv from "dotenv";
-import { jwtVerify } from "./middleware/jwtVerify.js";
+import jwtVerify from "./middleware/jwtVerify.js";
 import cookieParser from "cookie-parser";
-import authRouter from "./routes/auth.js";
 import cors from "cors";
 import hpp from "hpp";
 import helmet from "helmet";
 import xss from "xss-clean";
-import rateLimiting from "express-rate-limit";
 import cloudinary from "cloudinary";
 import { errorHandler, notFound } from "./middleware/error.js";
+import authRouter from "./routes/auth.js";
+import salonRouter from "./routes/salon.js";
 
 
 
 dotenv.config();
 
-cloudinary.config({
-	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-	api_key: process.env.CLOUDINARY_API_KEY,
-	api_secret: process.env.CLOUDINARY_API_SECRET,
-});
 
 const app = express();
 app.use(
@@ -52,6 +47,9 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRouter);
+app.use(jwtVerify);
+app.use("/api/salons", salonRouter);
+
 
 
 

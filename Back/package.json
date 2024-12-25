@@ -14,7 +14,6 @@
     "@chargily/chargily-pay": "^2.0.0",
     "@prisma/client": "^5.11.0",
     "bcrypt": "^5.1.1",
-    "cloudinary": "^2.1.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -22,10 +21,10 @@
     "helmet": "^7.1.0",
     "hpp": "^0.2.3",
     "jsonwebtoken": "^9.0.2",
-    "multer": "^1.4.5-lts.1",
     "prisma": "^5.11.0",
     "xss": "^1.0.15",
-    "xss-clean": "^0.1.4"
+    "xss-clean": "^0.1.4",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"

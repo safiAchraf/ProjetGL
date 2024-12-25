@@ -2,10 +2,11 @@ import prisma from "../prisma/client.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-
 const loginController = async (req, res) => {
   const { email, password } = req.body;
-  //search for user in db
+  const user = await prisma.$queryRaw`
+    SELECT * FROM User WHERE email = ${email}
+  `;
   if (!user) {
     return res
       .status(400)
@@ -31,28 +32,26 @@ const loginController = async (req, res) => {
     .json({ data: user, message: "login successfully" });
 };
 
-
 const registerController = async (req, res) => {
-  const { username, email, password  , phoneNum } = req.body;
+  const { username, email, password, phoneNum } = req.body;
   if (!username || !email || !password || !phoneNum) {
     return res
       .status(400)
       .json({ data: null, message: "All fields are required" });
   }
-  //search for user in db to check if user already exists
-  // const alreadyExists = await prisma.user.findFirst({
-  //   where: {
-  //     email,
-  //   },
-  // });
-
+  const alreadyExists = await prisma.$queryRaw`
+    SELECT * FROM User WHERE email = ${email}
+  `;
   if (alreadyExists) {
     return res.status(400).json({ data: null, message: "User already exists" });
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
-  //create user in db
-  
+  const user = await prisma.$executeRaw`
+    INSERT INTO User (email, password, name, phoneNumber, role)
+    VALUES (${email}, ${hashedPassword}, ${username}, ${phoneNum}, 'CUSTOMER')
+    RETURNING *
+  `;
 
   const token = jwt.sign(
     { userId: user.id, role: user.role },

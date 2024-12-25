@@ -8,15 +8,14 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-
 model User {
-  id          String   @id @default(uuid())
-  email       String   @unique
+  id          String    @id @default(uuid())
+  email       String    @unique
   password    String
   name        String
   phoneNumber String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   salonOwner  Salon?
   bookings    Booking[]
   reviews     Review[]
@@ -24,24 +23,22 @@ model User {
 }
 
 model Salon {
-  id          String     @id @default(uuid())
+  id          String    @id @default(uuid())
   name        String
   description String?
   address     String
   city        String
   phoneNumber String
   pictures    Picture[]
-  ownerId     String   @unique
-  owner       User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  rating      Float
+  ownerId     String    @unique
+  owner       User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  rating      Float?
 
   services     Service[]
   bookings     Booking[]
   reviews      Review[]
-  workingHours String
-  workingDays  String
   coupons      Coupon[]
   points       Points[]
 }
@@ -52,20 +49,21 @@ model Points {
   customer   User     @relation(fields: [customerId], references: [id], onDelete: Cascade)
   salonId    String
   salon      Salon    @relation(fields: [salonId], references: [id], onDelete: Cascade)
-  balance    Int      @default(0) 
+  balance    Int      @default(0)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+
   @@unique([customerId, salonId])
 }
 
 model Coupon {
-  id        String   @id @default(uuid())
-  code      String   @unique
+  id        String    @id @default(uuid())
+  code      String    @unique
   discount  Float
   salonId   String
-  salon     Salon    @relation(fields: [salonId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  salon     Salon     @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now())
   bookings  Booking[]
 
   @@unique([code, salonId])

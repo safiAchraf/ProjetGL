@@ -4,7 +4,11 @@ import { v4 as uuidv4 } from "uuid";
 const getAllSalons = async (req, res) => {
   try {
     const salons = await prisma.$queryRaw`SELECT * FROM "Salon"`;
-    res.json(salons);
+    const pictures = await prisma.$queryRaw`SELECT * FROM "Picture"`;
+    for (const salon of salons) {
+      salon.pictures = pictures.filter((picture) => picture.salonId === salon.id);
+    }
+    res.json({message: "All salons", data: salons});
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -13,7 +17,7 @@ const getAllSalons = async (req, res) => {
 const getSalonById = async (req, res) => {
   const { id } = req.params;
   try {
-    const salon = await prisma.$queryRaw`SELECT * FROM "Salon" WHERE "id" = ${id}`;
+    const [salon] = await prisma.$queryRaw`SELECT * FROM "Salon" WHERE "id" = ${id}`;
     if (salon) {
       res.json(salon);
     } else {
@@ -31,22 +35,23 @@ const createSalon = async (req, res) => {
     address,
     city,
     phoneNumber,
-    rating,
-    workingHours,
-    workingDays,
     pictures,
   } = req.body;
   const ownerId = req.user.id;
+  if (!name || !address || !city || !phoneNumber || !description) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
   const alreadyExists = await prisma.$queryRaw`
     SELECT * FROM "Salon" WHERE "ownerId" = ${ownerId}`;
   if (alreadyExists.length > 0) {
     return res.status(400).json({ error: "You already have a salon" });
   }
   try {
-    const newSalon = await prisma.$queryRaw`
-      INSERT INTO "Salon" (id, name, description, address, city, "phoneNumber", "ownerId", rating, "workingHours", "workingDays", "createdAt", "updatedAt")
-      VALUES (${uuidv4()}, ${name}, ${description}, ${address}, ${city}, ${phoneNumber}, ${ownerId}, ${rating}, ${workingHours}, ${workingDays}, NOW(), NOW())
+    const [newSalon] = await prisma.$queryRaw`
+      INSERT INTO "Salon" (id, name, description, address, city, "phoneNumber", "ownerId", "createdAt", "updatedAt")
+      VALUES (${uuidv4()}, ${name}, ${description}, ${address}, ${city}, ${phoneNumber}, ${ownerId}, NOW(), NOW())
       RETURNING *`;
+      console.log(newSalon);
     
     // Insert pictures
     if (pictures && pictures.length > 0) {
@@ -71,9 +76,6 @@ const updateSalon = async (req, res) => {
     address,
     city,
     phoneNumber,
-    rating,
-    workingHours,
-    workingDays,
   } = req.body;
   const ownerId = req.user.id;
   const salon = await prisma.$queryRaw`SELECT * FROM "Salon" WHERE id = ${id}`;
@@ -95,9 +97,6 @@ const updateSalon = async (req, res) => {
         address = COALESCE(${address}, address), 
         city = COALESCE(${city}, city), 
         "phoneNumber" = COALESCE(${phoneNumber}, "phoneNumber"), 
-        rating = COALESCE(${rating}, rating), 
-        "workingHours" = COALESCE(${workingHours}, "workingHours"), 
-        "workingDays" = COALESCE(${workingDays}, "workingDays"), 
         "updatedAt" = NOW()
       WHERE id = ${id}
       RETURNING *`;
@@ -115,8 +114,8 @@ const deleteSalon = async (req, res) => {
   const { id } = req.params;
   try {
     const deletedSalon = await prisma.$queryRaw`DELETE FROM "Salon" WHERE id = ${id} RETURNING *`;
-    if (deletedSalon) {
-      res.json(deletedSalon);
+    if (deletedSalon.length > 0) {
+      res.json({ message: "Salon deleted successfully" });
     } else {
       res.status(404).json({ error: "Salon not found" });
     }
@@ -125,4 +124,56 @@ const deleteSalon = async (req, res) => {
   }
 };
 
-export { getAllSalons, getSalonById, createSalon, updateSalon, deleteSalon };
+const addSalonPictures = async (req, res) => {
+  const { id } = req.params;
+  const ownerId = req.user.id;
+  const salon = await prisma.$queryRaw`SELECT * FROM "Salon" WHERE id = ${id}`;
+  if (salon.length === 0) {
+    return res.status(404).json({ error: "Salon not found" });
+  }
+  if (salon[0].ownerId !== ownerId) {
+    return res
+      .status(403)
+      .json({ error: "You are not authorized to update this salon" });
+  }
+  const {pictures} = req.body;
+  try {
+    for (const url of pictures) {
+      await prisma.$queryRaw`
+        INSERT INTO "Picture" (id, url, "salonId", "createdAt", "updatedAt")
+        VALUES (${uuidv4()}, ${url}, ${id}, NOW(), NOW())`;
+    }
+    res.json({ message: "Pictures added successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const deleteSalonPicture = async (req, res) => {
+  const { pictureId } = req.params;
+  const ownerId = req.user.id;
+  const picture = await prisma.$queryRaw`SELECT * FROM "Picture" WHERE id = ${pictureId}`;
+  if (picture.length === 0) {
+    return res.status(404).json({ error: "Picture not found" });
+  }
+  const salon = await prisma.$queryRaw`SELECT * FROM "Salon" WHERE id = ${picture[0].salonId}`;
+  if (salon.length === 0) {
+    return res.status(404).json({ error: "Salon not found" });
+  }
+  if (salon[0].ownerId !== ownerId) {
+    return res
+      .status(403)
+      .json({ error: "You are not authorized to update this salon" });
+  }
+  try {
+    await prisma.$queryRaw`DELETE FROM "Picture" WHERE id = ${pictureId}`;
+    res.json({ message: "Picture deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+  
+}
+
+
+
+export { getAllSalons, getSalonById, createSalon, updateSalon, deleteSalon , addSalonPictures, deleteSalonPicture};

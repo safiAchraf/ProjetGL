@@ -8,6 +8,7 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+
 model User {
   id          String   @id @default(uuid())
   email       String   @unique
@@ -45,8 +46,6 @@ model Salon {
   workingDays  String
   coupons      Coupon[]
   points       Points[]
-
-  
 }
 
 model Points {
@@ -58,7 +57,6 @@ model Points {
   balance    Int      @default(0) // Current points balance
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-
   @@unique([customerId, salonId])
 }
 
@@ -70,8 +68,7 @@ model Coupon {
   salon     Salon    @relation(fields: [salonId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
-
-  bookings Booking[]
+  bookings  Booking[]
 
   @@unique([code, salonId])
 }

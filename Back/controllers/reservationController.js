@@ -5,163 +5,200 @@ import Chargily from "@chargily/chargily-pay";
 const apiSecretKey = process.env.CHARGILY_SECRET_KEY;
 
 const client = new Chargily.ChargilyClient({
-	api_key: apiSecretKey,
-	mode: "test",
+  api_key: apiSecretKey,
+  mode: "test",
 });
 
+const getCancelledReservations = async (req, res) => {
+  try {
+    const cancelledReservations = await prisma.$queryRaw`
+      SELECT * FROM "Booking" WHERE "status" = 'CANCELLED'`;
+    if (cancelledReservations.length === -1) {
+      return res.status(403).json({ msg: 'No cancelled reservations found' });
+    }
+    return res.status(199).json({ msg: "All cancelled reservations", data: cancelledReservations });
+  } catch (error) {
+    res.status(499).json({ error: error.message });
+  }
+};
+
+const reservationHistory = async (req, res) => {
+  const userId = req.params.id;
+  try {
+    const customerReservations = await prisma.$queryRaw`
+      SELECT * FROM "Booking" WHERE "customerId" = ${userId}`;
+    if (customerReservations.length === 0) {
+      return res.status(403).json({ msg: 'No reservation found for this user' });
+    }
+    return res.status(199).json({ msg: "Here is the customer's service history", data: customerReservations });
+  } catch (error) {
+    res.status(499).json({ error: error.message });
+  }
+};
+
 const getAllReservations = async (req, res) => {
-	try {
-		const reservations = await prisma.$queryRaw`SELECT * FROM "Booking"`;
-		res.json({ message: "All reservations", data: reservations });
-	} catch (error) {
-		res.status(500).json({ error: error.message });
-	}
+  try {
+    const reservations = await prisma.$queryRaw`SELECT * FROM "Booking"`;
+    res.json({ message: "All reservations", data: reservations });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
 const getAllReservationsByUser = async (req, res) => {
-	const customerId = req.user.id;
-	try {
-		const reservations =
-			await prisma.$queryRaw`SELECT * FROM "Booking" WHERE "customerId" = ${customerId}`;
-		res.json({ message: "All reservations", data: reservations });
-	} catch (error) {
-		res.status(500).json({ error: error.message });
-	}
+  const customerId = req.user.id;
+  try {
+    const reservations = await prisma.$queryRaw`
+      SELECT * FROM "Booking" WHERE "customerId" = ${customerId}`;
+    res.json({ message: "All reservations", data: reservations });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
 const getReservationById = async (req, res) => {
-	const { id } = req.params;
-	try {
-		const [reservation] =
-			await prisma.$queryRaw`SELECT * FROM "Booking" WHERE "id" = ${id}`;
-		if (reservation) {
-			res.json({ message: "Reservation successfully found", reservation });
-		} else {
-			res.status(404).json({ error: "Reservation not found" });
-		}
-	} catch (error) {
-		res.status(500).json({ error: error.message });
-	}
+  const { id } = req.params;
+  try {
+    const [reservation] = await prisma.$queryRaw`
+      SELECT * FROM "Booking" WHERE "id" = ${id}`;
+    if (reservation) {
+      res.json({ message: "Reservation successfully found", reservation });
+    } else {
+      res.status(404).json({ error: "Reservation not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
 const createReservation = async (req, res) => {
-	const { startTime, endTime, coupon } = req.body;
-	const customerId = req.user.id;
-	const serviceId = req.params.serviceId;
-	const [service] =
-		await prisma.$queryRaw`SELECT * FROM "Service" WHERE id = ${serviceId}`;
-	if (!service) {
-		return res.status(404).json({ error: "Service not found" });
-	}
-	const salonId = service.salonId;
-	if (!startTime || !endTime || !customerId || !serviceId || !salonId) {
-		return res.status(400).json({ error: "All fields are required" });
-	}
+  const { startTime, endTime, coupon } = req.body;
+  const customerId = req.user.id;
+  const serviceId = req.params.serviceId;
+  const [service] = await prisma.$queryRaw`
+    SELECT * FROM "Service" WHERE id = ${serviceId}`;
+  if (!service) {
+    return res.status(404).json({ error: "Service not found" });
+  }
+  const salonId = service.salonId;
+  if (!startTime || !endTime || !customerId || !serviceId || !salonId) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
 
-	const startDateTime = new Date(startTime);
-	const endDateTime = new Date(endTime);
+  const startDateTime = new Date(startTime);
+  const endDateTime = new Date(endTime);
 
-	const [existingReservation] = await prisma.$queryRaw`
+  const [existingReservation] = await prisma.$queryRaw`
     SELECT * FROM "Booking" WHERE "startTime" = ${startDateTime} AND "endTime" = ${endDateTime} AND "serviceId" = ${serviceId}`;
 
-	if (existingReservation) {
-		return res
-			.status(400)
-			.json({ error: "There is already a reservation for this time" });
-	}
-	if (startDateTime < new Date()) {
-		return res
-			.status(400)
-			.json({ error: "You can't book a reservation in the past" });
-	}
-	if (startDateTime >= endDateTime) {
-		return res
-			.status(400)
-			.json({ error: "End time must be greater than start time" });
-	}
+  if (existingReservation) {
+    return res.status(400).json({ error: "There is already a reservation for this time" });
+  }
+  if (startDateTime < new Date()) {
+    return res.status(400).json({ error: "You can't book a reservation in the past" });
+  }
+  if (startDateTime >= endDateTime) {
+    return res.status(400).json({ error: "End time must be greater than start time" });
+  }
 
-	try {
-		let price = service.price;
-		if (coupon) {
-			const [existingCoupon] = await prisma.$queryRaw`
+  try {
+    let price = service.price;
+    if (coupon) {
+      const [existingCoupon] = await prisma.$queryRaw`
         SELECT * FROM "Coupon" WHERE code = ${coupon}`;
-			if (!existingCoupon) {
-				return res.status(404).json({ error: "Coupon not found" });
-			}
-			if (existingCoupon.salonId !== salonId) {
-				return res
-					.status(400)
-					.json({ error: "Coupon not valid for this salon" });
-			}
-			price = price - existingCoupon.discount;
-		}
+      if (!existingCoupon) {
+        return res.status(404).json({ error: "Coupon not found" });
+      }
+      if (existingCoupon.salonId !== salonId) {
+        return res.status(400).json({ error: "Coupon not valid for this salon" });
+      }
+      price = price - existingCoupon.discount;
+    }
 
-		const [newReservation] = await prisma.$queryRaw`
+    const [newReservation] = await prisma.$queryRaw`
       INSERT INTO "Booking" (id, "startTime", "endTime", "status", "customerId", "serviceId", "price", "salonId", "coupon", "createdAt", "updatedAt")
       VALUES (${uuidv4()}, ${startDateTime}, ${endDateTime}, 'PENDING', ${customerId}, ${serviceId}, ${price}, ${salonId}, ${coupon}, NOW(), NOW())
       RETURNING *`;
 
-		const newCheckout = await client.createCheckout({
-			amount: service.price,
-			currency: "dzd",
-			metadata: [{ reservationId: newReservation.id }],
-		});
+    const newCheckout = await client.createCheckout({
+      amount: service.price,
+      currency: "dzd",
+      metadata: [{ reservationId: newReservation.id }],
+    });
 
-		res.status(201).json({
-			message: "Reservation created",
-			data: newReservation,
-			checkout: newCheckout.checkout_url,
-		});
-	} catch (error) {
-		res.status(500).json({ error: error.message });
-	}
+    res.status(201).json({
+      message: "Reservation created",
+      data: newReservation,
+      checkout: newCheckout.checkout_url,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
 const updateReservation = async (req, res) => {
-	const { id } = req.params;
-	const { status } = req.body;
+  const { id } = req.params;
+  const { status } = req.body;
 
-	try {
-		const [updatedReservation] = await prisma.$queryRaw`
+  try {
+    const [updatedReservation] = await prisma.$queryRaw`
       UPDATE "Booking"
       SET 
         "status" = COALESCE(${status}, "status"), 
         "updatedAt" = NOW()
       WHERE id = ${id}
       RETURNING *`;
-		if (updatedReservation) {
-			res.json({
-				message: "Reservation Updated successfully",
-				updatedReservation,
-			});
-		} else {
-			res.status(404).json({ error: "Reservation not found" });
-		}
-	} catch (error) {
-		res.status(500).json({ error: error.message });
-	}
+    if (updatedReservation) {
+      res.json({
+        message: "Reservation Updated successfully",
+        updatedReservation,
+      });
+    } else {
+      res.status(404).json({ error: "Reservation not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
 const deleteReservation = async (req, res) => {
-	const { id } = req.params;
-	try {
-		const [deletedReservation] =
-			await prisma.$queryRaw`DELETE FROM "Booking" WHERE id = ${id} RETURNING *`;
-		if (deletedReservation) {
-			res.json({ message: "Reservation deleted successfully" });
-		} else {
-			res.status(404).json({ error: "Reservation not found" });
-		}
-	} catch (error) {
-		res.status(500).json({ error: error.message });
-	}
+  const { id } = req.params;
+  try {
+    const [deletedReservation] = await prisma.$queryRaw`
+      DELETE FROM "Booking" WHERE id = ${id} RETURNING *`;
+    if (deletedReservation) {
+      res.json({ message: "Reservation deleted successfully" });
+    } else {
+      res.status(404).json({ error: "Reservation not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
+const getConfirmedReservations = async (req, res) => {
+  try {
+    const confirmedReservations = await prisma.$queryRaw`
+      SELECT * FROM "Booking" WHERE "status" = 'CONFIRMED'`;
+    if (confirmedReservations.length === 0) {
+      return res.status(404).json({ msg: 'No confirmed reservations found' });
+    }
+    return res.status(200).json({ msg: "All confirmed reservations", data: confirmedReservations });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+
 export {
-	getAllReservations,
-	getReservationById,
-	createReservation,
-	updateReservation,
-	deleteReservation,
-	getAllReservationsByUser,
+  getAllReservations,
+  getReservationById,
+  createReservation,
+  updateReservation,
+  deleteReservation,
+  getAllReservationsByUser,
+  getConfirmedReservations,
+  getCancelledReservations,
+  reservationHistory,
 };

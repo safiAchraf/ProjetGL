@@ -121,7 +121,7 @@ const createReservation = async (req, res) => {
       RETURNING *`;
 
     const newCheckout = await client.createCheckout({
-      amount: service.price,
+      amount: price,
       currency: "dzd",
       metadata: [{ reservationId: newReservation.id }],
     });

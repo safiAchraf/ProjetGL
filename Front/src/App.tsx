@@ -72,20 +72,21 @@ function App() {
   );
 
   return (
-    <div className="font-poppins font-extralight">
-      <div className="min-h-screen ">
+    <main className="font-poppins font-extralight">
+      {/* Header (Navigation + Hero) */}
+      <header className="min-h-screen ">
         <LoginModal
           isOpen={isLoginModalOpen}
           onClose={() => setIsLoginModalOpen(false)}
         />
 
         {/* Navigation */}
-        <header className="px-10 py-10 flex absolute justify-between w-full z-50 text-white lg:py-14 lg:px-20 flex-1 h-10vh ">
+        <nav className="px-10 py-10 flex absolute justify-between w-full z-50 text-white lg:py-14 lg:px-20 flex-1 h-10vh ">
           <div data-aos="fade-down" className="flex flex-1 items-center">
             <span className="text-4xl">DZ BEAUTY</span>
           </div>
 
-          <nav className="lg:flex lg:flex-1 items-center justify-end hidden">
+          <div className="lg:flex lg:flex-1 items-center justify-end hidden">
             <ul
               data-aos="fade-down"
               data-aos-delay="100"
@@ -129,14 +130,14 @@ function App() {
                 </button>
               </li>
             </ul>
-          </nav>
+          </div>
 
           <div>{menuOpen && content}</div>
 
           <button className="block text-4xl lg:hidden " onClick={toggleMenu}>
             {menuOpen ? <IoIosClose /> : <IoIosMenu />}
           </button>
-        </header>
+        </nav>
 
         {/* Hero Section */}
         <section className="relative h-screen flex items-end">
@@ -174,7 +175,7 @@ function App() {
             </RouterLink>
           </div>
         </section>
-      </div>
+      </header>
 
       {/* Services Section */}
       <section className="py-16 mx-auto w-10/12" id="Services">
@@ -287,7 +288,7 @@ function App() {
       </section>
 
       {/* Our Creations */}
-      <div className="mt-28" id="Creations">
+      <section className="mt-28" id="Creations">
         <div className="w-10/12 flex mx-auto items-center justify-between">
           <div>
             <h2 className="text-4xl lg:text-5xl mb-2 relative z-10 font-light">
@@ -307,10 +308,10 @@ function App() {
         </div>
 
         <Carousel />
-      </div>
+      </section>
 
       {/* plan you visit */}
-      <div className="mx-auto flex w-full md:w-3/5 lg:w-2/5 flex-col items-center mt-24 mb-16 lg:mt-56 lg:mb-28 relative px-4">
+      <section className="mx-auto flex w-full md:w-3/5 lg:w-2/5 flex-col items-center mt-24 mb-16 lg:mt-56 lg:mb-28 relative px-4">
         <div className="absolute z-10 top-[-60px] lg:top-[-90px] text-center">
           <p className="text-lg md:text-xl">
             Exquisite Elegance, Timeless Radiance
@@ -335,10 +336,10 @@ function App() {
             PLAN YOUR VISIT
           </RouterLink>
         </div>
-      </div>
+      </section>
 
       {/* Contacts */}
-      <div
+      <footer
         className="w-10/12 border-t border-gray-200 py-20 mx-auto"
         id="Contacts"
       >
@@ -363,8 +364,8 @@ function App() {
             <p>123 Maple Street</p>
           </div>
         </div>
-      </div>
-    </div>
+      </footer>
+    </main>
   );
 }
 

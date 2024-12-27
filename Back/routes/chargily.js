@@ -1,7 +1,7 @@
 import bodyParser from "body-parser";
 import express from "express";
 import { verifySignature } from "@chargily/chargily-pay";
-import prisma from "../prisma/client";
+import prisma from "../prisma/client.js";
 
 const API_SECRET_KEY = process.env.CHARGILY_SECRET_KEY;
 

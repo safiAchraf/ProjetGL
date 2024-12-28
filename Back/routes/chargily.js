@@ -55,6 +55,12 @@ router.post("/webhook", async (req, res) => {
 			await prisma.$queryRaw`
         UPDATE "Booking" SET status = 'PAID' WHERE "id" = ${reservationId}`;
 			console.log("Reservation updated successfully");
+
+			const pointsToAdd = Math.floor(reservation.price * 0.1);
+			await prisma.$queryRaw`
+        UPDATE "Points" SET balance = balance + ${pointsToAdd} 
+        WHERE "customerId" = ${reservation.customerId} AND "salonId" = ${reservation.salonId}`;
+			console.log("Points added successfully");
 			break;
 		case "checkout.failed":
 			const failedCheckout = event.data;

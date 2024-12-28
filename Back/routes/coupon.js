@@ -16,8 +16,8 @@ router.get("/", getAllCoupons);
 router.post("/:id", createNewCoupon);
 router.put("/:id", updateCoupon);
 router.delete("/:id", deleteCoupon);
-router.get("oneCoupon/:id", getCoupon);
-router.get("salonCoupons/:id", getSalonCoupons);
+router.get("/:id", getCoupon);
+router.get("salon/:id", getSalonCoupons);
 
 
 export default router;

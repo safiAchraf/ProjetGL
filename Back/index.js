@@ -65,7 +65,6 @@ app.use("/api/coupon", couponRouter);
 app.use("/api/reservation", reservationRouter);
 
 
-
 app.use(notFound);
 app.use(errorHandler);
 

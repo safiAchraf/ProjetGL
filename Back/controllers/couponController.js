@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 const createNewCoupon = async (req, res)=>{
   const salonId = req.params.id
   const ownerId = req.user.id;
-  const {code , discount } = req.body
+  const {code , discount} = req.body
 
   if (
     !code || 
@@ -26,6 +26,7 @@ const createNewCoupon = async (req, res)=>{
   if(existinCoupon) {
     return res.status(409).json({ error : "coupon already excists"})
   }
+  
 
   try{
     const newCoupon = await prisma.$queryRaw`

@@ -102,11 +102,11 @@ const createReservation = async (req, res) => {
 	const [existingReservation] = await prisma.$queryRaw`
     SELECT * FROM "Booking" WHERE "startTime" = ${startDateTime} AND "endTime" = ${endDateTime} AND "serviceId" = ${serviceId}`;
 
-	// if (existingReservation) {
-	// 	return res
-	// 		.status(400)
-	// 		.json({ error: "There is already a reservation for this time" });
-	// }
+	if (existingReservation) {
+		return res
+			.status(400)
+			.json({ error: "There is already a reservation for this time" });
+	}
 	if (startDateTime < new Date()) {
 		return res
 			.status(400)

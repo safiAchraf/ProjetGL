@@ -10,7 +10,6 @@ const TimePicker = ({ onTimeSelect, selectedTime }: Props) => {
     "10:00 a.m",
     "11:00 a.m",
     "12:00 a.m",
-
     "1:00 p.m",
     "2:00 p.m",
     "3:00 p.m",

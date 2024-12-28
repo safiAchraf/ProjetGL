@@ -9,14 +9,6 @@ import AOS from "aos";
 import Carousel from "./components/carousel";
 import LoginModal from "./components/loginModal";
 
-/* Images */
-import Background from "./assets/bg.jpg";
-import Coffee from "./assets/coffee.png";
-import Hair from "./assets/hair.png";
-import Manicure from "./assets/manicure.png";
-import Nails from "./assets/nails.png";
-import Pedicure from "./assets/pedicure.png";
-
 /* Icons */
 import { IoIosMenu, IoIosClose } from "react-icons/io";
 import { FaInstagram } from "react-icons/fa";
@@ -142,7 +134,7 @@ function App() {
         {/* Hero Section */}
         <section className="relative h-screen flex items-end">
           <img
-            src={Background}
+            src="/bg.jpg"
             alt="Background Image"
             className="w-full h-full object-cover"
           />
@@ -201,7 +193,7 @@ function App() {
             className="lg:col-start-1 lg:col-end-5 lg:row-start-2 z-10 font-normal "
           >
             <img
-              src={Manicure}
+              src="/manicure.png"
               alt="Manicure"
               className="object-cover w-full"
             />
@@ -211,7 +203,7 @@ function App() {
                 to="/booking"
                 className="border border-black px-4 py-2 rounded-full hover:bg-black hover:text-white transition duration-300"
               >
-                Show price →
+                Show salon →
               </RouterLink>
             </div>
           </div>
@@ -222,14 +214,18 @@ function App() {
             data-aos-delay="200"
             className="lg:col-end-11 lg:col-span-3 lg:row-start-2  font-normal"
           >
-            <img src={Hair} alt="Cocktails" className="object-cover w-full" />
+            <img
+              src="/hair.png"
+              alt="Cocktails"
+              className="object-cover w-full"
+            />
             <div className="flex flex-col sm:flex-row justify-between items-center mt-5">
               <span className="text-2xl mb-2 sm:mb-0">Hair Care</span>
               <RouterLink
                 to="/booking"
                 className="border border-black px-4 py-2 rounded-full hover:bg-black hover:text-white transition duration-300"
               >
-                Show price →
+                Show salon →
               </RouterLink>
             </div>
           </div>
@@ -239,16 +235,20 @@ function App() {
             data-aos="fade-up"
             className="lg:col-end-7 lg:col-span-3 lg:row-start-4 font-normal"
           >
-            <img src={Coffee} alt="Coffee" className="object-cover w-full" />
+            <img
+              src="/coffee.png"
+              alt="Coffee"
+              className="object-cover w-full"
+            />
             <div className="flex flex-col sm:flex-row justify-between items-center mt-5">
-              <span className="w-[56%] text-2xl mb-2 sm:mb-0">
+              <span className="w-[55%] text-2xl mb-2 sm:mb-0">
                 Additional Services
               </span>
               <RouterLink
                 to="/booking"
-                className="border w-[44%] border-black px-4 py-2 rounded-full hover:bg-black hover:text-white transition duration-300"
+                className="border w-[45%] border-black px-4 py-2 rounded-full hover:bg-black hover:text-white transition duration-300"
               >
-                Show price →
+                Show salon →
               </RouterLink>
             </div>
           </div>
@@ -260,7 +260,7 @@ function App() {
             className="lg:col-end-12 lg:col-span-3 lg:row-start-5 font-normal"
           >
             <img
-              src={Pedicure}
+              src="pedicure.png"
               alt="Pedicure"
               className="object-cover w-full"
             />
@@ -270,7 +270,7 @@ function App() {
                 to="/booking"
                 className="border border-black px-4 py-2 rounded-full hover:bg-black hover:text-white transition duration-300"
               >
-                Show price →
+                Show salon →
               </RouterLink>
             </div>
           </div>
@@ -319,7 +319,7 @@ function App() {
           <h2 className="text-6xl lg:text-7xl xl:text-8xl">DZ Beauty</h2>
         </div>
         <img
-          src={Nails}
+          src="/nails.png"
           data-aos="zoom-in-up"
           alt="Pedicure"
           className="object-cover w-3/4 md:w-2/3 lg:w-1/2"

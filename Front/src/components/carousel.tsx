@@ -6,12 +6,6 @@ import {
   IoArrowBackCircleOutline,
 } from "react-icons/io5";
 
-/* Images */
-import Carousel1 from "../assets/carousel1.png";
-import Carousel2 from "../assets/carousel2.png";
-import Carousel3 from "../assets/carousel3.png";
-import Carousel4 from "../assets/carousel4.png";
-
 /* Styles */
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -26,7 +20,7 @@ const CustomNextArrow = (props: CustomArrowProps) => {
     >
       <IoArrowForwardCircleOutline
         size={36}
-        className="text-zinc-700 transition-transform duration-250 ease-in-out transform hover:translate-x-1.5"
+        className="text-zinc-700 transition-transform duration-250 ease-in-out transform hover:translate-x-1"
       />
     </div>
   );
@@ -42,7 +36,7 @@ const CustomPrevArrow = (props: CustomArrowProps) => {
     >
       <IoArrowBackCircleOutline
         size={36}
-        className="text-zinc-700 transition-transform duration-250 ease-in-out transform hover:-translate-x-1.5"
+        className="text-zinc-700 transition-transform duration-250 ease-in-out transform hover:-translate-x-1"
       />
     </div>
   );
@@ -87,16 +81,28 @@ const Carousel = () => {
     <div className="w-10/12 mx-auto relative mt-16">
       <Slider {...settings}>
         <div data-aos="zoom-in-up" data-aos-delay="100">
-          <img src={Carousel4} className="w-full h-[28rem] object-cover px-2" />
+          <img
+            src="/carousel4.png"
+            className="w-full h-[28rem] object-cover px-2"
+          />
         </div>
         <div data-aos="zoom-in-up" data-aos-delay="50">
-          <img src={Carousel2} className="w-full h-[28rem] object-cover px-2" />
+          <img
+            src="/carousel2.png"
+            className="w-full h-[28rem] object-cover px-2"
+          />
         </div>
         <div data-aos="zoom-in-up" data-aos-delay="150">
-          <img src={Carousel3} className="w-full h-[28rem] object-cover px-2" />
+          <img
+            src="/carousel3.png"
+            className="w-full h-[28rem] object-cover px-2"
+          />
         </div>
         <div data-aos="zoom-in-up">
-          <img src={Carousel1} className="w-full h-[28rem] object-cover px-2" />
+          <img
+            src="/carousel1.png"
+            className="w-full h-[28rem] object-cover px-2"
+          />
         </div>
       </Slider>
     </div>

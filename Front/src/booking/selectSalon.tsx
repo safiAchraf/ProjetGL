@@ -14,7 +14,7 @@ const defaults: Salon[] = [
   {
     id: 0,
     name: "Salon 1",
-    imgURL: "../../assets/nails.png",
+    imgURL: "/nails.png",
     rating: 1.4,
     reviewCount: 3,
     location: "Los Santos",
@@ -22,7 +22,7 @@ const defaults: Salon[] = [
   {
     id: 1,
     name: "Salon 2",
-    imgURL: "../../assets/hair.png",
+    imgURL: "/hair.png",
     rating: 4.4,
     reviewCount: 67,
     location: "Los Angles",
@@ -30,7 +30,7 @@ const defaults: Salon[] = [
   {
     id: 2,
     name: "Salon 3",
-    imgURL: "../../assets/manicure.png",
+    imgURL: "/manicure.png",
     rating: 7.4,
     reviewCount: 102,
     location: "Los Santos",
@@ -38,7 +38,7 @@ const defaults: Salon[] = [
   {
     id: 3,
     name: "Salon 4",
-    imgURL: "../../assets/pedicure.png",
+    imgURL: "/pedicure.png",
     rating: 3.4,
     reviewCount: 77,
     location: "Los Santos",

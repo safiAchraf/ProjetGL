@@ -17,21 +17,21 @@ const Header = ({ title, breadcrumbs, selectedCrumbs = [] }: Props) => {
     const currentStep = selectedCrumbs[selectedCrumbs.length - 1];
 
     switch (crumb) {
-      case "Services":
+      case "Salons":
         navigate("/booking");
         break;
-      case "Professional":
+      case "Services":
         if (
-          currentStep === "Professional" ||
-          currentStep === "Time" ||
+          currentStep === "Services" ||
+          currentStep === "Reservation" ||
           currentStep === "Confirm"
         ) {
-          navigate("/booking/professionals");
+          navigate("/booking/services");
         }
         break;
-      case "Time":
-        if (currentStep === "Time" || currentStep === "Confirm") {
-          navigate("/booking/time");
+      case "Reservation":
+        if (currentStep === "Reservation" || currentStep === "Confirm") {
+          navigate("/booking/reservation");
         }
         break;
       case "Confirm":
@@ -46,18 +46,19 @@ const Header = ({ title, breadcrumbs, selectedCrumbs = [] }: Props) => {
 
   const isCrumbClickable = (crumb: string) => {
     const currentStep = selectedCrumbs[selectedCrumbs.length - 1];
-    const steps = ["Services", "Professional", "Time", "Confirm"];
+    const steps = ["Salons", "Services", "Reservation", "Confirm"];
     return steps.indexOf(crumb) <= steps.indexOf(currentStep);
   };
 
   return (
     <header className="mb-6">
       <button
-        className="mb-2 text-gray-600 hover:text-gray-800 transition-colors"
+        className="mb-4 text-gray-600 hover:text-gray-800 transition-all duration-200 ease-in-out transform hover:-translate-x-1"
         onClick={() => navigate(-1)}
       >
         <ChevronLeft size={24} />
       </button>
+
       {breadcrumbs && (
         <nav className="text-sm text-gray-500 mb-2">
           {breadcrumbs.map((crumb, index) => (

@@ -1,5 +1,5 @@
 /* Hooks */
-import { useState } from "react";
+import { useBooking } from "../../hooks/useBooking";
 
 /* Components */
 import { Checkbox } from "../ui/checkbox";
@@ -29,15 +29,12 @@ const SidePanel = ({
   currentPage,
   onContinue,
 }: Props) => {
-  const [atHomeServices, setAtHomeServices] = useState<{
-    [key: number]: boolean;
-  }>({});
+  const { setSelectedServices } = useBooking();
 
   const calculateTotalPrice = () => {
     return selectedServices.reduce((sum, service) => {
-      const basePrice = service.price;
-      const atHomeCharge = atHomeServices[service.id] ? 10 : 0;
-      return sum + basePrice + atHomeCharge;
+      const atHomeCharge = service.atHome ? 10 : 0;
+      return sum + service.price + atHomeCharge;
     }, 0);
   };
 
@@ -46,10 +43,11 @@ const SidePanel = ({
   }, 0);
 
   const handleAtHome = (serviceId: number, checked: boolean) => {
-    setAtHomeServices((prev) => ({
-      ...prev,
-      [serviceId]: checked,
-    }));
+    setSelectedServices(
+      selectedServices.map((service) =>
+        service.id === serviceId ? { ...service, atHome: checked } : service
+      )
+    );
   };
 
   const isButtonDisabled = () => {
@@ -100,11 +98,11 @@ const SidePanel = ({
                   <p className="text-sm">{service.name}</p>
                   <p className="text-sm text-gray-500">
                     {service.duration} mins • ${service.price}
-                    {atHomeServices[service.id] && " + $10 (at home)"}
+                    {service.atHome && " + $10 (at home)"}
                   </p>
                 </div>
 
-                {service.inHome && (
+                {service.availableAtHome && (
                   <div className="flex items-center gap-1">
                     <Label
                       htmlFor={`atHome-${service.id}`}
@@ -114,7 +112,7 @@ const SidePanel = ({
                     </Label>
                     <Checkbox
                       id={`atHome-${service.id}`}
-                      checked={atHomeServices[service.id] || false}
+                      checked={service.atHome || false}
                       onCheckedChange={(checked) =>
                         handleAtHome(service.id, checked as boolean)
                       }

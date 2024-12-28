@@ -14,6 +14,8 @@ import Layout from "./booking/layout.tsx";
 import SelectSalon from "./booking/selectSalon.tsx";
 import SelectService from "./booking/selectService.tsx";
 import SelectTime from "./booking/selectTime.tsx";
+import ClientDashboard from "./dashboard/client/dashboard.tsx";
+import NotFound from "./NotFound.tsx";
 
 /* Styles */
 import "react-toastify/dist/ReactToastify.css";
@@ -23,6 +25,18 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+  },
+  {
+    path: "client",
+    element: <ClientDashboard />,
+  },
+  {
+    path: "/unauthorized",
+    element: <Unauthorized />,
+  },
+  {
+    path: "*",
+    element: <NotFound />,
   },
   {
     path: "/booking",
@@ -41,10 +55,6 @@ const router = createBrowserRouter([
         element: <SelectTime />,
       },
     ],
-  },
-  {
-    path: "/unauthorized",
-    element: <Unauthorized />,
   },
 ]);
 

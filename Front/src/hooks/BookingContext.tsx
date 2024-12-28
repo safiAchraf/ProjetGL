@@ -15,7 +15,8 @@ export type Service = {
   description: string;
   price: number;
   duration: string;
-  inHome?: boolean;
+  availableAtHome?: boolean;
+  atHome?: boolean;
 };
 
 interface BookingContextType {

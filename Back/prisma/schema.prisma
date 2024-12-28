@@ -83,6 +83,7 @@ model Service {
   description String?
   price       Float
   pointPrice  Int?
+  inHouse     Boolean
   duration    Int
   salonId     String
   salon       Salon     @relation(fields: [salonId], references: [id], onDelete: Cascade)
@@ -101,12 +102,19 @@ model Category {
   services  Service[]
 }
 
+
+enum PaymentType {
+  Money
+  Points
+}
+
 model Booking {
   id         String        @id @default(uuid())
   startTime  DateTime
   endTime    DateTime
   status     BookingStatus @default(PENDING)
   price     Float
+  paymentType PaymentType @default(Money)
   customerId String
   customer   User          @relation(fields: [customerId], references: [id])
   serviceId  String

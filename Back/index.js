@@ -6,7 +6,6 @@ import cors from "cors";
 import hpp from "hpp";
 import helmet from "helmet";
 import xss from "xss-clean";
-import cloudinary from "cloudinary";
 import { errorHandler, notFound } from "./middleware/error.js";
 import authRouter from "./routes/auth.js";
 import salonRouter from "./routes/salon.js";

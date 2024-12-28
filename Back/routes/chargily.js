@@ -14,6 +14,13 @@ router.use(
 		},
 	})
 );
+router.get("/succuss", (req, res) => {
+	res.json("Your payment was successful");
+});
+
+router.get("/fail", (req, res) => {
+	res.json("Your payment failed");
+});
 
 router.post("/webhook", async (req, res) => {
 	const signature = req.get("signature") || "";

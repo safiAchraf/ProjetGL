@@ -1,3 +1,10 @@
+/* Hooks */
+import { useState } from "react";
+
+/* Components */
+import { Checkbox } from "../ui/checkbox";
+import { Label } from "../ui/label";
+
 /* Utils */
 import { format } from "date-fns";
 import type { Salon, Service } from "../../hooks/BookingContext";
@@ -22,14 +29,28 @@ const SidePanel = ({
   currentPage,
   onContinue,
 }: Props) => {
-  const totalPrice = selectedServices.reduce(
-    (sum, service) => sum + service.price,
-    0
-  );
+  const [atHomeServices, setAtHomeServices] = useState<{
+    [key: number]: boolean;
+  }>({});
+
+  const calculateTotalPrice = () => {
+    return selectedServices.reduce((sum, service) => {
+      const basePrice = service.price;
+      const atHomeCharge = atHomeServices[service.id] ? 10 : 0;
+      return sum + basePrice + atHomeCharge;
+    }, 0);
+  };
 
   const totalDuration = selectedServices.reduce((sum, service) => {
     return sum + parseInt(service.duration);
   }, 0);
+
+  const handleAtHome = (serviceId: number, checked: boolean) => {
+    setAtHomeServices((prev) => ({
+      ...prev,
+      [serviceId]: checked,
+    }));
+  };
 
   const isButtonDisabled = () => {
     if (currentPage === "selectSalon") return selectedSalon.id === -1;
@@ -71,11 +92,35 @@ const SidePanel = ({
           <div className="border-t pt-4 mb-4">
             <h4 className="font-semibold mb-2">Selected Services</h4>
             {selectedServices.map((service) => (
-              <div key={service.id} className="mb-2">
-                <p className="text-sm">{service.name}</p>
-                <p className="text-sm text-gray-500">
-                  {service.duration} mins • ${service.price}
-                </p>
+              <div
+                key={service.id}
+                className="mb-2 flex items-center justify-between"
+              >
+                <div>
+                  <p className="text-sm">{service.name}</p>
+                  <p className="text-sm text-gray-500">
+                    {service.duration} mins • ${service.price}
+                    {atHomeServices[service.id] && " + $10 (at home)"}
+                  </p>
+                </div>
+
+                {service.inHome && (
+                  <div className="flex items-center gap-1">
+                    <Label
+                      htmlFor={`atHome-${service.id}`}
+                      className="text-sm cursor-pointer"
+                    >
+                      At Home
+                    </Label>
+                    <Checkbox
+                      id={`atHome-${service.id}`}
+                      checked={atHomeServices[service.id] || false}
+                      onCheckedChange={(checked) =>
+                        handleAtHome(service.id, checked as boolean)
+                      }
+                    />
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -85,7 +130,9 @@ const SidePanel = ({
       <div className="bg-gray-50 p-4">
         <div className="flex justify-between items-center mb-4">
           <span className="font-semibold">Total</span>
-          <span className="font-semibold text-xl">${totalPrice}</span>
+          <span className="font-semibold text-xl">
+            ${calculateTotalPrice()}
+          </span>
         </div>
 
         <p className="text-sm text-gray-500 mb-4">

@@ -29,6 +29,7 @@ const defaultCategories: Category[] = [
         description: "Description of service 1",
         duration: "90",
         price: 300,
+        inHome: true,
       },
       {
         id: 1,
@@ -50,6 +51,7 @@ const defaultCategories: Category[] = [
         description: "Description of service 4",
         duration: "60",
         price: 100,
+        inHome: true,
       },
     ],
   },
@@ -104,6 +106,7 @@ const defaultCategories: Category[] = [
         description: "Description of service 2",
         duration: "10",
         price: 20,
+        inHome: true,
       },
       {
         id: 10,
@@ -145,6 +148,7 @@ const defaultCategories: Category[] = [
         description: "Description of service 3",
         duration: "30",
         price: 50,
+        inHome: true,
       },
       {
         id: 15,

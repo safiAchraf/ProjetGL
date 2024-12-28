@@ -39,7 +39,14 @@ const ServiceCard = ({ service, isSelected, onSelect }: Props) => {
     >
       <div className="flex justify-between items-start">
         <div className="flex-grow pr-4">
-          <h3 className="font-medium text-lg">{service.name}</h3>
+          <h3 className="flex gap-1 font-medium text-lg">
+            {service.name}
+            {service.inHome && (
+              <span className="self-end text-xs text-zinc-700">
+                Service Available at Home
+              </span>
+            )}
+          </h3>
           <p className="text-sm text-gray-500">{service.duration} mins</p>
           <p
             className={`text-sm mt-2 text-gray-700 ${

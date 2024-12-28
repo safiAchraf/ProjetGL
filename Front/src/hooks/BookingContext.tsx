@@ -15,6 +15,7 @@ export type Service = {
   description: string;
   price: number;
   duration: string;
+  inHome?: boolean;
 };
 
 interface BookingContextType {

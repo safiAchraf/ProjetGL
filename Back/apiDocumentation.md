@@ -91,7 +91,7 @@
 
 ## Salon Routes
 
-### GET /api/salons
+### GET /api/salons  OR /visitor/salons
 
 **Description:** Get all salons
 
@@ -127,7 +127,7 @@
   }
   ```
 
-### GET /api/salons/:id
+### GET /api/salons/:id   or salon/:id
 
 **Description:** Get salon by ID
 
@@ -345,7 +345,7 @@
 
 ## Service Routes
 
-### GET /api/service
+### GET /api/service  OR /visitor/services
 
 **Description:** Get all services
 
@@ -414,7 +414,7 @@
   }
   ```
 
-### GET /api/service/:id
+### GET /api/service/:id  OR /visitor/services/:id
 
 **Description:** Get service by ID
 

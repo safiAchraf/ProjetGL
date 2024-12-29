@@ -99,7 +99,7 @@ const Carousel = ({
           >
             <img
               src={image}
-              className="w-full h-[38rem] object-center px-2"
+              className="w-full h-[28rem] object-center px-2"
               alt={`Salon Image ${index + 1}`}
             />
           </div>

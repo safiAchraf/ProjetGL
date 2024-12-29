@@ -196,7 +196,7 @@ const SelectService = () => {
       <Header
         title=""
         breadcrumbs={["Salons", "Services", "Reservation", "Confirm"]}
-        selectedCrumbs={["Services"]}
+        selectedCrumbs={["Salons", "Services"]}
       />
 
       <SalonInfo salon={selectedSalon} />

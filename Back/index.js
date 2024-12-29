@@ -16,29 +16,21 @@ import couponRouter from "./routes/coupon.js";
 import reservationRouter from "./routes/reservation.js";
 import nonAuth from "./routes/nonauth.js";
 
-
-
 // to do : Points systesm , search with filters , reviews, coupons
-
-
-
 
 dotenv.config();
 
-
 const app = express();
 app.use(
-	cors({
-		credentials: true,
-		origin:
-			process.env.NODE_ENV == "development"
-				? "http://localhost:5173"
-				: "someurl",
-	})
+  cors({
+    credentials: true,
+    origin: "*",
+    // origin:
+    // 	process.env.NODE_ENV == "development"
+    // 		? "http://localhost:5100"
+    // 		: "someurl",
+  })
 );
-
-
-
 
 app.use(express.urlencoded({ extended: false }));
 
@@ -51,9 +43,8 @@ app.use(hpp());
 app.use(helmet());
 app.use(xss());
 
-
 app.get("/", (req, res) => {
-	res.json("Hello World");
+  res.json("Hello World");
 });
 app.use("/visitor", nonAuth);
 
@@ -66,11 +57,10 @@ app.use("/api/review", reviewRouter);
 app.use("/api/coupon", couponRouter);
 app.use("/api/reservation", reservationRouter);
 
-
 app.use(notFound);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-	console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });

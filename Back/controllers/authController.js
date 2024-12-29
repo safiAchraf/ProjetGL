@@ -28,7 +28,8 @@ const loginController = async (req, res) => {
     .cookie("authorization", token, {
       httpOnly: true,
       sameSite: "None",
-      secure: process.env.NODE_ENV === "development" ? false : true,
+      // secure: process.env.NODE_ENV === "development" ? false : true,
+      secure: true,
     })
     .json({ data: user, message: "login successfully" });
 };
@@ -66,7 +67,8 @@ const registerController = async (req, res) => {
     .cookie("authorization", token, {
       httpOnly: true,
       sameSite: "None",
-      secure: process.env.NODE_ENV === "development" ? false : true,
+      // secure: process.env.NODE_ENV === "development" ? false : true,
+      secure: true,
     })
     .json({ data: user, message: "user created successfully" })
     .status(201);

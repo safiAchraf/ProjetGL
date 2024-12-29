@@ -24,11 +24,10 @@ const app = express();
 app.use(
   cors({
     credentials: true,
-    origin: "*",
-    // origin:
-    // 	process.env.NODE_ENV == "development"
-    // 		? "http://localhost:5100"
-    // 		: "someurl",
+    origin:
+    	process.env.NODE_ENV == "development"
+    		? "http://localhost:5175"
+    		: "someurl",
   })
 );
 

@@ -19,42 +19,11 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
 
   const modalRef = useRef<HTMLDivElement>(null);
 
   const handleLoginSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError("");
-
-    const loginData = {
-      email,
-      password,
-    };
-
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(loginData),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        toast.success("Login successful!");
-        onClose();
-        setEmail("");
-        setPassword("");
-      } else {
-        toast.error(data?.message || "Invalid credentials.");
-      }
-    } catch {
-      console.error("Login error:", error);
-      toast.error("Something went wrong. Please try again.");
-    }
 
     onClose();
     setEmail("");
@@ -96,8 +65,6 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
         </div>
 
         <p className="text-gray-600 mb-4">Log in to complete your booking</p>
-
-        {error && <p className="text-red-500 mb-4">{error}</p>}
 
         <form onSubmit={handleLoginSubmit}>
           <input

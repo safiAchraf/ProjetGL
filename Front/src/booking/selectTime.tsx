@@ -51,14 +51,6 @@ const SelectTime = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <main className="md:flex md:gap-6">
           <section className="flex-grow">
-            <div className="flex items-center mb-4">
-              <img
-                src={selectedSalon.imgURL}
-                alt={selectedSalon.name}
-                className="w-10 h-10 rounded-full mr-4"
-              />
-              <span>{selectedSalon.name}</span>
-            </div>
             <Calendar
               selectedDate={selectedDate}
               onDateSelect={setSelectedDate}

@@ -58,7 +58,7 @@ const Carousel = ({
   const settings = {
     autoplay,
     autoplaySpeed,
-    infinite: true,
+    infinite: images.length > 1,
     speed,
     slidesToShow: images.length === 1 ? 1 : slidesToShow,
     nextArrow: <CustomNextArrow />,

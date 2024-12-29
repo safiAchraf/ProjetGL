@@ -1,18 +1,15 @@
 import Slider, { CustomArrowProps } from "react-slick";
-
-/* Icons */
 import {
   IoArrowForwardCircleOutline,
   IoArrowBackCircleOutline,
 } from "react-icons/io5";
-
-/* Styles */
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 // Custom Next Arrow Component
 const CustomNextArrow = (props: CustomArrowProps) => {
   const { onClick } = props;
+
   return (
     <div
       className="hidden md:block absolute top-1/2 right-[-60px] transform -translate-y-1/2 cursor-pointer z-10"
@@ -29,6 +26,7 @@ const CustomNextArrow = (props: CustomArrowProps) => {
 // Custom Previous Arrow Component
 const CustomPrevArrow = (props: CustomArrowProps) => {
   const { onClick } = props;
+
   return (
     <div
       className="hidden md:block absolute top-1/2 left-[-60px] transform -translate-y-1/2 cursor-pointer z-10"
@@ -42,29 +40,42 @@ const CustomPrevArrow = (props: CustomArrowProps) => {
   );
 };
 
-const Carousel = () => {
+interface CarouselProps {
+  images: string[];
+  slidesToShow?: number;
+  autoplay?: boolean;
+  autoplaySpeed?: number;
+  speed?: number;
+}
+
+const Carousel = ({
+  images,
+  slidesToShow = 4,
+  autoplay = true,
+  autoplaySpeed = 1500,
+  speed = 500,
+}: CarouselProps) => {
   const settings = {
-    autoplay: true,
-    autoplaySpeed: 1500,
+    autoplay,
+    autoplaySpeed,
     infinite: true,
-    speed: 500,
-    slidesToShow: 4,
+    speed,
+    slidesToShow: images.length === 1 ? 1 : slidesToShow,
     nextArrow: <CustomNextArrow />,
     prevArrow: <CustomPrevArrow />,
     responsive: [
       {
         breakpoint: 1280,
         settings: {
-          slidesToShow: 3,
+          slidesToShow: images.length === 1 ? 1 : 3,
           slidesToScroll: 3,
         },
       },
       {
         breakpoint: 1024,
         settings: {
-          slidesToShow: 2,
+          slidesToShow: images.length === 1 ? 1 : 2,
           slidesToScroll: 2,
-          initialSlide: 2,
         },
       },
       {
@@ -78,32 +89,21 @@ const Carousel = () => {
   };
 
   return (
-    <div className="w-10/12 mx-auto relative mt-16">
+    <div className="w-10/12 mx-auto relative mt-16 mb-6">
       <Slider {...settings}>
-        <div data-aos="zoom-in-up" data-aos-delay="100">
-          <img
-            src="/carousel4.png"
-            className="w-full h-[28rem] object-cover px-2"
-          />
-        </div>
-        <div data-aos="zoom-in-up" data-aos-delay="50">
-          <img
-            src="/carousel2.png"
-            className="w-full h-[28rem] object-cover px-2"
-          />
-        </div>
-        <div data-aos="zoom-in-up" data-aos-delay="150">
-          <img
-            src="/carousel3.png"
-            className="w-full h-[28rem] object-cover px-2"
-          />
-        </div>
-        <div data-aos="zoom-in-up">
-          <img
-            src="/carousel1.png"
-            className="w-full h-[28rem] object-cover px-2"
-          />
-        </div>
+        {images.map((image, index) => (
+          <div
+            key={index}
+            data-aos="zoom-in-up"
+            data-aos-delay={`${index * 100}`}
+          >
+            <img
+              src={image}
+              className="w-full h-[38rem] object-center px-2"
+              alt={`Salon Image ${index + 1}`}
+            />
+          </div>
+        ))}
       </Slider>
     </div>
   );

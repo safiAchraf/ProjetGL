@@ -1,16 +1,15 @@
 /* Hooks */
-import { useState } from "react";
 import { useBooking } from "../../hooks/useBooking";
 
 /* Components */
 import { Checkbox } from "../ui/checkbox";
 import { Label } from "../ui/label";
 import ReviewStars from "../review/reviewStars";
-import ReviewsList from "../review/reviewsList";
 
 /* Utils */
 import { format } from "date-fns";
 import type { Salon, Service } from "../../hooks/BookingContext";
+import { MapPin } from "lucide-react";
 
 interface Props {
   selectedSalon: Salon;
@@ -29,7 +28,6 @@ const SidePanel = ({
   currentPage,
   onContinue,
 }: Props) => {
-  const [showReviews, setShowReviews] = useState<boolean>(false);
   const { setSelectedServices } = useBooking();
 
   const calculateTotalPrice = () => {
@@ -62,26 +60,32 @@ const SidePanel = ({
     <div className="bg-white shadow-md md:rounded-lg overflow-hidden">
       <div className="p-4 hidden md:block">
         <div className="flex items-center mb-4">
-          <img
-            src={selectedSalon.imgURL}
-            alt={selectedSalon.name}
-            className="w-12 h-12 rounded-full mr-3"
-          />
-          <div>
-            <h3 className="font-semibold">{selectedSalon.name}</h3>
-            <div className="flex items-center">
-              <ReviewStars rating={selectedSalon.avgRating || 0} />{" "}
-              <span className="text-sm ml-1">
-                ({selectedSalon.reviews.length})
-              </span>
+          {selectedSalon.avatar ? (
+            <img
+              src={selectedSalon.avatar}
+              alt={selectedSalon.name}
+              className="w-[5.35rem] max-h-16 rounded-full object-cover mr-3"
+            />
+          ) : (
+            <div className="rounded-full object-cover mr-3 bg-zinc-100 p-8"></div>
+          )}
+
+          <div className="w-full flex flex-col items-start">
+            <div className="w-full flex items-center justify-between">
+              <h3 className="font-semibold">{selectedSalon.name}</h3>
+
+              <div className="flex gap-0.5 items-center">
+                <ReviewStars rating={selectedSalon.avgRating || 0} />
+                <span className="text-sm text-zinc-500">
+                  ({selectedSalon.reviews.length})
+                </span>
+              </div>
             </div>
-            <p className="text-sm text-gray-500">{selectedSalon.location}</p>
-            <button
-              onClick={() => setShowReviews((prev) => !prev)}
-              className="text-sm text-blue-600 hover:underline mt-2"
-            >
-              {showReviews ? "Hide Reviews" : "View Reviews"}
-            </button>
+
+            <div className="flex items-center text-sm text-gray-600">
+              <MapPin className="w-3 h-3 mr-1" />
+              <span className="truncate">{selectedSalon.location}</span>
+            </div>
           </div>
         </div>
 
@@ -128,13 +132,6 @@ const SidePanel = ({
                 )}
               </div>
             ))}
-          </div>
-        )}
-
-        {/* Show Reviews Section */}
-        {showReviews && (
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-            <ReviewsList reviews={selectedSalon.reviews} />
           </div>
         )}
       </div>

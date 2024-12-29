@@ -61,7 +61,7 @@ const SalonCard = ({ salon, isSelected, onSelect }: Props) => {
     }
 
     return (
-      <div className="flex items-center mt-1 space-x-1">
+      <div className="flex gap-0.5 items-center mt-1 space-x-1">
         <ReviewStars rating={averageRating} />
 
         <button
@@ -87,7 +87,7 @@ const SalonCard = ({ salon, isSelected, onSelect }: Props) => {
         {/* Image Section */}
         <div className="flex-shrink-0">
           <img
-            src={salon.imgURL}
+            src={salon.avatar}
             alt={salon.name}
             className="w-16 h-16 rounded-lg object-cover"
           />

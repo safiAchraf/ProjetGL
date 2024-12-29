@@ -14,7 +14,14 @@ const defaults: Salon[] = [
   {
     id: 0,
     name: "Salon 1",
-    imgURL: "/nails.png",
+    description: "Beauty Like never before, choose this salon please",
+    avatar: "/nails.png",
+    imgs: [
+      "/carousel1.png",
+      "/carousel2.png",
+      "/carousel3.png",
+      "/carousel4.png",
+    ],
     location: "Los Santos",
     reviews: [
       {
@@ -40,7 +47,9 @@ const defaults: Salon[] = [
   {
     id: 1,
     name: "Salon 2",
-    imgURL: "/hair.png",
+    description: "Beauty Like never before, choose this salon please",
+    avatar: "/coffee.png",
+    imgs: ["/hair.png"],
     location: "Los Angles",
     reviews: [
       {
@@ -66,7 +75,9 @@ const defaults: Salon[] = [
   {
     id: 2,
     name: "Salon 3",
-    imgURL: "/manicure.png",
+    description: "Beauty Like never before, choose this salon please",
+    avatar: "",
+    imgs: [],
     location: "Los Santos",
     reviews: [
       {
@@ -92,7 +103,9 @@ const defaults: Salon[] = [
   {
     id: 3,
     name: "Salon 4",
-    imgURL: "/pedicure.png",
+    description: "Beauty Like never before, choose this salon please",
+    avatar: "/pedicure.png",
+    imgs: ["/pedicure.png"],
     location: "Los Santos",
     reviews: [
       {
@@ -118,7 +131,9 @@ const defaults: Salon[] = [
   {
     id: 4,
     name: "Salon 5",
-    imgURL: "/bg.jpg",
+    description: "Beauty Like never before, choose this salon please",
+    avatar: "/manicure.png",
+    imgs: ["/bg.jpg", "/nails.png"],
     location: "Tokyo",
     reviews: [],
   },
@@ -145,7 +160,7 @@ const SelectSalon = () => {
       />
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {salons.map((salon) => (
             <SalonCard
               key={salon.id}

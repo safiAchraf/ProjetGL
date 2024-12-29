@@ -8,6 +8,7 @@ import AOS from "aos";
 /* Custom Components */
 import Carousel from "./components/carousel";
 import LoginModal from "./components/loginModal";
+import SignupModal from "./components/signupModal";
 
 /* Icons */
 import { IoIosMenu, IoIosClose } from "react-icons/io";
@@ -21,6 +22,7 @@ import "aos/dist/aos.css";
 function App() {
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
+  const [isSignupModalOpen, setIsSignupModalOpen] = useState<boolean>(false);
 
   AOS.init({
     duration: 700,
@@ -71,6 +73,10 @@ function App() {
           isOpen={isLoginModalOpen}
           onClose={() => setIsLoginModalOpen(false)}
         />
+        <SignupModal
+          isOpen={isSignupModalOpen}
+          onClose={() => setIsSignupModalOpen(false)}
+        />
 
         {/* Navigation */}
         <nav className="px-10 py-10 flex absolute justify-between w-full z-50 text-white lg:py-14 lg:px-20 flex-1 h-10vh ">
@@ -119,6 +125,16 @@ function App() {
                   }}
                 >
                   Login
+                </button>
+              </li>
+              <li>
+                <button
+                  className="transition ease-in-out duration-150 hover:cursor-pointer hover:scale-110 border-b-2 border-transparent hover:border-current"
+                  onClick={() => {
+                    setIsSignupModalOpen(true);
+                  }}
+                >
+                  Signup
                 </button>
               </li>
             </ul>
@@ -307,7 +323,14 @@ function App() {
           </div>
         </div>
 
-        <Carousel />
+        <Carousel
+          images={[
+            "/carousel1.png",
+            "/carousel2.png",
+            "/carousel3.png",
+            "/carousel4.png",
+          ]}
+        />
       </section>
 
       {/* plan you visit */}

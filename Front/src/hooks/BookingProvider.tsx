@@ -11,7 +11,8 @@ export const BookingProvider = ({ children }: BookingProviderProps) => {
   const [selectedSalon, setSelectedSalon] = useState<Salon>({
     id: -1,
     name: "",
-    imgURL: "",
+    description: "",
+    imgs: [],
     location: "",
     reviews: [],
     avgRating: 0,

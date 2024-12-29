@@ -9,7 +9,9 @@ export type Review = {
 export type Salon = {
   id: number;
   name: string;
-  imgURL: string;
+  description: string;
+  avatar: string;
+  imgs: string[];
   location: string;
   reviews: Review[];
   avgRating?: number;

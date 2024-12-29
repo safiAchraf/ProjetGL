@@ -11,6 +11,7 @@ import ServiceList from "../components/bookingUI/serviceList";
 
 /* Types */
 import type { Service } from "../hooks/BookingContext";
+import SalonInfo from "../components/salonInfo";
 
 export type Category = {
   id: number;
@@ -193,10 +194,14 @@ const SelectService = () => {
   return (
     <div>
       <Header
-        title="Select services"
+        title=""
         breadcrumbs={["Salons", "Services", "Reservation", "Confirm"]}
         selectedCrumbs={["Services"]}
       />
+
+      <SalonInfo salon={selectedSalon} />
+
+      <h1 className="text-4xl font-medium mt-8 mb-4">Select Services</h1>
 
       <ServiceTabs
         categories={categories.map((cat) => cat.name)}

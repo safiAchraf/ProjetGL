@@ -41,7 +41,7 @@ const ServiceCard = ({ service, isSelected, onSelect }: Props) => {
         <div className="flex-grow pr-4">
           <h3 className="flex gap-1 font-medium text-lg">
             {service.name}
-            {service.inHome && (
+            {service.atHome && (
               <span className="self-end text-xs text-zinc-700">
                 Service Available at Home
               </span>

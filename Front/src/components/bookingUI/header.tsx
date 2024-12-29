@@ -18,7 +18,7 @@ const Header = ({ title, breadcrumbs, selectedCrumbs = [] }: Props) => {
 
     switch (crumb) {
       case "Salons":
-        navigate("/booking");
+        navigate("/booking/");
         break;
       case "Services":
         if (
@@ -26,17 +26,17 @@ const Header = ({ title, breadcrumbs, selectedCrumbs = [] }: Props) => {
           currentStep === "Reservation" ||
           currentStep === "Confirm"
         ) {
-          navigate("/booking/services");
+          navigate("/booking/services/");
         }
         break;
       case "Reservation":
         if (currentStep === "Reservation" || currentStep === "Confirm") {
-          navigate("/booking/reservation");
+          navigate("/booking/reservation/");
         }
         break;
       case "Confirm":
         if (currentStep === "Confirm") {
-          navigate("/booking/confirm");
+          navigate("/booking/confirm/");
         }
         break;
       default:

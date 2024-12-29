@@ -18,7 +18,7 @@ export type Salon = {
   owner: string;
   createdAt: string;
   updatedAt: string;
-  rating: number;
+  rating: number | null;
 };
 
 export type Service = {

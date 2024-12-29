@@ -2,8 +2,8 @@ import { createContext, ReactNode, useState } from "react";
 import type { Salon, Service } from "../types/data";
 
 type BookingContextType = {
-  selectedSalon: Salon | null;
-  setSelectedSalon: React.Dispatch<React.SetStateAction<Salon | null>>;
+  selectedSalon: Salon;
+  setSelectedSalon: React.Dispatch<React.SetStateAction<Salon>>;
   selectedServices: Service[];
   setSelectedServices: React.Dispatch<React.SetStateAction<Service[]>>;
 };
@@ -17,7 +17,20 @@ interface BookingProviderProps {
 export const BookingProvider: React.FC<BookingProviderProps> = ({
   children,
 }) => {
-  const [selectedSalon, setSelectedSalon] = useState<Salon | null>(null);
+  const [selectedSalon, setSelectedSalon] = useState<Salon>({
+    id: "",
+    name: "",
+    description: "",
+    phoneNumber: "",
+    address: "",
+    city: "",
+    pictures: [],
+    ownerId: "",
+    owner: "",
+    createdAt: "",
+    updatedAt: "",
+    rating: null,
+  });
   const [selectedServices, setSelectedServices] = useState<Service[]>([]);
 
   return (

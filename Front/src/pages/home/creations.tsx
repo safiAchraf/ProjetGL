@@ -1,4 +1,4 @@
-import Carousel from "../carousel";
+import Carousel from "../../components/carousel";
 
 const creations = () => {
   return (

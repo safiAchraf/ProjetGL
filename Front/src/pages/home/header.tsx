@@ -2,8 +2,8 @@
 import { useState } from "react";
 
 /* Components */
-import LoginModal from "../loginModal";
-import SignupModal from "../signupModal";
+import LoginModal from "../../components/loginModal";
+import SignupModal from "../../components/signupModal";
 import { Link as ScrollLink } from "react-scroll";
 import { Link as RouterLink } from "react-router";
 

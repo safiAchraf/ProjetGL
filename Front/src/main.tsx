@@ -13,6 +13,10 @@ import { ToastContainer } from "react-toastify";
 /* Main App */
 import App from "./App.tsx";
 
+/* Booking Page */
+import Layout from "./pages/booking/Layout.tsx";
+import SelectSalon from "./pages/booking/SelectSalon.tsx";
+
 /* Components */
 import NotFound from "./pages/NotFound.tsx";
 import UnauthorizedAccess from "./pages/UnauthorizedAccess.tsx";
@@ -32,6 +36,24 @@ const router = createBrowserRouter([
   {
     path: "/unauthorized",
     element: <UnauthorizedAccess />,
+  },
+  {
+    path: "/booking",
+    element: <Layout />,
+    children: [
+      {
+        index: true,
+        element: <SelectSalon />,
+      },
+      /*       {
+        path: "services",
+        element: <SelectServices />,
+      },
+      {
+        path: "reservation",
+        element: <SelectTime />,
+      }, */
+    ],
   },
 ]);
 

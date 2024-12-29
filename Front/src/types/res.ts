@@ -1,3 +1,5 @@
+import { Salon } from "./data";
+
 export type RegisterRes = {
   message: string;
   data: {
@@ -20,6 +22,11 @@ export type LoginRes = {
     createdAt: string;
     updatedAt: string;
   };
+};
+
+export type SalonRes = {
+  message: string;
+  data: Salon[];
 };
 
 export type ErrorRes = {

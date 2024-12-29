@@ -17,7 +17,7 @@ interface SignUpModalProps {
   onClose: () => void;
 }
 
-const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
+const SignupModal = ({ isOpen, onClose }: SignUpModalProps) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
@@ -205,4 +205,4 @@ const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
   );
 };
 
-export default SignUpModal;
+export default SignupModal;

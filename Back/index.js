@@ -32,7 +32,7 @@ app.use(
 		credentials: true,
 		origin:
 			process.env.NODE_ENV == "development"
-				? "http://localhost:3500"
+				? "http://localhost:5173"
 				: "someurl",
 	})
 );

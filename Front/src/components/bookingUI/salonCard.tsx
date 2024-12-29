@@ -1,9 +1,8 @@
 /* Hooks */
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useMemo } from "react";
 
 /* Components */
 import ReviewStars from "../review/reviewStars";
-import ReviewsList from "../review/reviewsList";
 
 /* Utils */
 import type { Salon } from "../../hooks/BookingContext";
@@ -18,23 +17,6 @@ interface Props {
 }
 
 const SalonCard = ({ salon, isSelected, onSelect }: Props) => {
-  const [showReviews, setShowReviews] = useState<boolean>(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const handleReviewToggle = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setShowReviews((prev) => !prev);
-  };
-
-  const handleClickOutside = (e: MouseEvent) => {
-    if (
-      dropdownRef.current &&
-      !dropdownRef.current.contains(e.target as Node)
-    ) {
-      setShowReviews(false);
-    }
-  };
-
   const averageRating = useMemo(() => {
     if (!salon.reviews.length) return 0;
     const total = salon.reviews.reduce((sum, review) => sum + review.rating, 0);
@@ -43,35 +25,12 @@ const SalonCard = ({ salon, isSelected, onSelect }: Props) => {
     return salon.avgRating;
   }, [salon]);
 
-  useEffect(() => {
-    if (showReviews) {
-      document.addEventListener("click", handleClickOutside);
-    } else {
-      document.removeEventListener("click", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, [showReviews]);
-
   const renderRatingSection = () => {
     if (salon.reviews.length === 0) {
       return <span className="text-sm text-gray-500">No reviews yet</span>;
     }
 
-    return (
-      <div className="flex gap-0.5 items-center mt-1 space-x-1">
-        <ReviewStars rating={averageRating} />
-
-        <button
-          onClick={handleReviewToggle}
-          className="text-sm text-blue-600 hover:underline ml-1"
-        >
-          ({salon.reviews.length} reviews)
-        </button>
-      </div>
-    );
+    return <ReviewStars rating={averageRating} />;
   };
 
   return (
@@ -110,21 +69,6 @@ const SalonCard = ({ salon, isSelected, onSelect }: Props) => {
           </div>
         </div>
       </div>
-
-      {/* Reviews Section */}
-      {showReviews && (
-        <div
-          ref={dropdownRef}
-          className={`absolute left-0 top-full mt-2 w-full bg-white shadow-lg rounded-lg z-10 transition-transform duration-300 ease-in-out origin-top ${
-            showReviews ? "scale-y-100" : "scale-y-0"
-          }`}
-          style={{ transform: showReviews ? "scaleY(1)" : "scaleY(0)" }}
-        >
-          <div className="p-3">
-            <ReviewsList reviews={salon.reviews} />
-          </div>
-        </div>
-      )}
     </div>
   );
 };

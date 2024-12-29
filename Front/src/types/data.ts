@@ -28,8 +28,21 @@ export type Service = {
   price: number;
   pointPrice: number;
   duration: number;
-  category: string;
+  categoryId: string;
   inHouse: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type Review = {
+  user: string;
+  rating: number;
+  review: string;
+};
+
+export type Category = {
+  id: string;
+  name: string;
   createdAt: string;
   updatedAt: string;
 };

@@ -64,6 +64,7 @@ const SelectSalon = () => {
 
   useEffect(() => {
     fetchSalons();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleContinue = () => {

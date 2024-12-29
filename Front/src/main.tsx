@@ -16,6 +16,7 @@ import App from "./App.tsx";
 /* Booking Page */
 import Layout from "./pages/booking/Layout.tsx";
 import SelectSalon from "./pages/booking/SelectSalon.tsx";
+import SelectServices from "./pages/booking/SelectServices.tsx";
 
 /* Components */
 import NotFound from "./pages/NotFound.tsx";
@@ -45,11 +46,11 @@ const router = createBrowserRouter([
         index: true,
         element: <SelectSalon />,
       },
-      /*       {
+      {
         path: "services",
         element: <SelectServices />,
       },
-      {
+      /*  {
         path: "reservation",
         element: <SelectTime />,
       }, */

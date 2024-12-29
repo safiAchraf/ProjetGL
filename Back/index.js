@@ -14,6 +14,7 @@ import serviceRouter from "./routes/service.js";
 import reviewRouter from "./routes/review.js";
 import couponRouter from "./routes/coupon.js";
 import reservationRouter from "./routes/reservation.js";
+import nonAuth from "./routes/nonauth.js";
 
 
 
@@ -54,6 +55,7 @@ app.use(xss());
 app.get("/", (req, res) => {
 	res.json("Hello World");
 });
+app.use("/visitor", nonAuth);
 
 app.use("/api/chargily", chargilyRouter);
 app.use("/api/auth", authRouter);

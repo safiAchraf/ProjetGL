@@ -18,6 +18,8 @@ const getSalonById = async (req, res) => {
   const { id } = req.params;
   try {
     const [salon] = await prisma.$queryRaw`SELECT * FROM "Salon" WHERE "id" = ${id}`;
+    const pictures = await prisma.$queryRaw`SELECT * FROM "Picture" WHERE "salonId" = ${id}`;
+    salon.pictures = pictures;
     if (salon) {
       res.json(salon);
     } else {

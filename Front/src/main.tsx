@@ -23,20 +23,20 @@ import "./index.css";
 
 const router = createBrowserRouter([
   {
+    path: "*",
+    element: <NotFound />,
+  },
+  {
     path: "/",
     element: <App />,
   },
   {
-    path: "client",
+    path: "/client",
     element: <ClientDashboard />,
   },
   {
     path: "/unauthorized",
     element: <Unauthorized />,
-  },
-  {
-    path: "*",
-    element: <NotFound />,
   },
   {
     path: "/booking",

@@ -1,16 +1,16 @@
 /* Hooks */
+import { useState } from "react";
 import { useBooking } from "../../hooks/useBooking";
 
 /* Components */
 import { Checkbox } from "../ui/checkbox";
 import { Label } from "../ui/label";
+import ReviewStars from "../review/reviewStars";
+import ReviewsList from "../review/reviewsList";
 
 /* Utils */
 import { format } from "date-fns";
 import type { Salon, Service } from "../../hooks/BookingContext";
-
-/* Icons */
-import { Star } from "lucide-react";
 
 interface Props {
   selectedSalon: Salon;
@@ -29,6 +29,7 @@ const SidePanel = ({
   currentPage,
   onContinue,
 }: Props) => {
+  const [showReviews, setShowReviews] = useState<boolean>(false);
   const { setSelectedServices } = useBooking();
 
   const calculateTotalPrice = () => {
@@ -69,12 +70,18 @@ const SidePanel = ({
           <div>
             <h3 className="font-semibold">{selectedSalon.name}</h3>
             <div className="flex items-center">
-              <Star className="w-4 h-4 text-yellow-400 fill-current" />
+              <ReviewStars rating={selectedSalon.avgRating || 0} />{" "}
               <span className="text-sm ml-1">
-                {selectedSalon.rating} ({selectedSalon.reviewCount})
+                ({selectedSalon.reviews.length})
               </span>
             </div>
             <p className="text-sm text-gray-500">{selectedSalon.location}</p>
+            <button
+              onClick={() => setShowReviews((prev) => !prev)}
+              className="text-sm text-blue-600 hover:underline mt-2"
+            >
+              {showReviews ? "Hide Reviews" : "View Reviews"}
+            </button>
           </div>
         </div>
 
@@ -121,6 +128,13 @@ const SidePanel = ({
                 )}
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Show Reviews Section */}
+        {showReviews && (
+          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+            <ReviewsList reviews={selectedSalon.reviews} />
           </div>
         )}
       </div>

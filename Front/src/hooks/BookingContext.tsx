@@ -1,12 +1,18 @@
 import { createContext } from "react";
 
+export type Review = {
+  user: string;
+  rating: number;
+  review: string;
+};
+
 export type Salon = {
   id: number;
   name: string;
   imgURL: string;
-  rating: number;
-  reviewCount: number;
   location: string;
+  reviews: Review[];
+  avgRating?: number;
 };
 
 export type Service = {

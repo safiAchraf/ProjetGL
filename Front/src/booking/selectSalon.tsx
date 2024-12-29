@@ -15,33 +15,112 @@ const defaults: Salon[] = [
     id: 0,
     name: "Salon 1",
     imgURL: "/nails.png",
-    rating: 1.4,
-    reviewCount: 3,
     location: "Los Santos",
+    reviews: [
+      {
+        user: "Sarah M.",
+        rating: 5,
+        review:
+          "Absolutely love this salon! My stylist was incredible with color matching and the atmosphere is so welcoming. Definitely worth every penny.",
+      },
+      {
+        user: "Michael R.",
+        rating: 4,
+        review:
+          "Great haircut and professional service. Would have given 5 stars but had to wait a bit past my appointment time.",
+      },
+      {
+        user: "Jennifer L.",
+        rating: 5,
+        review:
+          "The attention to detail here is amazing. They really listen to what you want and deliver exactly that. My new go-to salon!",
+      },
+    ],
   },
   {
     id: 1,
     name: "Salon 2",
     imgURL: "/hair.png",
-    rating: 4.4,
-    reviewCount: 67,
     location: "Los Angles",
+    reviews: [
+      {
+        user: "David K.",
+        rating: 3,
+        review:
+          "Decent service but a bit pricey for what you get. The location is convenient though.",
+      },
+      {
+        user: "Emma P.",
+        rating: 5,
+        review:
+          "First time here and I'm impressed! The staff is super friendly and my highlights came out perfect. Already booked my next appointment.",
+      },
+      {
+        user: "James W.",
+        rating: 4,
+        review:
+          "Solid experience overall. The stylist was knowledgeable and gave good recommendations for my hair type.",
+      },
+    ],
   },
   {
     id: 2,
     name: "Salon 3",
     imgURL: "/manicure.png",
-    rating: 7.4,
-    reviewCount: 102,
     location: "Los Santos",
+    reviews: [
+      {
+        user: "Lisa T.",
+        rating: 5,
+        review:
+          "Been coming here for years and never disappointed. They consistently deliver great results and the customer service is top-notch.",
+      },
+      {
+        user: "Alex H.",
+        rating: 2,
+        review:
+          "Not thrilled with my latest visit. The cut wasn't quite what I asked for and felt rushed through the service.",
+      },
+      {
+        user: "Maria G.",
+        rating: 4,
+        review:
+          "Very modern salon with skilled stylists. A bit on the expensive side but the quality makes up for it.",
+      },
+    ],
   },
   {
     id: 3,
     name: "Salon 4",
     imgURL: "/pedicure.png",
-    rating: 3.4,
-    reviewCount: 77,
     location: "Los Santos",
+    reviews: [
+      {
+        user: "Ryan B.",
+        rating: 5,
+        review:
+          "Outstanding service! The scalp massage during the wash was amazing and my fade turned out perfect.",
+      },
+      {
+        user: "Sophie C.",
+        rating: 3,
+        review:
+          "Mixed feelings. The end result was good but communication could have been better throughout the process.",
+      },
+      {
+        user: "Tom M.",
+        rating: 4,
+        review:
+          "Clean, professional environment and friendly staff. Good experience overall but parking can be a challenge.",
+      },
+    ],
+  },
+  {
+    id: 4,
+    name: "Salon 5",
+    imgURL: "/bg.jpg",
+    location: "Tokyo",
+    reviews: [],
   },
 ];
 
@@ -58,7 +137,7 @@ const SelectSalon = () => {
   }, [salons, selectedSalon, setSelectedSalon]);
 
   return (
-    <main className="min-h-full max-h-screen relative">
+    <main className="min-h-full relative">
       <Header
         title="Salons"
         breadcrumbs={["Salons", "Services", "Reservation", "Confirm"]}

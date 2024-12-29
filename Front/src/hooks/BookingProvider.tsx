@@ -12,9 +12,9 @@ export const BookingProvider = ({ children }: BookingProviderProps) => {
     id: -1,
     name: "",
     imgURL: "",
-    rating: 0.0,
-    reviewCount: 0,
     location: "",
+    reviews: [],
+    avgRating: 0,
   });
   const [selectedServices, setSelectedServices] = useState<Service[]>([]);
 

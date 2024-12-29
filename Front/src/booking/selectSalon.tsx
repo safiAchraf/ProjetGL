@@ -176,7 +176,7 @@ const SelectSalon = () => {
         onClick={() => navigate("/booking/services")}
         className="fixed bottom-8 right-8 bg-white hover:bg-gray-100 font-semibold py-3 px-6 rounded-lg shadow-lg transition-all duration-200 hover:scale-105 active:scale-95"
       >
-        Choose a salon
+        Confirm
       </button>
     </main>
   );

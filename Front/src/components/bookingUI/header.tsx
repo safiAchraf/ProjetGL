@@ -12,10 +12,9 @@ interface Props {
 
 const Header = ({ title, breadcrumbs, selectedCrumbs = [] }: Props) => {
   const navigate = useNavigate();
+  const currentStep = selectedCrumbs[selectedCrumbs.length - 1];
 
   const handleNavigation = (crumb: string) => {
-    const currentStep = selectedCrumbs[selectedCrumbs.length - 1];
-
     switch (crumb) {
       case "Salons":
         navigate("/booking/");
@@ -50,11 +49,30 @@ const Header = ({ title, breadcrumbs, selectedCrumbs = [] }: Props) => {
     return steps.indexOf(crumb) <= steps.indexOf(currentStep);
   };
 
+  const handleGoBack = () => {
+    switch (currentStep) {
+      case "Salons":
+        navigate("/");
+        break;
+      case "Services":
+        navigate("/booking/");
+        break;
+      case "Reservation":
+        navigate("/booking/services/");
+        break;
+      case "Confirm":
+        navigate("/booking/reservation/");
+        break;
+      default:
+        navigate("/");
+    }
+  };
+
   return (
     <header className="mb-6">
       <button
         className="mb-4 text-gray-600 hover:text-gray-800 transition-all duration-200 ease-in-out transform hover:-translate-x-1"
-        onClick={() => navigate(-1)}
+        onClick={handleGoBack}
       >
         <ChevronLeft size={24} />
       </button>

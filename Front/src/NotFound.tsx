@@ -2,7 +2,7 @@
 import { useNavigate } from "react-router";
 
 /* Icons */
-import { Frown } from "lucide-react";
+import { Frown, Home, ArrowLeft } from "lucide-react";
 
 const NotFound = () => {
   const navigate = useNavigate();
@@ -28,9 +28,17 @@ const NotFound = () => {
 
         <div className="space-y-4">
           <button
-            onClick={() => navigate("/")}
-            className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors duration-200"
+            onClick={() => navigate(-1)}
+            className="w-9/12 mx-auto bg-gray-100 text-gray-700 py-2 px-8 pr-12 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center justify-center gap-2"
           >
+            <ArrowLeft />
+            Go Back
+          </button>
+          <button
+            onClick={() => navigate("/")}
+            className="w-9/12 mx-auto bg-gray-100 text-gray-700 py-2 px-8 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center justify-center gap-2"
+          >
+            <Home />
             Back to Home
           </button>
         </div>

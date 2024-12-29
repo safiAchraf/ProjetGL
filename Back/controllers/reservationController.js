@@ -81,7 +81,7 @@ const getReservationById = async (req, res) => {
 };
 
 const createReservation = async (req, res) => {
-	const { startTime, coupon, paymentType } = req.body;
+	const { startTime, coupon, paymentType , inHouse } = req.body;
 	const customerId = req.user.id;
 	const serviceId = req.params.serviceId;
 	const [service] = await prisma.$queryRaw`
@@ -149,8 +149,8 @@ const createReservation = async (req, res) => {
 	try {
 		if (paymentType === "Money") {
 			const [newReservation] = await prisma.$queryRaw`
-      INSERT INTO "Booking" (id, "startTime", "endTime", "status", "customerId", "serviceId", "price", "salonId", "coupon", "paymentType", "createdAt", "updatedAt")
-      VALUES (${uuidv4()}, ${startDateTime}, ${endDateTime}, 'PENDING', ${customerId}, ${serviceId}, ${price}, ${salonId}, ${coupon}, ${paymentType}::"PaymentType", NOW(), NOW())
+      INSERT INTO "Booking" (id, "startTime", "endTime", "status", "customerId", "serviceId", "price", "salonId", "coupon", "paymentType", "createdAt", "updatedAt" , "inHouse")
+      VALUES (${uuidv4()}, ${startDateTime}, ${endDateTime}, 'PENDING', ${customerId}, ${serviceId}, ${price}, ${salonId}, ${coupon}, ${paymentType}::"PaymentType", NOW(), NOW() , ${inHouse})
       RETURNING *`;
 			console.log(newReservation);
 			console.log(price);
@@ -169,8 +169,8 @@ const createReservation = async (req, res) => {
 		}
 		if (paymentType === "Points") {
 			const [newReservation] = await prisma.$queryRaw`
-      INSERT INTO "Booking" (id, "startTime", "endTime", "status", "customerId", "serviceId", "price", "salonId", "coupon", "paymentType", "createdAt", "updatedAt")
-      VALUES (${uuidv4()}, ${startDateTime}, ${endDateTime}, 'CONFIRMED', ${customerId}, ${serviceId}, ${price}, ${salonId}, ${coupon}, ${paymentType}::"PaymentType", NOW(), NOW())
+      INSERT INTO "Booking" (id, "startTime", "endTime", "status", "customerId", "serviceId", "price", "salonId", "coupon", "paymentType", "createdAt", "updatedAt" , "inHouse")
+      VALUES (${uuidv4()}, ${startDateTime}, ${endDateTime}, 'CONFIRMED', ${customerId}, ${serviceId}, ${price}, ${salonId}, ${coupon}, ${paymentType}::"PaymentType", NOW(), NOW() , ${inHouse})
       RETURNING *`;
 			res.status(201).json({
 				message: "Reservation created",
@@ -237,13 +237,14 @@ const getConfirmedReservations = async (req, res) => {
 	}
 };
 const getAvailableHours = async (req, res) => {
-	const { day, month } = req.params;
+	const { day, month, salonId } = req.params;
 	const year = new Date().getFullYear();
 	const startDate = new Date(year, month - 1, day, 0, 0, 0);
 	const endDate = new Date(year, month - 1, day, 23, 59, 59);
 	try {
-		const reservations =
-			await prisma.$queryRaw`      SELECT "startTime", "endTime" FROM "Booking"       WHERE "startTime" BETWEEN ${startDate} AND ${endDate}`;
+		const reservations = await prisma.$queryRaw`
+      SELECT "startTime", "endTime" FROM "Booking" 
+      WHERE "startTime" BETWEEN ${startDate} AND ${endDate} AND "salonId" = ${salonId}`;
 		const availableHours = [];
 		for (let hour = 8; hour < 21; hour++) {
 			const isAvailable = !reservations.some((reservation) => {

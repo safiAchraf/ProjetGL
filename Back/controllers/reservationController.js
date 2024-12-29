@@ -271,5 +271,4 @@ export {
 	getCancelledReservations,
 	reservationHistory,
 	getAvailableHours,
-	testChargily,
 };

@@ -9,6 +9,8 @@ const client = new Chargily.ChargilyClient({
 	mode: "test",
 });
 
+
+
 const getCancelledReservations = async (req, res) => {
 	try {
 		const cancelledReservations = await prisma.$queryRaw`
@@ -25,7 +27,7 @@ const getCancelledReservations = async (req, res) => {
 };
 
 const reservationHistory = async (req, res) => {
-	const userId = req.params.id;
+	const userId = req.user.id;
 	try {
 		const customerReservations = await prisma.$queryRaw`
       SELECT * FROM "Booking" WHERE "customerId" = ${userId}`;
@@ -79,7 +81,7 @@ const getReservationById = async (req, res) => {
 };
 
 const createReservation = async (req, res) => {
-	const { startTime, endTime, coupon, paymentType } = req.body;
+	const { startTime, coupon, paymentType } = req.body;
 	const customerId = req.user.id;
 	const serviceId = req.params.serviceId;
 	const [service] = await prisma.$queryRaw`
@@ -88,12 +90,14 @@ const createReservation = async (req, res) => {
 		return res.status(404).json({ error: "Service not found" });
 	}
 	const salonId = service.salonId;
-	if (!startTime || !endTime || !customerId || !serviceId || !salonId) {
+	if (!startTime || !customerId || !serviceId || !salonId) {
 		return res.status(400).json({ error: "All fields are required" });
 	}
 
 	const startDateTime = new Date(startTime);
-	const endDateTime = new Date(endTime);
+	const endDateTime = new Date(
+		startDateTime.getTime() + service.duration * 60000
+	);
 
 	const [existingReservation] = await prisma.$queryRaw`
     SELECT * FROM "Booking" WHERE "startTime" = ${startDateTime} AND "endTime" = ${endDateTime} AND "serviceId" = ${serviceId}`;
@@ -146,13 +150,16 @@ const createReservation = async (req, res) => {
 		if (paymentType === "Money") {
 			const [newReservation] = await prisma.$queryRaw`
       INSERT INTO "Booking" (id, "startTime", "endTime", "status", "customerId", "serviceId", "price", "salonId", "coupon", "paymentType", "createdAt", "updatedAt")
-      VALUES (${uuidv4()}, ${startDateTime}, ${endDateTime}, 'PENDING', ${customerId}, ${serviceId}, ${price}, ${salonId}, ${coupon}, ${paymentType}, NOW(), NOW())
+      VALUES (${uuidv4()}, ${startDateTime}, ${endDateTime}, 'PENDING', ${customerId}, ${serviceId}, ${price}, ${salonId}, ${coupon}, ${paymentType}::"PaymentType", NOW(), NOW())
       RETURNING *`;
-
+			console.log(newReservation);
+			console.log(price);
 			const newCheckout = await client.createCheckout({
 				amount: price,
 				currency: "dzd",
 				metadata: [{ reservationId: newReservation.id }],
+				success_url: "http://localhost:3000/success",
+				failure_url: "http://localhost:3000/failure",
 			});
 			res.status(201).json({
 				message: "Reservation created",
@@ -163,7 +170,7 @@ const createReservation = async (req, res) => {
 		if (paymentType === "Points") {
 			const [newReservation] = await prisma.$queryRaw`
       INSERT INTO "Booking" (id, "startTime", "endTime", "status", "customerId", "serviceId", "price", "salonId", "coupon", "paymentType", "createdAt", "updatedAt")
-      VALUES (${uuidv4()}, ${startDateTime}, ${endDateTime}, 'CONFIRMED', ${customerId}, ${serviceId}, ${price}, ${salonId}, ${coupon}, ${paymentType}, NOW(), NOW())
+      VALUES (${uuidv4()}, ${startDateTime}, ${endDateTime}, 'CONFIRMED', ${customerId}, ${serviceId}, ${price}, ${salonId}, ${coupon}, ${paymentType}::"PaymentType", NOW(), NOW())
       RETURNING *`;
 			res.status(201).json({
 				message: "Reservation created",
@@ -229,18 +236,14 @@ const getConfirmedReservations = async (req, res) => {
 		res.status(500).json({ error: error.message });
 	}
 };
-
 const getAvailableHours = async (req, res) => {
 	const { day, month } = req.params;
 	const year = new Date().getFullYear();
 	const startDate = new Date(year, month - 1, day, 0, 0, 0);
 	const endDate = new Date(year, month - 1, day, 23, 59, 59);
-
 	try {
-		const reservations = await prisma.$queryRaw`
-      SELECT "startTime", "endTime" FROM "Booking" 
-      WHERE "startTime" BETWEEN ${startDate} AND ${endDate}`;
-
+		const reservations =
+			await prisma.$queryRaw`      SELECT "startTime", "endTime" FROM "Booking"       WHERE "startTime" BETWEEN ${startDate} AND ${endDate}`;
 		const availableHours = [];
 		for (let hour = 8; hour < 21; hour++) {
 			const isAvailable = !reservations.some((reservation) => {
@@ -252,13 +255,11 @@ const getAvailableHours = async (req, res) => {
 				availableHours.push(hour);
 			}
 		}
-
 		res.status(200).json({ availableHours });
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
 };
-
 export {
 	getAllReservations,
 	getReservationById,
@@ -270,4 +271,5 @@ export {
 	getCancelledReservations,
 	reservationHistory,
 	getAvailableHours,
+	testChargily,
 };

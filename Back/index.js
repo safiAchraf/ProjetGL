@@ -13,6 +13,7 @@ import chargilyRouter from "./routes/chargily.js";
 import serviceRouter from "./routes/service.js";
 import reviewRouter from "./routes/review.js";
 import couponRouter from "./routes/coupon.js";
+import reservationRouter from "./routes/reservation.js";
 
 
 
@@ -61,8 +62,7 @@ app.use("/api/salons", salonRouter);
 app.use("/api/service", serviceRouter);
 app.use("/api/review", reviewRouter);
 app.use("/api/coupon", couponRouter);
-
-
+app.use("/api/reservation", reservationRouter);
 
 
 app.use(notFound);

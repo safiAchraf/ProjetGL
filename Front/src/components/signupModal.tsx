@@ -1,15 +1,16 @@
 /* Hooks */
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router";
 
 /* Utils */
 import { api } from "../api/axios";
+import { toast } from "react-toastify";
+import { AxiosError } from "axios";
+import { ErrorRes, RegisterRes } from "../types/res";
 
-/* Icons */
-import { Eye, EyeClosed } from "lucide-react";
-
-/* Styles */
+/* Assets */
+import { Eye, EyeClosed, Loader2 } from "lucide-react";
 import "react-toastify/dist/ReactToastify.css";
-import { RegisterRes } from "../types/res";
 
 interface SignUpModalProps {
   isOpen: boolean;
@@ -17,36 +18,74 @@ interface SignUpModalProps {
 }
 
 const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [name, setName] = useState<string>("");
-  const [phoneNumber, setPhoneNumber] = useState<string>("");
-
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    name: "",
+    phoneNumber: "",
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const resetForm = () => {
+    setFormData({
+      email: "",
+      password: "",
+      name: "",
+      phoneNumber: "",
+    });
+    setShowPassword(false);
+    setIsLoading(false);
+  };
 
   const handleSignUpSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
 
     try {
-      const response: RegisterRes = await api.post("/auth/register", {
-        name,
-        email,
-        password,
-        phoneNum: phoneNumber,
+      const response = await api.post<RegisterRes>("/api/auth/register", {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        phoneNum: formData.phoneNumber,
       });
 
-      console.log(response.message);
-    } catch (error) {
-      console.log(error);
-    }
+      if (response.status === 200) {
+        toast.success("Account created successfully!");
+        onClose();
+        resetForm();
 
-    onClose();
-    setEmail("");
-    setPassword("");
-    setName("");
-    setPhoneNumber("");
-    setShowPassword(false);
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      const errorResponse = error as AxiosError;
+
+      if (errorResponse.response) {
+        toast.error(
+          (errorResponse.response.data as ErrorRes).message ||
+            "An unexpected error occurred."
+        );
+      } else if (errorResponse.request) {
+        toast.error(
+          "Unable to connect to the server. Please check your internet connection."
+        );
+      } else {
+        toast.error("An unexpected error occurred. Please try again.");
+      }
+    } finally {
+      resetForm();
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -55,16 +94,15 @@ const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
         modalRef.current &&
         !modalRef.current.contains(event.target as Node)
       ) {
+        resetForm();
         onClose();
       }
     };
 
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
-
-      return () => {
+      return () =>
         document.removeEventListener("mousedown", handleClickOutside);
-      };
     }
   }, [isOpen, onClose]);
 
@@ -78,6 +116,7 @@ const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 text-4xl"
+            disabled={isLoading}
           >
             ×
           </button>
@@ -85,53 +124,80 @@ const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
 
         <p className="text-gray-600 mb-4">Create an account to get started</p>
 
-        <form onSubmit={handleSignUpSubmit}>
-          <input
-            type="text"
-            placeholder="Full Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md mb-3"
-            required
-          />
-          <input
-            type="email"
-            placeholder="Email address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md mb-3"
-            required
-          />
-          <div className="relative mb-3">
+        <form onSubmit={handleSignUpSubmit} className="space-y-4">
+          <div>
             <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              type="text"
+              name="name"
+              placeholder="Full Name"
+              value={formData.name}
+              onChange={handleInputChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               required
+              disabled={isLoading}
+            />
+          </div>
+
+          <div>
+            <input
+              type="email"
+              name="email"
+              placeholder="Email address"
+              value={formData.email}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              required
+              disabled={isLoading}
+            />
+          </div>
+
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md pr-10"
+              required
+              disabled={isLoading}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500"
+              disabled={isLoading}
             >
-              {showPassword ? <EyeClosed /> : <Eye />}
+              {showPassword ? <EyeClosed size={20} /> : <Eye size={20} />}
             </button>
           </div>
-          <input
-            type="text"
-            placeholder="Phone Number"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md mb-3"
-            required
-          />
+
+          <div>
+            <input
+              type="tel"
+              name="phoneNumber"
+              placeholder="Phone Number"
+              value={formData.phoneNumber}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              required
+              disabled={isLoading}
+            />
+          </div>
+
           <button
             type="submit"
-            className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-800"
+            disabled={isLoading}
+            className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
           >
-            Sign Up
+            {isLoading ? (
+              <>
+                <Loader2 className="animate-spin" size={20} />
+                <span>Creating Account...</span>
+              </>
+            ) : (
+              <span>Sign Up</span>
+            )}
           </button>
         </form>
       </div>

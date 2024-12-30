@@ -26,7 +26,7 @@ app.use(
     credentials: true,
     origin:
     	process.env.NODE_ENV == "development"
-    		? "http://localhost:5175"
+    		? "http://localhost:5173"
     		: "someurl",
   })
 );

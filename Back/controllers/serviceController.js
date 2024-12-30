@@ -147,7 +147,7 @@ const getSalonServices = async (req, res) => {
     const services = await prisma.$queryRaw`SELECT * FROM "Service" WHERE "salonId" = ${salonId}`;
 
     if (services.length === 0) {
-      return res.status(404).json({ error: "Services not found" });
+      return res.status(200).json({ msg: "No services found for this salon", data: [] });
     }
 
     res.status(200).json({ msg: "All services of the salon", data: services });

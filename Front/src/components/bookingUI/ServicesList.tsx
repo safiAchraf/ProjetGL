@@ -53,6 +53,9 @@ const ServiceList = ({
                 onSelect={onServiceSelect}
               />
             ))}
+          {services?.filter((service) => service.categoryId === category.id).length === 0 && (
+            <p className="pl-8 mb-4 text-gray-600">No services found for this salon in this category.</p>
+          )}
         </div>
       ))}
     </div>

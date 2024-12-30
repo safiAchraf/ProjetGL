@@ -42,7 +42,7 @@ const ServiceCard = ({ service, isSelected, onSelect }: Props) => {
           <h3 className="flex gap-1 font-medium text-lg">
             {service.name}
             {service.inHouse === true && (
-              <span className="self-end text-xs text-green-700 pb-1 pl-3">
+              <span className="self-end text-xs text-green-700 pb-1">
                 (Service Available at Home)
               </span>
             )}

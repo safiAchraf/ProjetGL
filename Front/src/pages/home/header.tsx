@@ -10,17 +10,15 @@ import { Link as RouterLink } from "react-router";
 /* Utils */
 import AOS from "aos";
 
-/* Icons */
+/* Assets */
 import { IoIosMenu, IoIosClose } from "react-icons/io";
-
-/* Styles */
 import "aos/dist/aos.css";
 
-interface NavigationItem {
+type NavigationItem = {
   to: string;
   label: string;
   desktopOnly?: boolean;
-}
+};
 
 interface NavItemProps extends NavigationItem {
   onClick?: () => void;
@@ -28,9 +26,9 @@ interface NavItemProps extends NavigationItem {
 }
 
 const Header: React.FC = () => {
+  const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
   const [isSignupModalOpen, setIsSignupModalOpen] = useState<boolean>(false);
-  const [menuOpen, setMenuOpen] = useState<boolean>(false);
 
   AOS.init({
     duration: 700,
@@ -69,7 +67,7 @@ const Header: React.FC = () => {
     );
   };
 
-  const MobileMenu: React.FC = () => (
+  const MobileMenu = () => (
     <div className="lg:hidden duration-500 block absolute top-24 left-0 right-0 bg-gray-50 transition-opacity text-black z-10">
       <ul className="text-center text-2xl p-20 flex flex-col items-center gap-4">
         {navigationItems.map((item) => (

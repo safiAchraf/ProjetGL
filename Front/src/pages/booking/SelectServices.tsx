@@ -1,10 +1,11 @@
 /* Hooks */
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import useBooking from "../../hooks/useBooking";
 
 /* Components */
 import Header from "../../components/bookingUI/BookingHeader";
+import SidePanel from "../../components/bookingUI/sidePanel";
 import SalonInfo from "../../components/bookingUI/SalonInfo";
 import ServiceTabs from "../../components/bookingUI/ServiceTabs";
 import ServicesList from "../../components/bookingUI/ServicesList";
@@ -14,106 +15,188 @@ import { api } from "../../api/axios";
 import { toast } from "react-toastify";
 
 /* Types */
+import type { AxiosError } from "axios";
 import type { Category, Service } from "../../types/data";
-import type { CategoryRes } from "../../types/res";
+import type { CategoryRes, ErrorRes, ServicesRes } from "../../types/res";
+import type { Error } from "../../types/custom";
 
-const SelectService = () => {
+/* Assets */
+import { Loader2 } from "lucide-react";
+
+const SelectServices = () => {
+  const [error, setError] = useState<Error | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
   const [activeCategory, setActiveCategory] = useState<string>("");
+  const [isLoadingServices, setIsLoadingServices] = useState<boolean>(true);
+  const [isLoadingCategories, setIsLoadingCategories] = useState<boolean>(true);
 
   const { selectedSalon, selectedServices, setSelectedServices } = useBooking();
   const navigate = useNavigate();
 
-  const handleServiceSelect = (service: Service) => {
-    setSelectedServices((prevSelected: Service[]) => {
-      const isAlreadySelected = prevSelected.some(
-        (s: Service) => s.id === service.id
-      );
+  const handleServiceSelect = useCallback(
+    (service: Service) => {
+      setSelectedServices((prevSelected: Service[]) => {
+        const isAlreadySelected = prevSelected.some((s) => s.id === service.id);
+        return isAlreadySelected
+          ? prevSelected.filter((s) => s.id !== service.id)
+          : [...prevSelected, service];
+      });
+    },
+    [setSelectedServices]
+  );
 
-      if (isAlreadySelected) {
-        return prevSelected.filter((s: Service) => s.id !== service.id);
-      } else {
-        return [...prevSelected, service];
-      }
-    });
-  };
+  const fetchCategories = useCallback(async () => {
+    setIsLoadingCategories(true);
+    setError(null);
 
-  const fetchCategories = async () => {
     try {
       const response = await api.get<CategoryRes>("/visitor/categories");
-      if (response.status !== 200) {
-        throw new Error("Failed to fetch categories.");
+
+      const fetchedCategories = response.data.categories;
+      if (!fetchedCategories?.length) {
+        setError({ status: 404, message: "No service categories available." });
+        return;
       }
 
-      const categories = response.data.categories;
-      setCategories(categories);
-      setActiveCategory(categories[0]?.name || "");
-    } catch (error) {
-      toast.error(`Unable to fetch categories. Refreshing!.`, {
-        position: "bottom-center",
-        autoClose: 5000,
-        closeOnClick: true,
-        draggable: true,
-        pauseOnHover: true,
-        onClose: () => {
-          window.location.reload();
-        },
-      });
-
-      console.log(error);
+      setCategories(fetchedCategories);
+      setActiveCategory(fetchedCategories[0]?.name || "");
+    } catch (err) {
+      const error = err as AxiosError;
+      setError({ message: "Unable to fetch service categories." });
+      toast.error(
+        (error.response?.data as ErrorRes)?.message ||
+          "Failed to load categories. Please try again."
+      );
+    } finally {
+      setIsLoadingCategories(false);
     }
-  };
-
-  useEffect(() => {
-    fetchCategories();
   }, []);
 
+  const fetchServices = useCallback(async () => {
+    if (!selectedSalon.id) return;
+
+    setIsLoadingServices(true);
+    setError(null);
+
+    try {
+      const response = await api.get<ServicesRes>(
+        `/visitor/services/salon/${selectedSalon.id}`
+      );
+      setServices(response.data.data);
+    } catch (err) {
+      const error = err as AxiosError;
+      setError({ message: "Unable to fetch services." });
+      toast.error(
+        (error.response?.data as ErrorRes)?.message ||
+          "Failed to load services. Please try again."
+      );
+    } finally {
+      setIsLoadingServices(false);
+    }
+  }, [selectedSalon.id]);
+
   useEffect(() => {
-    if (selectedSalon.id === "") {
+    Promise.all([fetchCategories(), fetchServices()]);
+  }, [fetchCategories, fetchServices]);
+
+  useEffect(() => {
+    if (!selectedSalon.id) {
       navigate("/booking/");
     }
   }, [selectedSalon.id, navigate]);
 
+  const handleCategoryChange = useCallback(
+    (category: string) => {
+      setActiveCategory(category);
+      const categoryElement = document.getElementById(
+        categories.find((cat) => cat.name === category)?.id || ""
+      );
+      if (categoryElement) {
+        categoryElement.scrollIntoView({ behavior: "smooth" });
+      }
+    },
+    [categories]
+  );
+
+  const renderContent = () => {
+    if (isLoadingCategories || isLoadingServices) {
+      return (
+        <div className="flex-1 flex items-center justify-center min-h-[400px]">
+          <div className="flex flex-col items-center space-y-4">
+            <Loader2 className="w-8 h-8 animate-spin text-gray-700" />
+            <p className="text-gray-600">Loading services...</p>
+          </div>
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="flex-1 flex items-center justify-center min-h-[400px]">
+          <div className="text-center space-y-4">
+            <p className="text-gray-600">{error.message}</p>
+            {error.status !== 404 && (
+              <button
+                onClick={() =>
+                  Promise.all([fetchCategories(), fetchServices()])
+                }
+                className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+              >
+                Retry
+              </button>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <>
+        <ServiceTabs
+          categories={categories.map((cat) => cat.name)}
+          activeCategory={activeCategory}
+          onCategoryChange={handleCategoryChange}
+        />
+
+        <main className="py-6 flex gap-6">
+          <section className="flex-grow">
+            <ServicesList
+              categories={categories}
+              services={services}
+              selectedServices={selectedServices}
+              onServiceSelect={handleServiceSelect}
+            />
+          </section>
+
+          <aside className="md:w-80 fixed bottom-0 left-0 right-0 md:static shadow-lg md:shadow-none">
+            <div className="md:sticky md:top-4">
+              <SidePanel
+                onContinue={() => navigate("/booking/reservation")}
+                currentPage="selectServices"
+              />
+            </div>
+          </aside>
+        </main>
+      </>
+    );
+  };
+
   return (
-    <div>
+    <div className="min-h-screen flex flex-col">
       <Header
         title=""
         breadcrumbs={["Salons", "Services", "Reservation", "Confirm"]}
         selectedCrumbs={["Salons", "Services"]}
       />
 
-      <SalonInfo salon={selectedSalon} />
-
-      <h1 className="text-4xl font-medium mt-8 mb-4">Select Services</h1>
-
-      <ServiceTabs
-        categories={categories.map((cat) => cat.name)}
-        activeCategory={activeCategory}
-        onCategoryChange={setActiveCategory}
-      />
-
-      <main className="py-6 flex gap-6">
-        <section className="flex-grow">
-          <ServicesList
-            categories={categories}
-            selectedServices={selectedServices}
-            onServiceSelect={handleServiceSelect}
-          />
-        </section>
-
-        <aside className="md:w-80 fixed bottom-0 left-0 right-0 md:static">
-          <div className="md:sticky md:top-4">
-            {/* <SidePanel
-              selectedSalon={selectedSalon}
-              selectedServices={selectedServices}
-              onContinue={() => navigate("/booking/reservation")}
-              currentPage="selectServices"
-            /> */}
-          </div>
-        </aside>
-      </main>
+      <div className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8">
+        <SalonInfo salon={selectedSalon} />
+        <h1 className="text-4xl font-medium mt-8 mb-4">Select Services</h1>
+        {renderContent()}
+      </div>
     </div>
   );
 };
 
-export default SelectService;
+export default SelectServices;

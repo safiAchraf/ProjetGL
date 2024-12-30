@@ -1,12 +1,15 @@
+/* Hooks */
 import { useNavigate } from "react-router";
+
+/* Assets */
 import { ArrowLeft, Home, Lock } from "lucide-react";
 
 const UnauthorizedAccess = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="text-center p-8 max-w-md">
+    <main className="min-h-screen flex items-center justify-center bg-gray-50">
+      <section className="text-center p-8 max-w-md">
         <div className="mb-6 flex justify-center">
           <div className="p-4 bg-red-100 rounded-full">
             <Lock className="w-12 h-12 text-red-500" />
@@ -36,8 +39,8 @@ const UnauthorizedAccess = () => {
             Back to Home
           </button>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 };
 

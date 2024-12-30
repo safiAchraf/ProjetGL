@@ -1,17 +1,20 @@
 /* Hooks */
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import useBooking from "../../hooks/useBooking";
 
 /* Components */
 import Header from "../../components/bookingUI/BookingHeader";
 import SalonCard from "../../components/bookingUI/SalonCard";
-import { toast } from "react-toastify";
 
 /* Utils */
 import { api } from "../../api/axios";
+import { toast } from "react-toastify";
+
+/* Types */
+import type { Error } from "../../types/custom";
 import type { Salon } from "../../types/data";
-import type { SalonRes, ErrorRes } from "../../types/res";
+import type { SalonRes } from "../../types/res";
 import type { AxiosError } from "axios";
 
 /* Assets */
@@ -20,11 +23,11 @@ import { Loader2 } from "lucide-react";
 const SelectSalon = () => {
   const [salons, setSalons] = useState<Salon[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<Error | null>(null);
   const { selectedSalon, setSelectedSalon } = useBooking();
   const navigate = useNavigate();
 
-  const fetchSalons = async () => {
+  const fetchSalons = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
@@ -33,97 +36,83 @@ const SelectSalon = () => {
       const fetchedSalons = response.data.data;
 
       if (fetchedSalons.length === 0) {
-        setError("No salons available at the moment.");
+        setError({
+          status: 404,
+          message: "No salons available at the moment.",
+        });
         return;
       }
 
       setSalons(fetchedSalons);
+    } catch (err) {
+      const error = err as AxiosError;
 
-      if (!selectedSalon.id && fetchedSalons.length > 0) {
-        setSelectedSalon(fetchedSalons[0]);
-      }
-    } catch (error) {
-      const err = error as AxiosError;
-
-      if (err.response) {
-        toast.error(
-          (err.response.data as ErrorRes).message ||
-            "An unexpected error occurred."
-        );
-      } else if (err.request) {
-        toast.error(
-          "Unable to connect to the server. Please check your internet connection."
-        );
+      if (error.status === 404) {
+        setError({
+          status: 404,
+          message: "No salons available at the moment.",
+        });
       } else {
+        setError({
+          message: error.message,
+        });
         toast.error("An unexpected error occurred. Please try again.");
       }
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (salons.length > 0 && !selectedSalon.id) {
+      setSelectedSalon(salons[0]);
+    }
+  }, [salons, selectedSalon.id, setSelectedSalon]);
 
   useEffect(() => {
     fetchSalons();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchSalons]);
 
   const handleContinue = () => {
     if (!selectedSalon.id) {
       toast.warning("Please select a salon to continue");
       return;
     }
+
     navigate("/booking/services");
   };
 
-  if (isLoading) {
-    return (
-      <main className="min-h-screen flex flex-col">
-        <Header
-          title="Salons"
-          breadcrumbs={["Salons", "Services", "Reservation", "Confirm"]}
-          selectedCrumbs={["Salons"]}
-        />
+  const renderContent = () => {
+    if (isLoading) {
+      return (
         <div className="flex-1 flex items-center justify-center">
           <div className="flex flex-col items-center space-y-4">
             <Loader2 className="w-8 h-8 animate-spin text-gray-700" />
             <p className="text-gray-600">Loading salons...</p>
           </div>
         </div>
-      </main>
-    );
-  }
+      );
+    }
 
-  if (error) {
-    return (
-      <main className="min-h-screen flex flex-col">
-        <Header
-          title="Salons"
-          breadcrumbs={["Salons", "Services", "Reservation", "Confirm"]}
-          selectedCrumbs={["Salons"]}
-        />
+    if (error) {
+      return (
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center space-y-4">
-            <p className="text-gray-600">{error}</p>
-            <button
-              onClick={fetchSalons}
-              className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
-            >
-              Retry
-            </button>
+            <p className="text-gray-600">{error.message}</p>
+            {error.status !== 404 && (
+              <button
+                onClick={fetchSalons}
+                className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+              >
+                Retry
+              </button>
+            )}
           </div>
         </div>
-      </main>
-    );
-  }
+      );
+    }
 
-  return (
-    <main className="min-h-full relative pb-24">
-      <Header
-        title="Salons"
-        breadcrumbs={["Salons", "Services", "Reservation", "Confirm"]}
-        selectedCrumbs={["Salons"]}
-      />
-
+    return (
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {salons.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -142,6 +131,18 @@ const SelectSalon = () => {
           </div>
         )}
       </section>
+    );
+  };
+
+  return (
+    <main className="min-h-full flex flex-col relative pb-24">
+      <Header
+        title="Salons"
+        breadcrumbs={["Salons", "Services", "Reservation", "Confirm"]}
+        selectedCrumbs={["Salons"]}
+      />
+
+      {renderContent()}
 
       <button
         onClick={handleContinue}

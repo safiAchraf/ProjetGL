@@ -1,43 +1,22 @@
-/* Hooks */
-import { useEffect, useState } from "react";
-import useBooking from "../../hooks/useBooking";
-
 /* Components */
 import ServiceCard from "./serviceCard";
 
 /* Utils */
-import { api } from "../../api/axios";
 import type { Category, Service } from "../../types/data";
-import type { ServicesRes } from "../../types/res";
+
 interface Props {
   categories: Category[];
+  services: Service[];
   selectedServices: Service[];
   onServiceSelect: (service: Service) => void;
 }
 
 const ServiceList = ({
   categories,
+  services,
   selectedServices,
   onServiceSelect,
 }: Props) => {
-  const [services, setServices] = useState<Service[] | null>(null);
-  const { selectedSalon } = useBooking();
-
-  const fetchServices = async (): Promise<void> => {
-    const response = await api.get<ServicesRes>(
-      `/visitor/services/salon/${selectedSalon.id}`
-    );
-    const services = response.data.data;
-
-    setServices(services);
-    console.log(services, categories);
-  };
-
-  useEffect(() => {
-    fetchServices();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <div>
       {categories.map((category, index) => (
@@ -53,8 +32,11 @@ const ServiceList = ({
                 onSelect={onServiceSelect}
               />
             ))}
-          {services?.filter((service) => service.categoryId === category.id).length === 0 && (
-            <p className="pl-8 mb-4 text-gray-600">No services found for this salon in this category.</p>
+          {services?.filter((service) => service.categoryId === category.id)
+            .length === 0 && (
+            <p className="pl-8 mb-4 text-gray-600">
+              No services found for this salon in this category.
+            </p>
           )}
         </div>
       ))}

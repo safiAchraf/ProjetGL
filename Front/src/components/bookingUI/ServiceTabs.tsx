@@ -4,7 +4,7 @@ import { Link } from "react-scroll";
 interface Props {
   categories: string[];
   activeCategory: string;
-  onCategoryChange: React.Dispatch<React.SetStateAction<string>>;
+  onCategoryChange: (category: string) => void;
 }
 
 const ServiceTabs = ({

@@ -1,5 +1,6 @@
 /* Hooks */
-import { useState } from "react";
+import { useEffect } from "react";
+import { useNavigate } from "react-router";
 import useBooking from "../../hooks/useBooking";
 
 /* Components */
@@ -26,11 +27,13 @@ const SidePanel = ({
   currentPage,
   onContinue,
 }: Props) => {
-  const [inHouseServices, setInHouseServices] = useState<{
-    [key: string]: boolean;
-  }>({});
-
-  const { selectedSalon, selectedServices } = useBooking();
+  const {
+    selectedSalon,
+    selectedServices,
+    inHouseServices,
+    setInHouseServices,
+  } = useBooking();
+  const navigate = useNavigate();
 
   const calculateTotalPrice = () => {
     return selectedServices.reduce((sum, service) => {
@@ -57,11 +60,21 @@ const SidePanel = ({
     return false;
   };
 
+  useEffect(() => {
+    if (selectedSalon.id === "") {
+      navigate("/booking");
+    }
+
+    if (selectedServices.length === 0) {
+      navigate("/booking/services");
+    }
+  }, [navigate, selectedSalon.id, selectedServices.length]);
+
   return (
     <div className="bg-white shadow-md md:rounded-lg overflow-hidden">
       <div className="p-4 hidden md:block">
         <div className="flex items-center mb-4">
-          {selectedSalon.pictures[0].url ? (
+          {selectedSalon.pictures[0] ? (
             <img
               src={selectedSalon.pictures[0].url}
               className="w-[5.35rem] max-h-16 rounded-full object-cover mr-3"

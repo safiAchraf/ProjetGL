@@ -6,6 +6,12 @@ type BookingContextType = {
   setSelectedSalon: React.Dispatch<React.SetStateAction<Salon>>;
   selectedServices: Service[];
   setSelectedServices: React.Dispatch<React.SetStateAction<Service[]>>;
+  inHouseServices: { [key: string]: boolean };
+  setInHouseServices: React.Dispatch<
+    React.SetStateAction<{
+      [key: string]: boolean;
+    }>
+  >;
 };
 
 const BookingContext = createContext<BookingContextType | undefined>(undefined);
@@ -32,6 +38,9 @@ export const BookingProvider: React.FC<BookingProviderProps> = ({
     rating: null,
   });
   const [selectedServices, setSelectedServices] = useState<Service[]>([]);
+  const [inHouseServices, setInHouseServices] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   return (
     <BookingContext.Provider
@@ -40,6 +49,8 @@ export const BookingProvider: React.FC<BookingProviderProps> = ({
         setSelectedSalon,
         selectedServices,
         setSelectedServices,
+        inHouseServices,
+        setInHouseServices,
       }}
     >
       {children}

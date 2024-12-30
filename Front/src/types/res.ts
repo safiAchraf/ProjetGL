@@ -38,6 +38,10 @@ export type ServicesRes = {
   data: Service[];
 };
 
+export type AvailableHoursRes = {
+  availableHours: number[];
+};
+
 export type ErrorRes = {
   message: string;
   data: null;

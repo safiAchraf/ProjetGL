@@ -2,7 +2,7 @@
 import { useNavigate } from "react-router";
 
 /* Assets */
-import { ArrowLeft, Home, Lock } from "lucide-react";
+import { Home, Lock } from "lucide-react";
 
 const UnauthorizedAccess = () => {
   const navigate = useNavigate();
@@ -24,13 +24,6 @@ const UnauthorizedAccess = () => {
         </p>
 
         <div className="space-y-4">
-          <button
-            onClick={() => navigate(-1)}
-            className="w-9/12 mx-auto bg-gray-100 text-gray-700 py-2 px-8 pr-12 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center justify-center gap-2"
-          >
-            <ArrowLeft />
-            Go Back
-          </button>
           <button
             onClick={() => navigate("/")}
             className="w-9/12 mx-auto bg-gray-100 text-gray-700 py-2 px-8 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center justify-center gap-2"

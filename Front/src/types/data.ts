@@ -46,3 +46,12 @@ export type Category = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type User = {
+  id: string;
+  email: string;
+  name: string;
+  phoneNumber: string;
+  createdAt: string;
+  updatedAt: string;
+};

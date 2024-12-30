@@ -19,9 +19,13 @@ import SelectSalon from "./pages/booking/SelectSalon.tsx";
 import SelectServices from "./pages/booking/SelectServices.tsx";
 import SelectTime from "./pages/booking/SelectTime.tsx";
 
+/* Dashboard Page */
+import Dashboard from "./pages/dashboard/Dashboard.tsx";
+
 /* Components */
 import NotFound from "./pages/NotFound.tsx";
 import UnauthorizedAccess from "./pages/UnauthorizedAccess.tsx";
+import ProtectedRoute from "./components/ProtectedRoute.tsx";
 
 /* Styles */
 import "./index.css";
@@ -38,6 +42,16 @@ const router = createBrowserRouter([
   {
     path: "/unauthorized",
     element: <UnauthorizedAccess />,
+  },
+  {
+    path: "/dashboard",
+    element: <ProtectedRoute />,
+    children: [
+      {
+        index: true,
+        element: <Dashboard />,
+      },
+    ],
   },
   {
     path: "/booking",

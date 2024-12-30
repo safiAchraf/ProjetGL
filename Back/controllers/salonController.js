@@ -50,8 +50,8 @@ const createSalon = async (req, res) => {
   }
   try {
     const [newSalon] = await prisma.$queryRaw`
-      INSERT INTO "Salon" (id, name, description, address, city, "phoneNumber", "ownerId", "createdAt", "updatedAt")
-      VALUES (${uuidv4()}, ${name}, ${description}, ${address}, ${city}, ${phoneNumber}, ${ownerId}, NOW(), NOW())
+      INSERT INTO "Salon" (id, name, description, address, city, "phoneNumber", "ownerId", "createdAt", "updatedAt" , rating)
+      VALUES (${uuidv4()}, ${name}, ${description}, ${address}, ${city}, ${phoneNumber}, ${ownerId}, NOW(), NOW() , 0)
       RETURNING *`;
       console.log(newSalon);
     

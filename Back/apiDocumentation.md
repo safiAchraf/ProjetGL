@@ -618,7 +618,7 @@
   }
   ```
 
-### GET /api/reservation/user/:id
+### GET /api/reservation/user
 
 **Description:** Get all reservations by user ID
 
@@ -734,7 +734,7 @@
   }
   ```
 
-### GET /api/reservation/available/:day/:month
+### GET /api/reservation/available/:salonId/:day/:month
 
 **Description:** Get available hours for a specific day and month
 
@@ -791,6 +791,7 @@
 	"startTime": "string",
 	"coupon": "string",
 	"paymentType": "string"
+	"inHouse" : boolean
 }
 ```
 
@@ -824,7 +825,7 @@
   }
   ```
 
-### PUT /api/reservation/:id
+### PUT /api/reservation/:reservationid
 
 **Description:** Update a reservation
 
@@ -871,7 +872,7 @@
   }
   ```
 
-### DELETE /api/reservation/:id
+### DELETE /api/reservation/:reservationid
 
 **Description:** Delete a reservation
 
@@ -890,18 +891,590 @@
   }
   ```
 
-## Other Routes
+# Coupon API Documentation
 
-### GET /
+## Endpoints
 
-**Description:** Welcome route
+### Get All Coupons
+**URL:** `/api/coupon/`
+
+**Method:** `GET`
+
+**Description:** Retrieves all coupons.
 
 **Response:**
-
-- 200 OK: Returns "Hello World".
+- **200 OK:** 
   ```json
   {
-  	"message": "Hello World"
+    "msg": "All coupons",
+    "data": [
+      {
+        "id": "string",
+        "code": "string",
+        "discount": "number",
+        "salonId": "string",
+        "createdAt": "string",
+        "updatedAt": "string"
+      },
+      ...
+    ]
+  }
+  ```
+- **404 Not Found:** 
+  ```json
+  {
+    "error": "No coupons found"
+  }
+  ```
+- **500 Internal Server Error:** 
+  ```json
+  {
+    "error": "string"
+  }
+  ```
+
+### Create New Coupon
+**URL:** `/api/coupon/:salonid`
+
+**Method:** `POST`
+
+**Description:** Creates a new coupon for a salon.
+
+**Request Body:**
+```json
+{
+  "code": "string",
+  "discount": "number"
+}
+```
+
+**Response:**
+- **201 Created:** 
+  ```json
+  {
+    "msg": "Coupon created",
+    "data": {
+      "id": "string",
+      "code": "string",
+      "discount": "number",
+      "salonId": "string",
+      "createdAt": "string",
+      "updatedAt": "string"
+    }
+  }
+  ```
+- **400 Bad Request:** 
+  ```json
+  {
+    "msg": "Missing required fields"
+  }
+  ```
+- **403 Forbidden:** 
+  ```json
+  {
+    "error": "You are not authorized to create coupons for this salon"
+  }
+  ```
+- **409 Conflict:** 
+  ```json
+  {
+    "error": "Coupon already exists"
+  }
+  ```
+- **500 Internal Server Error:** 
+  ```json
+  {
+    "error": "string"
+  }
+  ```
+
+### Update Coupon
+**URL:** `/api/coupon/:couponid`
+
+**Method:** `PUT`
+
+**Description:** Updates an existing coupon.
+
+**Request Body:**
+```json
+{
+  "code": "string",
+  "discount": "number"
+}
+```
+
+**Response:**
+- **200 OK:** 
+  ```json
+  {
+    "msg": "Coupon updated",
+    "data": {
+      "id": "string",
+      "code": "string",
+      "discount": "number",
+      "salonId": "string",
+      "createdAt": "string",
+      "updatedAt": "string"
+    }
+  }
+  ```
+- **403 Forbidden:** 
+  ```json
+  {
+    "error": "You are not authorized to update this coupon"
+  }
+  ```
+- **404 Not Found:** 
+  ```json
+  {
+    "error": "Coupon not found"
+  }
+  ```
+- **500 Internal Server Error:** 
+  ```json
+  {
+    "error": "string"
+  }
+  ```
+
+### Delete Coupon
+**URL:** `/api/coupon/:couponid`
+
+**Method:** `DELETE`
+
+**Description:** Deletes an existing coupon.
+
+**Response:**
+- **200 OK:** 
+  ```json
+  {
+    "msg": "Coupon deleted"
+  }
+  ```
+- **403 Forbidden:** 
+  ```json
+  {
+    "error": "You are not authorized to delete this coupon"
+  }
+  ```
+- **404 Not Found:** 
+  ```json
+  {
+    "error": "Coupon not found"
+  }
+  ```
+- **500 Internal Server Error:** 
+  ```json
+  {
+    "error": "string"
+  }
+  ```
+
+### Get Coupon
+**URL:** `/api/coupon/:couponid`
+
+**Method:** `GET`
+
+**Description:** Retrieves a specific coupon by ID.
+
+**Response:**
+- **200 OK:** 
+  ```json
+  {
+    "id": "string",
+    "code": "string",
+    "discount": "number",
+    "salonId": "string",
+    "createdAt": "string",
+    "updatedAt": "string"
+  }
+  ```
+- **404 Not Found:** 
+  ```json
+  {
+    "error": "Coupon not found"
+  }
+  ```
+- **500 Internal Server Error:** 
+  ```json
+  {
+    "error": "string"
+  }
+  ```
+
+### Get Salon Coupons
+**URL:** `/api/coupon/salon/:salonid`
+
+**Method:** `GET`
+
+**Description:** Retrieves all coupons for a specific salon.
+
+**Response:**
+- **200 OK:** 
+  ```json
+  {
+    "msg": "All coupons of the salon",
+    "data": [
+      {
+        "id": "string",
+        "code": "string",
+        "discount": "number",
+        "salonId": "string",
+        "createdAt": "string",
+        "updatedAt": "string"
+      },
+      ...
+    ]
+  }
+  ```
+- **404 Not Found:** 
+  ```json
+  {
+    "error": "Salon not found"
+  }
+  ```
+  ```json
+  {
+    "error": "No coupons found for this salon"
+  }
+  ```
+- **500 Internal Server Error:** 
+  ```json
+  {
+    "error": "string"
+  }
+  ```
+  
+
+  # Review API Documentation
+
+## Endpoints
+
+### Get All Reviews
+**URL:** `/api/review/`
+
+**Method:** `GET`
+
+**Description:** Retrieves all reviews.
+
+**Response:**
+- **200 OK:** 
+  ```json
+  {
+    "msg": "All Reviews",
+    "data": [
+      {
+        "id": "string",
+        "rating": "number",
+        "comment": "string",
+        "customerId": "string",
+        "salonId": "string",
+        "createdAt": "string",
+        "updatedAt": "string"
+      },
+      ...
+    ]
+  }
+  ```
+- **404 Not Found:** 
+  ```json
+  {
+    "error": "Reviews not found"
+  }
+  ```
+- **500 Internal Server Error:** 
+  ```json
+  {
+    "error": "string"
+  }
+  ```
+
+### Create New Review
+**URL:** `/api/review/:salonid`
+
+**Method:** `POST`
+
+**Description:** Creates a new review for a salon.
+
+**Request Body:**
+```json
+{
+  "rating": "number",
+  "comment": "string"
+}
+```
+
+**Response:**
+- **201 Created:** 
+  ```json
+  {
+    "msg": "Review posted",
+    "data": {
+      "id": "string",
+      "rating": "number",
+      "comment": "string",
+      "customerId": "string",
+      "salonId": "string",
+      "createdAt": "string",
+      "updatedAt": "string"
+    }
+  }
+  ```
+- **400 Bad Request:** 
+  ```json
+  {
+    "msg": "Missing required fields"
+  }
+  ```
+- **401 Unauthorized:** 
+  ```json
+  {
+    "msg": "You can't review your own salon"
+  }
+  ```
+- **404 Not Found:** 
+  ```json
+  {
+    "msg": "Salon not found"
+  }
+  ```
+- **500 Internal Server Error:** 
+  ```json
+  {
+    "error": "string"
+  }
+  ```
+
+### Update Review
+**URL:** `/api/review/:reivewid`
+
+**Method:** `PUT`
+
+**Description:** Updates an existing review.
+
+**Request Body:**
+```json
+{
+  "rating": "number",
+  "comment": "string"
+}
+```
+
+**Response:**
+- **200 OK:** 
+  ```json
+  {
+    "msg": "Review updated",
+    "data": {
+      "id": "string",
+      "rating": "number",
+      "comment": "string",
+      "customerId": "string",
+      "salonId": "string",
+      "createdAt": "string",
+      "updatedAt": "string"
+    }
+  }
+  ```
+- **401 Unauthorized:** 
+  ```json
+  {
+    "msg": "You are not authorized to update comments other than yours"
+  }
+  ```
+- **404 Not Found:** 
+  ```json
+  {
+    "error": "no review found"
+  }
+  ```
+- **500 Internal Server Error:** 
+  ```json
+  {
+    "error": "string"
+  }
+  ```
+
+### Delete Review
+**URL:** `/api/review/:reviewid`
+
+**Method:** `DELETE`
+
+**Description:** Deletes an existing review.
+
+**Response:**
+- **200 OK:** 
+  ```json
+  {
+    "msg": "Review deleted"
+  }
+  ```
+- **401 Unauthorized:** 
+  ```json
+  {
+    "msg": "You are not authorized to delete comments other than yours"
+  }
+  ```
+- **404 Not Found:** 
+  ```json
+  {
+    "error": "Review not found"
+  }
+  ```
+- **500 Internal Server Error:** 
+  ```json
+  {
+    "error": "string"
+  }
+  ```
+
+### Get Review
+**URL:** `/api/review/:reviewid`
+
+**Method:** `GET`
+
+**Description:** Retrieves a specific review by ID.
+
+**Response:**
+- **200 OK:** 
+  ```json
+  {
+    "id": "string",
+    "rating": "number",
+    "comment": "string",
+    "customerId": "string",
+    "salonId": "string",
+    "createdAt": "string",
+    "updatedAt": "string"
+  }
+  ```
+- **404 Not Found:** 
+  ```json
+  {
+    "error": "Review not found"
+  }
+  ```
+- **500 Internal Server Error:** 
+  ```json
+  {
+    "error": "string"
+  }
+  ```
+
+### Get Personal Reviews
+**URL:** `/api/review/personalReviews`
+
+**Method:** `GET`
+
+**Description:** Retrieves all reviews made by the authenticated user.
+
+**Response:**
+- **200 OK:** 
+  ```json
+  {
+    "msg": "All reviews you have made",
+    "data": [
+      {
+        "id": "string",
+        "rating": "number",
+        "comment": "string",
+        "customerId": "string",
+        "salonId": "string",
+        "createdAt": "string",
+        "updatedAt": "string"
+      },
+      ...
+    ]
+  }
+  ```
+- **404 Not Found:** 
+  ```json
+  {
+    "error": "You haven't made any reviews"
+  }
+  ```
+- **500 Internal Server Error:** 
+  ```json
+  {
+    "error": "string"
+  }
+  ```
+
+### Get Salon Reviews
+**URL:** `/api/review/salonReviews/:salonid`
+
+**Method:** `GET`
+
+**Description:** Retrieves all reviews for a specific salon.
+
+**Response:**
+- **200 OK:** 
+  ```json
+  {
+    "msg": "All reviews you have made",
+    "data": [
+      {
+        "id": "string",
+        "rating": "number",
+        "comment": "string",
+        "customerId": "string",
+        "salonId": "string",
+        "createdAt": "string",
+        "updatedAt": "string"
+      },
+      ...
+    ]
+  }
+  ```
+- **404 Not Found:** 
+  ```json
+  {
+    "error": "No reviews have been made about this salon"
+  }
+  ```
+- **500 Internal Server Error:** 
+  ```json
+  {
+    "error": "string"
+  }
+  ```
+
+### Get Personal Salon Reviews
+**URL:** `/api/review/personalSalonReviews/:salonid`
+
+**Method:** `GET`
+
+**Description:** Retrieves all reviews made by the authenticated user for a specific salon.
+
+**Response:**
+- **200 OK:** 
+  ```json
+  {
+    "msg": "All reviews you have made for this salon",
+    "data": [
+      {
+        "id": "string",
+        "rating": "number",
+        "comment": "string",
+        "customerId": "string",
+        "salonId": "string",
+        "createdAt": "string",
+        "updatedAt": "string"
+      },
+      ...
+    ]
+  }
+  ```
+- **404 Not Found:** 
+  ```json
+  {
+    "error": "You haven't made any reviews about this salon"
+  }
+  ```
+- **500 Internal Server Error:** 
+  ```json
+  {
+    "error": "string"
   }
   ```
 
@@ -910,5 +1483,3 @@
 (not tested yet)
 
 - `/api/chargily`: Chargily routes
-- `/api/review`: Review routes (Private)
-- `/api/coupon`: Coupon routes (Private)

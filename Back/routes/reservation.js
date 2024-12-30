@@ -15,11 +15,11 @@ import {
 const router = express.Router();
 
 router.get("/", getAllReservations);
-router.get("/user/:id", getAllReservationsByUser);
+router.get("/user", getAllReservationsByUser);
 router.get("/confirmed", getConfirmedReservations);
 router.get("/cancelled", getCancelledReservations);
 router.get("/history", reservationHistory);
-router.get("/available/:day/:month", getAvailableHours);
+router.get("/available/:salonId/:day/:month", getAvailableHours);
 router.get("/:id", getReservationById);
 router.post("/:serviceId", createReservation);
 router.put("/:id", updateReservation);

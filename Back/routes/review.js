@@ -17,9 +17,9 @@ router.get("/", getAllReviews);
 router.post("/:id", createNewReview);
 router.put("/:id", updateReview);
 router.delete("/:id", deleteReview);
-router.get("oneReview/:id", getReview);
+router.get("/:id", getReview);
 
-router.get("personalReviews/:id", getPersonalReviews);
+router.get("personalReviews", getPersonalReviews);
 router.get("salonReviews/:id", getSalonReviews);
 router.get("personalSalonReviews/:id", getPersonalSalonReviews);
 

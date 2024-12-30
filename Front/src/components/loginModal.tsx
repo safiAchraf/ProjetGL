@@ -1,6 +1,7 @@
 /* Hooks */
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
+import useAuth from "../hooks/useAuth";
 
 /* Utils */
 import { api } from "../api/axios";
@@ -18,7 +19,6 @@ interface LoginModalProps {
 }
 
 const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -26,6 +26,9 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
+
+  const navigate = useNavigate();
+  const { setIsAuthenticated } = useAuth();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -55,27 +58,17 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
       });
 
       if (response.status === 200) {
+        setIsAuthenticated(true);
         toast.success("Login successful!");
         onClose();
-        resetForm();
-
         navigate("/dashboard");
       }
     } catch (error) {
       const errorResponse = error as AxiosError;
-
-      if (errorResponse.response) {
-        toast.error(
-          (errorResponse.response.data as ErrorRes).message ||
-            "An unexpected error occurred."
-        );
-      } else if (errorResponse.request) {
-        toast.error(
-          "Unable to connect to the server. Please check your internet connection."
-        );
-      } else {
-        toast.error("An unexpected error occurred. Please try again.");
-      }
+      toast.error(
+        (errorResponse.response?.data as ErrorRes)?.message ||
+          "An unexpected error occurred."
+      );
     } finally {
       resetForm();
       setIsLoading(false);

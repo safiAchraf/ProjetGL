@@ -1,7 +1,8 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-/* Provider */
+/* Context Providers */
+import { AuthProvider } from "./context/AuthContext.tsx";
 import { BookingProvider } from "./context/BookingContext.tsx";
 
 /* Router */
@@ -77,23 +78,25 @@ const root = document.getElementById("root")!;
 
 createRoot(root).render(
   <StrictMode>
-    <BookingProvider>
-      <>
-        <RouterProvider router={router} />
-        <ToastContainer
-          position="top-right"
-          autoClose={2000}
-          hideProgressBar={false}
-          newestOnTop
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-          limit={3}
-        />
-      </>
-    </BookingProvider>
+    <AuthProvider>
+      <BookingProvider>
+        <>
+          <RouterProvider router={router} />
+          <ToastContainer
+            position="top-right"
+            autoClose={2000}
+            hideProgressBar={false}
+            newestOnTop
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+            limit={3}
+          />
+        </>
+      </BookingProvider>
+    </AuthProvider>
   </StrictMode>
 );

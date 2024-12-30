@@ -1,5 +1,6 @@
 /* Hooks */
 import { useState } from "react";
+import useAuth from "../../hooks/useAuth";
 
 /* Components */
 import LoginModal from "../../components/loginModal";
@@ -29,6 +30,8 @@ const Header: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
   const [isSignupModalOpen, setIsSignupModalOpen] = useState<boolean>(false);
+
+  const { isAuthenticated } = useAuth();
 
   AOS.init({
     duration: 700,
@@ -73,18 +76,25 @@ const Header: React.FC = () => {
         {navigationItems.map((item) => (
           <NavItem key={item.to} {...item} />
         ))}
-        <NavItem
-          to=""
-          isButton
-          label="Login"
-          onClick={() => setIsLoginModalOpen(true)}
-        />
-        <NavItem
-          to=""
-          isButton
-          label="Signup"
-          onClick={() => setIsSignupModalOpen(true)}
-        />
+
+        {isAuthenticated ? (
+          <NavItem to="/dashboard" isButton label="Dashboard" />
+        ) : (
+          <>
+            <NavItem
+              to=""
+              isButton
+              label="Login"
+              onClick={() => setIsLoginModalOpen(true)}
+            />
+            <NavItem
+              to=""
+              isButton
+              label="Signup"
+              onClick={() => setIsSignupModalOpen(true)}
+            />
+          </>
+        )}
       </ul>
     </div>
   );
@@ -120,18 +130,28 @@ const Header: React.FC = () => {
             {navigationItems.map((item) => (
               <NavItem key={item.to} {...item} />
             ))}
-            <NavItem
-              to=""
-              isButton
-              label="Login"
-              onClick={() => setIsLoginModalOpen(true)}
-            />
-            <NavItem
-              to=""
-              isButton
-              label="Signup"
-              onClick={() => setIsSignupModalOpen(true)}
-            />
+            {isAuthenticated ? (
+              <RouterLink to="/dashboard">
+                <li className="transition ease-in-out duration-150 hover:cursor-pointer hover:scale-110 border-b-2 border-transparent hover:border-current">
+                  Dashboard
+                </li>
+              </RouterLink>
+            ) : (
+              <>
+                <NavItem
+                  to=""
+                  isButton
+                  label="Login"
+                  onClick={() => setIsLoginModalOpen(true)}
+                />
+                <NavItem
+                  to=""
+                  isButton
+                  label="Signup"
+                  onClick={() => setIsSignupModalOpen(true)}
+                />
+              </>
+            )}
           </ul>
         </div>
 

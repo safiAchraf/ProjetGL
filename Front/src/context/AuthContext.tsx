@@ -36,11 +36,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   }, []);
 
   const logout = async () => {
+    setIsLoading(true);
+
     try {
       await api.get("/api/auth/logout");
       setIsAuthenticated(false);
     } catch (error) {
       console.error("Logout failed:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 

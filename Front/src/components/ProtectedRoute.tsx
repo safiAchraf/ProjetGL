@@ -12,7 +12,7 @@ import UnauthorizedAccess from "../pages/UnauthorizedAccess";
 const ProtectedRoute: React.FC = () => {
   const { isAuthenticated } = useAuth();
 
-  if (isAuthenticated) {
+  if (!isAuthenticated) {
     return <UnauthorizedAccess />;
   }
 

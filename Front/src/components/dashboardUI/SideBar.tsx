@@ -30,7 +30,6 @@ import {
   Settings,
   User2,
   LogOut,
-  Loader2,
 } from "lucide-react";
 
 const DashboardSidebar = () => {
@@ -38,7 +37,7 @@ const DashboardSidebar = () => {
 
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { isLoading, logout } = useAuth();
+  const { logout } = useAuth();
 
   const items = [
     { title: "Home", url: "/dashboard", icon: Home },
@@ -54,15 +53,6 @@ const DashboardSidebar = () => {
       console.error("Logout failed:", error);
     }
   };
-
-  if (isLoading) {
-    return (
-      <>
-        <Loader2 className="animate-spin" size={20} />
-        <span>Loading...</span>
-      </>
-    );
-  }
 
   return (
     <Sidebar>

@@ -17,13 +17,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        setIsLoading(true);
-
         await api.get("/api/auth/check");
         setIsAuthenticated(true);
       } catch (error) {

@@ -74,4 +74,25 @@ const logoutController = (req, res) => {
 		.json({ data: null, message: "Logged out successfully" });
 };
 
-export { loginController, registerController, logoutController };
+const checkAuth = async (req, res) => {
+	const token = req.cookies.authorization;
+	if (!token) {
+		return res.status(401).json({ message: "Unauthorized" });
+	}
+	try {
+		const decoded = jwt.verify(token, process.env.JWT_SECRET);
+		const [user] = await prisma.$queryRaw`
+	  SELECT * FROM "User" WHERE id = ${decoded.id}
+	`;
+		if (!user) {
+			return res.status(401).json({ message: "Unauthorized" });
+		}
+		res.status(200).json({ message: "Authorized" });
+	} catch (error) {
+		return res.status(401).json({ message: "Unauthorized" });
+	}
+}
+
+
+
+export { loginController, registerController, logoutController , checkAuth };

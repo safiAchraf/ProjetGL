@@ -28,7 +28,7 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
   const navigate = useNavigate();
-  const { setIsAuthenticated } = useAuth();
+  const { setIsAuthenticated, setUser } = useAuth();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -58,6 +58,9 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
       });
 
       if (response.status === 200) {
+        const data = response.data;
+        setUser(data.data);
+
         setIsAuthenticated(true);
         toast.success("Login successful!");
         onClose();

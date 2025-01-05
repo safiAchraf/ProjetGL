@@ -4,7 +4,12 @@ import { createContext, ReactNode, useEffect, useState } from "react";
 /* Utils */
 import { api } from "../api/axios";
 
+/* Types */
+import { User } from "../types/data";
+
 type AuthContextType = {
+  user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
   isAuthenticated: boolean;
   isLoading: boolean;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
@@ -16,6 +21,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
+  const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -45,12 +51,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       console.error("Logout failed:", error);
     } finally {
       setIsLoading(false);
+      setUser(null);
     }
   };
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, setIsAuthenticated, isLoading, logout }}
+      value={{
+        user,
+        setUser,
+        isAuthenticated,
+        setIsAuthenticated,
+        isLoading,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>

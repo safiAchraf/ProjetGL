@@ -1,5 +1,4 @@
 /* Hooks */
-import { useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import useAuth from "../../hooks/useAuth";
 
@@ -18,26 +17,27 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
 } from "../ui/dropdown-menu";
 import { NavLink } from "react-router";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 /* Icons */
 import {
-  ChevronUp,
   Clock,
   Home,
   List,
-  Settings,
-  User2,
   LogOut,
+  ChevronsUpDown,
+  Settings,
 } from "lucide-react";
 
 const DashboardSidebar = () => {
-  const [isDropdownMenuOpen, setIsDropdownMenuOpen] = useState<boolean>(false);
-
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
 
   const items = [
     { title: "Home", url: "/dashboard", icon: Home },
@@ -57,7 +57,15 @@ const DashboardSidebar = () => {
   return (
     <Sidebar>
       <SidebarHeader>
-        <h1 className="text-4xl p-4 text-center">DZ BEAUTY</h1>
+        <div className="flex gap-2 py-2 text-sidebar-accent-foreground ">
+          <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+            {/* LOGO */}
+          </div>
+          <div className="grid flex-1 text-left text-sm leading-tight">
+            <span className="truncate font-semibold">DZ BEAUTY</span>
+            <span className="truncate text-xs">Beauty, Redefined</span>
+          </div>
+        </div>
       </SidebarHeader>
       <SidebarContent className="mt-36">
         <SidebarMenu>
@@ -80,44 +88,77 @@ const DashboardSidebar = () => {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <DropdownMenu
-              open={isDropdownMenuOpen}
-              onOpenChange={setIsDropdownMenuOpen}
-            >
+            <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <SidebarMenuButton>
-                  <User2 className="w-5 h-5" />
-                  <span>Username</span>
-                  <ChevronUp className="ml-auto w-4 h-4" />
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                >
+                  <Avatar className="h-8 w-8 rounded-lg">
+                    <AvatarImage
+                      src={user?.avatar || ""}
+                      alt={user?.name || ""}
+                    />
+                    <AvatarFallback className="rounded-lg">
+                      {user?.name?.slice(0, 2)?.toUpperCase() || "CN"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-semibold">
+                      {user?.name || ""}
+                    </span>
+                    <span className="truncate text-xs">
+                      {user?.email || ""}
+                    </span>
+                  </div>
+                  <ChevronsUpDown className="ml-auto size-4" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
-
               <DropdownMenuContent
-                side="top"
-                align="start"
-                className="w-56 bg-white rounded-lg border border-gray-200 shadow-lg py-1 animate-in fade-in-0 zoom-in-95"
+                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                side="bottom"
+                align="end"
+                sideOffset={4}
               >
-                <DropdownMenuItem>
-                  <NavLink
-                    to="/dashboard/settings"
-                    className="flex items-center w-full px-3 py-2 text-sm text-gray-700"
-                    onClick={() => setIsDropdownMenuOpen(false)}
-                  >
-                    <Settings className="w-4 h-4 mr-2" />
-                    Settings
-                  </NavLink>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <button
-                    onClick={() => {
-                      setIsDropdownMenuOpen(false);
-                      handleLogout();
-                    }}
-                    className="flex items-center w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                  >
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Logout
-                  </button>
+                <DropdownMenuLabel className="p-0 font-normal">
+                  <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                    <Avatar className="h-8 w-8 rounded-lg">
+                      <AvatarImage
+                        src={user?.avatar || ""}
+                        alt={user?.name || ""}
+                      />
+                      <AvatarFallback className="rounded-lg">
+                        {user?.name?.slice(0, 2)?.toUpperCase() || "CN"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="grid flex-1 text-left text-sm leading-tight">
+                      <span className="truncate font-semibold">
+                        {user?.name || ""}
+                      </span>
+                      <span className="truncate text-xs">
+                        {" "}
+                        {user?.email || ""}
+                      </span>
+                    </div>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <Settings />
+                    Account
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  style={{
+                    cursor: "pointer",
+                    color: "red",
+                  }}
+                >
+                  <LogOut />
+                  Log out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

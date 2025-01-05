@@ -30,7 +30,7 @@ const SignupModal = ({ isOpen, onClose }: SignUpModalProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  const { setIsAuthenticated } = useAuth();
+  const { setIsAuthenticated, setUser } = useAuth();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -64,6 +64,9 @@ const SignupModal = ({ isOpen, onClose }: SignUpModalProps) => {
       });
 
       if (response.status === 200) {
+        const data = response.data;
+        setUser(data.data);
+
         setIsAuthenticated(true);
         toast.success("Account created successfully!");
         onClose();

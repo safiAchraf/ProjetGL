@@ -2,8 +2,9 @@ import prisma from "../prisma/client.js";
 
 export const getUser = async (req, res) => {
   try {
+    const userId = req.user.id;
     const [user] = await prisma.$queryRaw`
-      SELECT * FROM "User" WHERE id = ${req.params.id}
+      SELECT * FROM "User" WHERE id = ${userId}
     `;
     if (!user) {
       return res.status(404).json({ error: "User not found" });
@@ -17,10 +18,11 @@ export const getUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const { name, email, phoneNum } = req.body;
+    const userId = req.user.id;
     const [user] = await prisma.$queryRaw`
       UPDATE "User"
       SET name = ${name}, email = ${email}, "phoneNumber" = ${phoneNum}, "updatedAt" = now()
-      WHERE id = ${req.params.id}
+      WHERE id = ${userId}
       RETURNING *
     `;
     if (!user) {
@@ -34,8 +36,9 @@ export const updateUser = async (req, res) => {
 
 export const deleteUser = async (req, res) => {
   try {
+    const userId = req.user.id;
     const [user] = await prisma.$queryRaw`
-      DELETE FROM "User" WHERE id = ${req.params.id}
+      DELETE FROM "User" WHERE id = ${userId}
       RETURNING *
     `;
     if (!user) {

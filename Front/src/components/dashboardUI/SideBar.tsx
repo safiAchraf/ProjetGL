@@ -1,5 +1,5 @@
 /* Hooks */
-import { Link, useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import useAuth from "../../hooks/useAuth";
 
 /* Components */
@@ -145,13 +145,13 @@ const DashboardSidebar = () => {
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem className="cursor-pointer">
-                    <Link
+                    <NavLink
                       to="/dashboard/settings"
                       className="flex items-center gap-2"
                     >
                       <Settings />
                       <span>Account</span>
-                    </Link>
+                    </NavLink>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />

@@ -41,6 +41,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     checkAuth();
   }, []);
 
+  useEffect(() => {
+    const getUser = async () => {
+      try {
+        const response = await api.get("/api/user");
+        setUser(response.data);
+      } catch (error) {
+        console.log("Failed to fetch user data: " + error);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (!user && isAuthenticated) getUser();
+  }, [isAuthenticated, user]);
+
   const logout = async () => {
     setIsLoading(true);
 

@@ -4,6 +4,7 @@ import { useState } from "react";
 /* Components */
 import Carousel from "../carousel";
 import ReviewStars from "../review/ReviewStars";
+import { Link } from "react-scroll";
 
 /* Utils */
 import type { Review, Salon } from "../../types/data";
@@ -14,7 +15,7 @@ interface SalonInfoProps {
 }
 
 const SalonInfo = ({ salon }: SalonInfoProps) => {
-  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviews] = useState<Review[]>([]);
   const salonImages = salon.pictures.map((picture) => picture.url);
 
   return (
@@ -41,9 +42,17 @@ const SalonInfo = ({ salon }: SalonInfoProps) => {
         <Carousel images={salonImages} slidesToShow={1} />
       )}
 
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Reviews</h2>
+      <div className="text-right">
+        <h2 className="text-xl font-semibold mb-4 text-start">Reviews</h2>
         <ReviewsList reviews={reviews} limit={3} orientation={"horizontal"} />
+        <Link
+          to="reviews"
+          className="transition ease-in-out duration-50 hover:cursor-pointer"
+          spy={true}
+          smooth={true}
+        >
+          Show more...
+        </Link>
       </div>
     </section>
   );

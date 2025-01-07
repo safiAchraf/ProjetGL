@@ -1,6 +1,5 @@
 /* Hooks */
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router";
 import useAuth from "../hooks/useAuth";
 
 /* Utils */
@@ -27,7 +26,6 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  const navigate = useNavigate();
   const { setIsAuthenticated, setUser } = useAuth();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,7 +62,6 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
         setIsAuthenticated(true);
         toast.success("Login successful!");
         onClose();
-        navigate("/dashboard");
       }
     } catch (error) {
       const errorResponse = error as AxiosError;

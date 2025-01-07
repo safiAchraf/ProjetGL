@@ -16,12 +16,13 @@ import { toast } from "react-toastify";
 
 /* Types */
 import type { AxiosError } from "axios";
-import type { Category, Service } from "../../types/data";
+import type { Category, Review, Service } from "../../types/data";
 import type { CategoryRes, ErrorRes, ServicesRes } from "../../types/res";
 import type { Error } from "../../types/custom";
 
 /* Assets */
 import { Loader2 } from "lucide-react";
+import ReviewsList from "../../components/review/ReviewsList";
 
 const SelectServices = () => {
   const [error, setError] = useState<Error | null>(null);
@@ -30,6 +31,7 @@ const SelectServices = () => {
   const [activeCategory, setActiveCategory] = useState<string>("");
   const [isLoadingServices, setIsLoadingServices] = useState<boolean>(true);
   const [isLoadingCategories, setIsLoadingCategories] = useState<boolean>(true);
+  const [reviews] = useState<Review[]>([]);
 
   const { selectedSalon, selectedServices, setSelectedServices } = useBooking();
   const navigate = useNavigate();
@@ -178,6 +180,10 @@ const SelectServices = () => {
             </div>
           </aside>
         </main>
+        <div id="reviews">
+          <h2 className="text-xl font-semibold mb-4">Reviews</h2>
+          <ReviewsList reviews={reviews} limit={3} orientation={"horizontal"} />
+        </div>
       </>
     );
   };

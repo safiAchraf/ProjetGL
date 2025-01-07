@@ -1,6 +1,5 @@
 /* Hooks */
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router";
 import useAuth from "../hooks/useAuth";
 
 /* Utils */
@@ -19,7 +18,6 @@ interface SignUpModalProps {
 }
 
 const SignupModal = ({ isOpen, onClose }: SignUpModalProps) => {
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -70,7 +68,6 @@ const SignupModal = ({ isOpen, onClose }: SignUpModalProps) => {
         setIsAuthenticated(true);
         toast.success("Account created successfully!");
         onClose();
-        navigate("/dashboard");
       }
     } catch (error) {
       const errorResponse = error as AxiosError;

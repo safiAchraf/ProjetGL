@@ -14,6 +14,7 @@ import AOS from "aos";
 /* Assets */
 import { IoIosMenu, IoIosClose } from "react-icons/io";
 import "aos/dist/aos.css";
+import { ChevronDown, LogOut, Settings, User } from "lucide-react";
 
 type NavigationItem = {
   to: string;
@@ -30,8 +31,9 @@ const Header: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
   const [isSignupModalOpen, setIsSignupModalOpen] = useState<boolean>(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
 
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
 
   AOS.init({
     duration: 700,
@@ -43,6 +45,51 @@ const Header: React.FC = () => {
     { to: "Creations", label: "Creation" },
     { to: "Contacts", label: "Contacts" },
   ];
+
+  const UserDropdown = () => (
+    <div className="relative">
+      <button
+        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+        className="flex items-center gap-2 text-2xl transition ease-in-out duration-150 hover:scale-110"
+      >
+        <span className="capitalize">{user?.name}</span>
+        <ChevronDown
+          className={`w-5 h-5 transition-transform ${
+            isDropdownOpen ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      {isDropdownOpen && (
+        <div
+          className="absolute -right-30 mt-2 w-48 bg-white border-zinc-950 rounded-md shadow-lg py-1 text-black"
+          style={{
+            border: "1.2px solid black",
+          }}
+        >
+          <RouterLink to="/dashboard">
+            <button className="flex items-center gap-2 px-4 py-2 text-sm w-full hover:bg-gray-100">
+              <User className="w-4 h-4" />
+              Dashboard
+            </button>
+          </RouterLink>
+          <RouterLink to="/dashboard/settings">
+            <button className="flex items-center gap-2 px-4 py-2 text-sm w-full hover:bg-gray-100">
+              <Settings className="w-4 h-4" />
+              Settings
+            </button>
+          </RouterLink>
+          <button
+            onClick={logout}
+            className="flex items-center gap-2 px-4 py-2 text-sm w-full hover:bg-gray-100 text-red-600"
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </button>
+        </div>
+      )}
+    </div>
+  );
 
   const NavItem: React.FC<NavItemProps> = ({
     to,
@@ -125,17 +172,13 @@ const Header: React.FC = () => {
           <ul
             data-aos="fade-down"
             data-aos-delay="100"
-            className="flex gap-10 xl:gap-20 xl:mr-16 text-2xl"
+            className="flex gap-10 xl:gap-20 xl:mr-16 text-2xl items-center"
           >
             {navigationItems.map((item) => (
               <NavItem key={item.to} {...item} />
             ))}
             {isAuthenticated ? (
-              <RouterLink to="/dashboard">
-                <li className="transition ease-in-out duration-150 hover:cursor-pointer hover:scale-110 border-b-2 border-transparent hover:border-current">
-                  Dashboard
-                </li>
-              </RouterLink>
+              <UserDropdown />
             ) : (
               <>
                 <NavItem

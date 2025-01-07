@@ -1,5 +1,5 @@
 /* Hooks */
-import { useLocation, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import useAuth from "../../hooks/useAuth";
 
 /* Components */
@@ -57,15 +57,15 @@ const DashboardSidebar = () => {
   return (
     <Sidebar>
       <SidebarHeader>
-        <div className="flex gap-2 py-2 text-sidebar-accent-foreground ">
+        <Link to="/" className="flex gap-2 py-2 text-sidebar-accent-foreground">
           <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-            {/* LOGO */}
+            <img src="/logo.png" alt="DZ BEAUTY" />
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">
             <span className="truncate font-semibold">DZ BEAUTY</span>
             <span className="truncate text-xs">Beauty, Redefined</span>
           </div>
-        </div>
+        </Link>
       </SidebarHeader>
       <SidebarContent className="mt-36">
         <SidebarMenu>
@@ -145,13 +145,13 @@ const DashboardSidebar = () => {
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem className="cursor-pointer">
-                    <NavLink
+                    <Link
                       to="/dashboard/settings"
                       className="flex items-center gap-2"
                     >
                       <Settings />
-                      <span>Account</span>
-                    </NavLink>
+                      <span>Settings</span>
+                    </Link>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />

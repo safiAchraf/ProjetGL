@@ -15,6 +15,7 @@ import reviewRouter from "./routes/review.js";
 import couponRouter from "./routes/coupon.js";
 import reservationRouter from "./routes/reservation.js";
 import nonAuth from "./routes/nonauth.js";
+import userRouter from "./routes/user.js";
 
 // to do : Points systesm , search with filters , reviews, coupons
 
@@ -50,6 +51,7 @@ app.use("/visitor", nonAuth);
 app.use("/api/chargily", chargilyRouter);
 app.use("/api/auth", authRouter);
 app.use(jwtVerify);
+app.use("/api/user", userRouter);
 app.use("/api/salons", salonRouter);
 app.use("/api/service", serviceRouter);
 app.use("/api/review", reviewRouter);

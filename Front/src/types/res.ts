@@ -1,27 +1,13 @@
-import { Category, Salon, Service } from "./data";
+import { Category, Salon, Service, User } from "./data";
 
 export type RegisterRes = {
   message: string;
-  data: {
-    id: string;
-    email: string;
-    name: string;
-    phoneNumber: string;
-    createdAt: string;
-    updatedAt: string;
-  };
+  data: User;
 };
 
 export type LoginRes = {
   message: string;
-  data: {
-    id: string;
-    email: string;
-    name: string;
-    phoneNumber: string;
-    createdAt: string;
-    updatedAt: string;
-  };
+  data: User;
 };
 
 export type SalonRes = {

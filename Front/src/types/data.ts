@@ -51,6 +51,7 @@ export type User = {
   id: string;
   email: string;
   name: string;
+  avatar: string;
   phoneNumber: string;
   createdAt: string;
   updatedAt: string;

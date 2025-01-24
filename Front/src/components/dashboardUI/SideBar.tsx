@@ -26,7 +26,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 /* Icons */
 import {
-  Clock,
   Home,
   CalendarSearch,
   Star,
@@ -34,6 +33,8 @@ import {
   ChevronsUpDown,
   Settings,
   Sparkles,
+  ShoppingCart,
+  HandCoins,
 } from "lucide-react";
 
 const DashboardSidebar = () => {
@@ -50,6 +51,7 @@ const DashboardSidebar = () => {
     },
     { title: "Services", url: "/dashboard/services", icon: Sparkles },
     { title: "Reviews", url: "/dashboard/reviews", icon: Star },
+    { title: "Coupons", url: "/dashboard/coupons", icon: HandCoins },
   ];
 
   const handleLogout = async () => {
@@ -162,11 +164,11 @@ const DashboardSidebar = () => {
                   </DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer">
                     <Link
-                      to="/dashboard/history"
+                      to="/dashboard/orders"
                       className="flex items-center gap-2"
                     >
-                      <Clock />
-                      <span>History</span>
+                      <ShoppingCart />
+                      <span>Orders</span>
                     </Link>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>

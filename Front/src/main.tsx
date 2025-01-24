@@ -23,10 +23,11 @@ import SelectTime from "./pages/booking/SelectTime.tsx";
 /* Dashboard Page */
 import Dashboard from "./pages/dashboard/Dashboard.tsx";
 import Reservations from "./pages/dashboard/Reservations.tsx";
-import History from "./pages/dashboard/History.tsx";
+import Orders from "./pages/dashboard/Orders.tsx";
 import Review from "./pages/dashboard/Review.tsx";
 import Settings from "./pages/dashboard/Settings.tsx";
 import Services from "./pages/dashboard/Services.tsx";
+import Coupons from "./pages/dashboard/Coupons.tsx";
 
 /* Components */
 import NotFound from "./pages/NotFound.tsx";
@@ -66,8 +67,8 @@ const router = createBrowserRouter([
         element: <Services />,
       },
       {
-        path: "history",
-        element: <History />,
+        path: "orders",
+        element: <Orders />,
       },
       {
         path: "reviews",
@@ -76,6 +77,10 @@ const router = createBrowserRouter([
       {
         path: "settings",
         element: <Settings />,
+      },
+      {
+        path: "coupons",
+        element: <Coupons />,
       },
     ],
   },
@@ -109,7 +114,7 @@ createRoot(root).render(
           <RouterProvider router={router} />
           <ToastContainer
             position="top-right"
-            autoClose={2000}
+            autoClose={1000}
             hideProgressBar={false}
             newestOnTop
             closeOnClick

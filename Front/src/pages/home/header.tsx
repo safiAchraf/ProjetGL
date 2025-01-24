@@ -14,7 +14,13 @@ import AOS from "aos";
 /* Assets */
 import { IoIosMenu, IoIosClose } from "react-icons/io";
 import "aos/dist/aos.css";
-import { ChevronDown, Clock, LogOut, Settings, User } from "lucide-react";
+import {
+  ChevronDown,
+  LogOut,
+  Settings,
+  ShoppingCart,
+  User,
+} from "lucide-react";
 
 type NavigationItem = {
   to: string;
@@ -79,10 +85,10 @@ const Header: React.FC = () => {
               Settings
             </button>
           </RouterLink>
-          <RouterLink to="/dashboard/history">
+          <RouterLink to="/dashboard/Orders">
             <button className="flex items-center gap-2 px-4 py-2 text-sm w-full hover:bg-gray-100">
-              <Clock className="w-4 h-4" />
-              History
+              <ShoppingCart className="w-4 h-4" />
+              Orders
             </button>
           </RouterLink>
           <button

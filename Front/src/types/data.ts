@@ -63,5 +63,13 @@ export type Reservation = {
   services: string[];
   bookDate: string;
   amount: number;
-  status: "Pending" | "Confirmed" | "Cancelled";
+  status: "Pending" | "Confirmed" | "Cancelled" | "Completed";
 };
+
+export type Categories =
+  | "Hair"
+  | "Skin Care"
+  | "Nails"
+  | "Makeup"
+  | "Massage"
+  | "";

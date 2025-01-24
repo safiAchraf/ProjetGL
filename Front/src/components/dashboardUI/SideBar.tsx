@@ -33,6 +33,7 @@ import {
   LogOut,
   ChevronsUpDown,
   Settings,
+  Sparkles,
 } from "lucide-react";
 
 const DashboardSidebar = () => {
@@ -47,8 +48,8 @@ const DashboardSidebar = () => {
       url: "/dashboard/reservations",
       icon: CalendarSearch,
     },
+    { title: "Services", url: "/dashboard/services", icon: Sparkles },
     { title: "Reviews", url: "/dashboard/reviews", icon: Star },
-    { title: "Services", url: "/dashboard/services", icon: Star },
   ];
 
   const handleLogout = async () => {

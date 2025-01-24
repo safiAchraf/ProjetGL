@@ -28,7 +28,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import {
   Clock,
   Home,
-  List,
+  CalendarSearch,
+  Star,
   LogOut,
   ChevronsUpDown,
   Settings,
@@ -41,8 +42,13 @@ const DashboardSidebar = () => {
 
   const items = [
     { title: "Home", url: "/dashboard", icon: Home },
-    { title: "History", url: "/dashboard/history", icon: Clock },
-    { title: "Reviews Center", url: "/dashboard/reviews", icon: List },
+    {
+      title: "Reservations",
+      url: "/dashboard/reservations",
+      icon: CalendarSearch,
+    },
+    { title: "Reviews", url: "/dashboard/reviews", icon: Star },
+    { title: "Services", url: "/dashboard/services", icon: Star },
   ];
 
   const handleLogout = async () => {
@@ -151,6 +157,15 @@ const DashboardSidebar = () => {
                     >
                       <Settings />
                       <span>Settings</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <Link
+                      to="/dashboard/history"
+                      className="flex items-center gap-2"
+                    >
+                      <Clock />
+                      <span>History</span>
                     </Link>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>

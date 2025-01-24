@@ -22,9 +22,11 @@ import SelectTime from "./pages/booking/SelectTime.tsx";
 
 /* Dashboard Page */
 import Dashboard from "./pages/dashboard/Dashboard.tsx";
+import Reservations from "./pages/dashboard/Reservations.tsx";
 import History from "./pages/dashboard/History.tsx";
 import Review from "./pages/dashboard/Review.tsx";
 import Settings from "./pages/dashboard/Settings.tsx";
+import Services from "./pages/dashboard/Services.tsx";
 
 /* Components */
 import NotFound from "./pages/NotFound.tsx";
@@ -54,6 +56,14 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <Dashboard />,
+      },
+      {
+        path: "reservations",
+        element: <Reservations />,
+      },
+      {
+        path: "services",
+        element: <Services />,
       },
       {
         path: "history",

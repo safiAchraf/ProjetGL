@@ -56,3 +56,12 @@ export type User = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type Reservation = {
+  id: string;
+  client: string;
+  services: string[];
+  bookDate: string;
+  amount: number;
+  status: "Pending" | "Confirmed" | "Cancelled";
+};

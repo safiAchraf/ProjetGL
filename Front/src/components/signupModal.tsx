@@ -179,6 +179,7 @@ const SignupModal = ({ isOpen, onClose }: SignUpModalProps) => {
           </div>
 
           <button
+            id="submit"
             type="submit"
             disabled={isLoading}
             className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center space-x-2"

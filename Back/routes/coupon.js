@@ -94,7 +94,7 @@ router.get("/", getAllCoupons);
  *       409:
  *         description: Coupon already exists
  */
-router.post("/:id", createNewCoupon);
+router.post("/", createNewCoupon);
 
 /**
  * @swagger

@@ -2,15 +2,15 @@ import prisma from "../prisma/client.js";
 import { v4 as uuidv4 } from "uuid";
 
 const createNewCoupon = async (req, res) => {
-  const salonId = req.params.id;
+  
   const ownerId = req.user.id;
   const { code, discount } = req.body;
-
+  const [salon] = await prisma.$queryRaw`SELECT * FROM "Salon" WHERE id = ${salonId}`;
+  const salonId = salon.id;
   if (!code || !discount) {
     return res.status(400).json({ msg: "Missing required fields" });
   }
 
-  const [salon] = await prisma.$queryRaw`SELECT * FROM "Salon" WHERE id = ${salonId}`;
   if (!salon) {
     return res.status(404).json({ error: "Salon not found" });
   }
@@ -101,7 +101,7 @@ const getSalonCoupons = async (req, res) => {
     
     const [salon] = await prisma.$queryRaw`SELECT * FROM "Salon" WHERE id = ${salonId}`;
     const salonId = salon.id;
-    
+
     if (!salon) {
       return res.status(404).json({ error: "Salon not found" });
     }

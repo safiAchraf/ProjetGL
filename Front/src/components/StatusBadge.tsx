@@ -21,6 +21,10 @@ const StatusBadge = ({ status }: { status: Reservation["status"] }) => {
       "font-medium text-xs px-2 py-0.5 rounded-sm",
       "bg-red-200 text-red-600 hover:bg-red-200"
     ),
+    Completed: cn(
+      "font-medium text-xs px-2 py-0.5 rounded-sm",
+      "bg-black text-white hover:bg-black"
+    ),
   };
 
   return <Badge className={statusStyles[status]}>{status}</Badge>;

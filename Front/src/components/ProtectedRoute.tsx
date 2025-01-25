@@ -12,7 +12,11 @@ import UnauthorizedAccess from "../pages/UnauthorizedAccess";
 /* Icons */
 import { Loader2 } from "lucide-react";
 
-const ProtectedRoute: React.FC = () => {
+interface Props {
+  isUser?: boolean;
+}
+
+const ProtectedRoute: React.FC = ({ isUser = false }: Props) => {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
@@ -30,7 +34,7 @@ const ProtectedRoute: React.FC = () => {
 
   return (
     <SidebarProvider defaultOpen>
-      <DashboardSidebar />
+      {!isUser && <DashboardSidebar />}
       <main className="w-full h-full">
         <Outlet />
       </main>

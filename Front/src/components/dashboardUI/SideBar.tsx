@@ -35,6 +35,7 @@ import {
   Sparkles,
   ShoppingCart,
   HandCoins,
+  Store,
 } from "lucide-react";
 
 const DashboardSidebar = () => {
@@ -49,6 +50,7 @@ const DashboardSidebar = () => {
       url: "/dashboard/reservations",
       icon: CalendarSearch,
     },
+    { title: "Salon", url: "/dashboard/salon", icon: Store },
     { title: "Services", url: "/dashboard/services", icon: Sparkles },
     { title: "Reviews", url: "/dashboard/reviews", icon: Star },
     { title: "Coupons", url: "/dashboard/coupons", icon: HandCoins },
@@ -153,7 +155,7 @@ const DashboardSidebar = () => {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem className="cursor-pointer">
+                  <DropdownMenuItem asChild className="cursor-pointer">
                     <Link
                       to="/dashboard/settings"
                       className="flex items-center gap-2"
@@ -162,7 +164,7 @@ const DashboardSidebar = () => {
                       <span>Settings</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
+                  <DropdownMenuItem asChild className="cursor-pointer">
                     <Link
                       to="/dashboard/orders"
                       className="flex items-center gap-2"

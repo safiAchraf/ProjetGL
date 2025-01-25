@@ -1,5 +1,5 @@
 import express from "express";
-import { getAllSalons, getSalonById, createSalon, updateSalon, deleteSalon, addSalonPictures, deleteSalonPicture } from "../controllers/salonController.js";
+import { getAllSalons, getSalonById, createSalon, updateSalon, deleteSalon, addSalonPictures, deleteSalonPicture , userHaveSalon } from "../controllers/salonController.js";
 
 const router = express.Router();
 
@@ -304,5 +304,7 @@ router.delete("/:id", deleteSalon);
  *         description: Unauthorized to add pictures to this salon
  */
 router.post("/:id/pictures", addSalonPictures);
+
+router.get("/userHaveSalon", userHaveSalon);
 
 export default router;

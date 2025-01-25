@@ -6,7 +6,6 @@ const createNewCoupon = async (req, res) => {
 	const { code, discount } = req.body;
 	const [salon] =
 		await prisma.$queryRaw` SELECT * FROM "Salon" WHERE "ownerId" = ${ownerId}`;
-	const salonId = salon.id;
 	if (!code || !discount) {
 		return res.status(400).json({ msg: "Missing required fields" });
 	}
@@ -14,6 +13,7 @@ const createNewCoupon = async (req, res) => {
 	if (!salon) {
 		return res.status(404).json({ error: "Salon not found" });
 	}
+  const salonId = salon.id;
 
 	if (salon.ownerId !== ownerId) {
 		return res

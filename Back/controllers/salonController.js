@@ -176,6 +176,17 @@ const deleteSalonPicture = async (req, res) => {
   
 }
 
+const userHaveSalon = async (req, res) => {
+  const ownerId = req.user.id;
+  const alreadyExists = await prisma.$queryRaw`
+    SELECT * FROM "Salon" WHERE "ownerId" = ${ownerId}`;
+  if (alreadyExists.length > 0) {
+    return res.json({ message: "You already have a salon", data: true });
+  }
+  return res.json({ message: "You don't have a salon", data: false });
+};
 
 
-export { getAllSalons, getSalonById, createSalon, updateSalon, deleteSalon , addSalonPictures, deleteSalonPicture};
+
+
+export { getAllSalons, getSalonById, createSalon, updateSalon, deleteSalon , addSalonPictures, deleteSalonPicture , userHaveSalon};

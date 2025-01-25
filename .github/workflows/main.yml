@@ -35,7 +35,7 @@ jobs:
           docker-compose build
       - name: Push Docker image to VPS and deploy
         run: |
-          cd ${{ secrets.REPO_LOCATION_IN_VPS }} || exit 1
+          cd /app || exit 1
           git pull origin main || exit 1
           docker-compose down || exit 1
           docker-compose up --build -d || exit 1

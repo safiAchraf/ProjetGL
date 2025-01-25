@@ -16,8 +16,8 @@ import couponRouter from "./routes/coupon.js";
 import reservationRouter from "./routes/reservation.js";
 import nonAuth from "./routes/nonauth.js";
 import userRouter from "./routes/user.js";
-
-// to do : Points systesm , search with filters , reviews, coupons
+import swaggerUi from "swagger-ui-express";
+import swaggerJsDoc from "swagger-jsdoc";
 
 dotenv.config();
 
@@ -42,6 +42,28 @@ app.use(hpp());
 
 app.use(helmet());
 app.use(xss());
+
+const swaggerOptions = {
+  swaggerDefinition: {
+    openapi: "3.0.0",
+    info: {
+      title: "DzBeauty API",
+      version: "1.0.0",
+      description: "API documentation for DzBeauty Platform",
+    },
+    servers: [
+      {
+        url: "http://localhost:3000",
+      },
+    ],
+  },
+  apis: ["./routes/*.js"],
+
+  
+};
+
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 app.get("/", (req, res) => {
   res.json("Hello World");

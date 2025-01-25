@@ -96,8 +96,11 @@ const getCoupon = async (req, res) => {
 
 const getSalonCoupons = async (req, res) => {
   try {
-    const salonId = req.params.id;
+    const ownerId = req.user.id;
+
+    
     const [salon] = await prisma.$queryRaw`SELECT * FROM "Salon" WHERE id = ${salonId}`;
+    const salonId = salon.id;
     
     if (!salon) {
       return res.status(404).json({ error: "Salon not found" });

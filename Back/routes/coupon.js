@@ -242,6 +242,6 @@ router.get("/:id", getCoupon);
  *       403:
  *         description: Unauthorized to get this salon's coupons
  */
-router.get("/salon/:id", getSalonCoupons);
+router.get("/salon", getSalonCoupons);
 
 export default router;

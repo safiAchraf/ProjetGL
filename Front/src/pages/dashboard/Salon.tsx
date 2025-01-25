@@ -17,38 +17,22 @@ import type { Salon, Picture } from "../../types/data";
 /* Icons */
 import { Trash2, Upload } from "lucide-react";
 
-const MOCK_SALON: Salon = {
-  id: "1",
-  name: "Safi Salon",
-  description: "Premium beauty experience in the heart of the city",
-  address: "123 Beauty Street",
-  city: "Los Angeles",
-  phoneNumber: "(555) 123-4567",
-  pictures: [
-    {
-      id: "1",
-      url: "https://source.unsplash.com/random/800x600/?salon,1",
-      salonId: "1",
-      createdAt: "2024-02-01",
-      updatedAt: "2024-02-01",
-    },
-    {
-      id: "2",
-      url: "https://source.unsplash.com/random/800x600/?salon,2",
-      salonId: "1",
-      createdAt: "2024-02-01",
-      updatedAt: "2024-02-01",
-    },
-  ],
-  ownerId: "1",
-  owner: "Achraf",
-  createdAt: "2024-02-01",
-  updatedAt: "2024-02-01",
-  rating: 4.9,
-};
-
 const Salon = () => {
-  const [salon, setSalon] = useState<Salon>(MOCK_SALON);
+  const initSalon: Salon = {
+    id: "",
+    name: "",
+    address: "",
+    city: "",
+    createdAt: "",
+    description: "",
+    owner: "",
+    ownerId: "",
+    phoneNumber: "",
+    pictures: [],
+    rating: 0,
+    updatedAt: "",
+  };
+  const [salon, setSalon] = useState<Salon>(initSalon);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -69,42 +53,111 @@ const Salon = () => {
   const uploadImages = async () => {
     if (!selectedFiles.length) return;
 
-    const newPictures: Picture[] = selectedFiles.map((file, index) => ({
-      id: `mock-${Date.now()}-${index}`,
-      url: URL.createObjectURL(file),
-      salonId: salon.id,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    }));
+    try {
+      const uploadPromises = selectedFiles.map(async (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", import.meta.env.VITE_UPLOAD_PRESET!);
+        formData.append("cloud_name", import.meta.env.VITE_CLOUD_NAME!);
 
-    setSalon({
-      ...salon,
-      pictures: [...salon.pictures, ...newPictures],
-    });
+        const response = await fetch(
+          `https://api.cloudinary.com/v1_1/${
+            import.meta.env.VITE_CLOUD_NAME
+          }/image/upload`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
 
-    setSelectedFiles([]);
-    toast.success("Images uploaded successfully");
+        if (!response.ok) throw new Error("Upload failed");
+        const data = await response.json();
+
+        return {
+          id: data.public_id,
+          url: data.secure_url,
+          salonId: salon.id,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        } as Picture;
+      });
+
+      const newPictures = await Promise.all(uploadPromises);
+      setSalon((prev) => ({
+        ...prev,
+        pictures: [...prev.pictures, ...newPictures],
+      }));
+      setSelectedFiles([]);
+      toast.success("Images uploaded to Cloudinary");
+    } catch (error) {
+      console.error(error);
+      toast.error("Image upload failed");
+    }
   };
 
-  const deleteImage = (pictureId: string) => {
-    setSalon({
-      ...salon,
-      pictures: salon.pictures.filter((pic) => pic.id !== pictureId),
-    });
-    toast.success("Image deleted successfully");
+  const deleteImage = async (pictureId: string) => {
+    try {
+      const timestamp = Date.now();
+      const signature = await createSignature(pictureId, timestamp);
+
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${
+          import.meta.env.VITE_CLOUD_NAME
+        }/image/destroy`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            public_id: pictureId,
+            api_key: import.meta.env.VITE_API_KEY,
+            signature: signature,
+            timestamp: timestamp,
+          }),
+        }
+      );
+
+      if (!response.ok) throw new Error("Cloudinary deletion failed");
+
+      // Then update local state
+      setSalon((prev) => ({
+        ...prev,
+        pictures: prev.pictures.filter((pic) => pic.id !== pictureId),
+      }));
+
+      toast.success("Image deleted from gallery");
+    } catch (error) {
+      toast.error("Failed to delete image");
+      console.error("Deletion error:", error);
+    }
+  };
+
+  const createSignature = async (publicId: string, timestamp: number) => {
+    const message = `public_id=${publicId}&timestamp=${timestamp}${
+      import.meta.env.VITE_API_SECRET
+    }`;
+    const encoder = new TextEncoder();
+    const hashBuffer = await crypto.subtle.digest(
+      "SHA-1",
+      encoder.encode(message)
+    );
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
   };
 
   const saveSalonInfo = () => {
+    console.log(salon);
     toast.success("Salon information updated successfully");
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-8">
+    <div className="max-w-6xl mx-auto p-4 space-y-4">
       <h2 className="text-3xl font-bold">Manage Your Salon</h2>
 
       <div className="space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-3">
+          <div className="space-y-2">
             <Label className="text-sm font-medium">Salon Name</Label>
             <Input
               className="rounded-lg h-12"
@@ -114,7 +167,7 @@ const Salon = () => {
             />
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2">
             <Label className="text-sm font-medium">Phone Number</Label>
             <Input
               className="rounded-lg h-12"
@@ -125,7 +178,7 @@ const Salon = () => {
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           <Label className="text-sm font-medium">Description</Label>
           <Textarea
             className="rounded-lg min-h-[120px]"
@@ -146,7 +199,7 @@ const Salon = () => {
             />
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2">
             <Label className="text-sm font-medium">City</Label>
             <Input
               className="rounded-lg h-12"
@@ -157,7 +210,7 @@ const Salon = () => {
           </div>
         </div>
 
-        <div className="space-y-8">
+        <div className="space-y-2">
           <Label className="text-sm font-medium">Salon Gallery</Label>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

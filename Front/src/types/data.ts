@@ -73,3 +73,15 @@ export type Categories =
   | "Makeup"
   | "Massage"
   | "";
+
+export type UpdateUserPayload = Partial<User> & {
+  currentPassword?: string;
+  newPassword?: string;
+};
+
+export type Coupon = {
+  id: "string";
+  code: "string";
+  discount: 0;
+  salonId: "string";
+};

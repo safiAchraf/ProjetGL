@@ -32,7 +32,7 @@ const SelectSalon = () => {
     setError(null);
 
     try {
-      const response = await api.get<SalonRes>("/visitor/salons");
+      const response = await api.get<SalonRes>("/nonauth/salons");
       const fetchedSalons = response.data.data;
 
       if (fetchedSalons.length === 0) {

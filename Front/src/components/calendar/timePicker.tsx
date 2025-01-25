@@ -29,7 +29,7 @@ const TimePicker = ({ day, month, onTimeSelect, selectedTime }: Props) => {
 
     try {
       const response = await api.get<AvailableHoursRes>(
-        `/visitor/available/${selectedSalon.id}/${day}/${month}`
+        `/nonauth/available/${selectedSalon.id}/${day}/${month}`
       );
       const availableHours = response.data.availableHours;
 

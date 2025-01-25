@@ -34,6 +34,9 @@ import Salon from "./pages/dashboard/Salon.tsx";
 import Orders from "./pages/dashboard/Orders.tsx";
 import Services from "./pages/dashboard/Services.tsx";
 
+/* Create Salon */
+import CreateSalon from "./pages/create.tsx";
+
 /* Components */
 import NotFound from "./pages/NotFound.tsx";
 import UnauthorizedAccess from "./pages/UnauthorizedAccess.tsx";
@@ -55,6 +58,7 @@ const router = createBrowserRouter([
     path: "/unauthorized",
     element: <UnauthorizedAccess />,
   },
+  { path: "/create", element: <CreateSalon /> },
   {
     path: "/dashboard",
     element: <ProtectedRoute />,

@@ -1,8 +1,9 @@
 /* Hooks */
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import useAuth from "../../hooks/useAuth";
+import { api } from "../../api/axios";
 
 /* Utils */
-import { format } from "date-fns";
 import { toast } from "react-toastify";
 
 /* Components */
@@ -23,160 +24,114 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../../components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../components/ui/select";
-import { Badge } from "../../components/ui/badge";
+
 import { Label } from "../../components/ui/label";
+
+/* Types */
+import type { Coupon } from "../../types/data";
 
 /* Icons */
 import { Trash2, Pencil } from "lucide-react";
 
-interface Coupon {
-  id: string;
-  code: string;
-  discountType: "percentage" | "fixed";
-  discountValue: number;
-  expirationDate: Date;
-  usageLimit: number;
-  usedCount: number;
-  isActive: boolean;
-}
-
-const mockData: Coupon[] = [
-  {
-    id: "1",
-    code: "SUMMER20",
-    discountType: "percentage",
-    discountValue: 20,
-    expirationDate: new Date("2024-08-31"),
-    usageLimit: 100,
-    usedCount: 45,
-    isActive: true,
-  },
-  {
-    id: "2",
-    code: "WINTER15",
-    discountType: "percentage",
-    discountValue: 15,
-    expirationDate: new Date("2024-12-31"),
-    usageLimit: 50,
-    usedCount: 10,
-    isActive: true,
-  },
-  {
-    id: "3",
-    code: "FALL25",
-    discountType: "fixed",
-    discountValue: 25,
-    expirationDate: new Date("2024-10-15"),
-    usageLimit: 200,
-    usedCount: 150,
-    isActive: true,
-  },
-  {
-    id: "4",
-    code: "SPRING10",
-    discountType: "percentage",
-    discountValue: 10,
-    expirationDate: new Date("2025-03-31"),
-    usageLimit: 30,
-    usedCount: 5,
-    isActive: true,
-  },
-];
-
 const Coupons = () => {
-  const [coupons, setCoupons] = useState<Coupon[]>(mockData);
+  const { user } = useAuth();
+  const [coupons, setCoupons] = useState<Coupon[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null);
   const [formState, setFormState] = useState({
     code: "",
-    discountType: "percentage" as "percentage" | "fixed",
-    discountValue: 0,
-    expirationDate: new Date(),
-    usageLimit: 0,
+    discount: 0,
+    salonId: "",
   });
-  const [, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const fetchCoupons = async () => {
+      try {
+        const response = await api.get("/api/coupons");
+
+        if (response.status === 404) {
+          toast.info("No coupons found");
+          setCoupons([]);
+        }
+
+        setCoupons(response.data);
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to load coupons");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCoupons();
+  }, []);
 
   const validateForm = () => {
-    const newErrors: Record<string, string> = {};
+    const errors = [];
 
     if (formState.code.length < 3) {
-      newErrors.code = "Code must be at least 3 characters";
+      errors.push("Code must be at least 3 characters");
     }
-    if (formState.discountValue < 1) {
-      newErrors.discountValue = "Discount value must be at least 1";
-    }
-    if (formState.usageLimit < 1) {
-      newErrors.usageLimit = "Usage limit must be at least 1";
+    if (formState.discount < 1) {
+      errors.push("Discount must be at least 1");
     }
 
-    setErrors(newErrors);
-
-    if (Object.keys(newErrors).length > 0) {
-      Object.values(newErrors).forEach((error) => toast.error(error));
+    if (errors.length > 0) {
+      errors.forEach((error) => toast.error(error));
       return false;
     }
     return true;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    if (!validateForm() || !user) return;
 
-    const couponData = {
-      ...formState,
-      id: editingCoupon?.id || Math.random().toString(36).substr(2, 9),
-      usedCount: editingCoupon?.usedCount || 0,
-      isActive: true,
-    };
+    try {
+      if (editingCoupon) {
+        const response = await api.put(
+          `/api/coupon/${editingCoupon.id}`,
+          formState
+        );
+        setCoupons((prev) =>
+          prev.map((c) => (c.id === editingCoupon.id ? response.data : c))
+        );
+        toast.success("Coupon updated!");
+      } else {
+        const response = await api.post("/api/coupon", formState);
+        setCoupons((prev) => [...prev, response.data]);
+        toast.success("Coupon created!");
+      }
 
-    setCoupons((prev) =>
-      editingCoupon
-        ? prev.map((c) => (c.id === editingCoupon.id ? couponData : c))
-        : [...prev, couponData]
-    );
-
-    toast.success(editingCoupon ? "Coupon updated!" : "Coupon created!");
-    setIsDialogOpen(false);
-    setFormState({
-      code: "",
-      discountType: "percentage",
-      discountValue: 0,
-      expirationDate: new Date(),
-      usageLimit: 0,
-    });
-  };
-
-  const deleteCoupon = (id: string) => {
-    setCoupons(coupons.filter((coupon) => coupon.id !== id));
-    toast.success("Coupon deleted!");
-  };
-
-  const getStatus = (coupon: Coupon) => {
-    if (!coupon.isActive) return "Inactive";
-    if (coupon.usedCount >= coupon.usageLimit) return "Expired";
-    if (new Date() > coupon.expirationDate) return "Expired";
-    return "Active";
-  };
-
-  const statusVariant = (status: string) => {
-    switch (status) {
-      case "Active":
-        return "default";
-      case "Expired":
-        return "destructive";
-      case "Inactive":
-        return "secondary";
-      default:
-        return "outline";
+      setIsDialogOpen(false);
+      setFormState({
+        code: "",
+        discount: 0,
+        salonId: "",
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        editingCoupon ? "Failed to update coupon" : "Failed to create coupon"
+      );
     }
   };
+
+  const deleteCoupon = async (id: string) => {
+    try {
+      await api.delete(`/api/coupons/${id}`);
+      setCoupons((prev) => prev.filter((coupon) => coupon.id !== id));
+      toast.success("Coupon deleted!");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to delete coupon");
+    }
+  };
+
+  if (isLoading) {
+    return <div className="p-4">Loading coupons...</div>;
+  }
 
   return (
     <div className="p-4 space-y-6 max-w-full">
@@ -189,10 +144,8 @@ const Coupons = () => {
                 setEditingCoupon(null);
                 setFormState({
                   code: "",
-                  discountType: "percentage",
-                  discountValue: 0,
-                  expirationDate: new Date(),
-                  usageLimit: 0,
+                  discount: 0,
+                  salonId: "",
                 });
               }}
             >
@@ -219,68 +172,17 @@ const Coupons = () => {
                 </div>
 
                 <div>
-                  <Label>Discount Type</Label>
-                  <Select
-                    value={formState.discountType}
-                    onValueChange={(value) =>
-                      setFormState({
-                        ...formState,
-                        discountType: value as "percentage" | "fixed",
-                      })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="percentage">Percentage</SelectItem>
-                      <SelectItem value="fixed">Fixed Amount</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label>Discount Value</Label>
+                  <Label>Discount</Label>
                   <Input
                     type="number"
-                    value={formState.discountValue}
+                    value={formState.discount}
                     onChange={(e) =>
                       setFormState({
                         ...formState,
-                        discountValue: Number(e.target.value),
+                        discount: Number(e.target.value),
                       })
                     }
                     placeholder="20"
-                  />
-                </div>
-
-                <div>
-                  <Label>Expiration Date</Label>
-                  <Input
-                    type="date"
-                    value={format(formState.expirationDate, "yyyy-MM-dd")}
-                    onChange={(e) =>
-                      setFormState({
-                        ...formState,
-                        expirationDate: new Date(e.target.value),
-                      })
-                    }
-                    min={format(new Date(), "yyyy-MM-dd")}
-                  />
-                </div>
-
-                <div>
-                  <Label>Usage Limit</Label>
-                  <Input
-                    type="number"
-                    value={formState.usageLimit}
-                    onChange={(e) =>
-                      setFormState({
-                        ...formState,
-                        usageLimit: Number(e.target.value),
-                      })
-                    }
-                    placeholder="100"
                   />
                 </div>
               </div>
@@ -306,61 +208,50 @@ const Coupons = () => {
             <TableRow>
               <TableHead>Code</TableHead>
               <TableHead>Discount</TableHead>
-              <TableHead>Expiration</TableHead>
-              <TableHead>Usage</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>Salon ID</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {coupons.map((coupon) => (
-              <TableRow key={coupon.id}>
-                <TableCell className="font-medium">{coupon.code}</TableCell>
-                <TableCell>
-                  {coupon.discountType === "percentage"
-                    ? `${coupon.discountValue}%`
-                    : `$${coupon.discountValue}`}
-                </TableCell>
-                <TableCell>
-                  {format(coupon.expirationDate, "MM/dd/yyyy")}
-                </TableCell>
-                <TableCell>
-                  <span className="font-medium">{coupon.usedCount}</span> /{" "}
-                  {coupon.usageLimit}
-                </TableCell>
-                <TableCell>
-                  <Badge variant={statusVariant(getStatus(coupon))}>
-                    {getStatus(coupon)}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right space-x-2">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => {
-                      setEditingCoupon(coupon);
-                      setIsDialogOpen(true);
-                      setFormState({
-                        code: coupon.code,
-                        discountType: coupon.discountType,
-                        discountValue: coupon.discountValue,
-                        expirationDate: coupon.expirationDate,
-                        usageLimit: coupon.usageLimit,
-                      });
-                    }}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => deleteCoupon(coupon.id)}
-                  >
-                    <Trash2 className="h-4 w-4 text-red-500" />
-                  </Button>
+            {coupons.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center h-24">
+                  No coupons found
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              coupons.map((coupon) => (
+                <TableRow key={coupon.id}>
+                  <TableCell className="font-medium">{coupon.code}</TableCell>
+                  <TableCell>${coupon.discount}</TableCell>
+                  <TableCell>{coupon.salonId}</TableCell>
+                  <TableCell className="text-right space-x-2">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => {
+                        setEditingCoupon(coupon);
+                        setIsDialogOpen(true);
+                        setFormState({
+                          code: coupon.code,
+                          discount: coupon.discount,
+                          salonId: "",
+                        });
+                      }}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => deleteCoupon(coupon.id)}
+                    >
+                      <Trash2 className="h-4 w-4 text-red-500" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

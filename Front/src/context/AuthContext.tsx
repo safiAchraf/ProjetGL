@@ -5,7 +5,7 @@ import { createContext, ReactNode, useEffect, useState } from "react";
 import { api } from "../api/axios";
 
 /* Types */
-import { User } from "../types/data";
+import { Salon, UpdateUserPayload, User } from "../types/data";
 
 type AuthContextType = {
   user: User | null;
@@ -14,6 +14,10 @@ type AuthContextType = {
   isLoading: boolean;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
   logout: () => Promise<void>;
+  updateUser: (updatedData: UpdateUserPayload) => Promise<void>;
+  deleteUser: () => Promise<void>;
+  salon: Salon | null;
+  setSalon: React.Dispatch<React.SetStateAction<Salon | null>>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -22,6 +26,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [salon, setSalon] = useState<Salon | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -57,6 +62,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     if (!user && isAuthenticated) getUser();
   }, [isAuthenticated, user]);
 
+  useEffect(() => {
+    const getSalon = async () => {
+      setIsLoading(true);
+      try {
+        const response = await api.get("/api/userHaveSalon");
+        setSalon(response.data);
+      } catch (error) {
+        console.error("Failed to fetch salon: ", error);
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (user) getSalon();
+  }, [user]);
+
   const logout = async () => {
     setIsLoading(true);
 
@@ -71,6 +93,34 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  const updateUser = async (updatedData: UpdateUserPayload) => {
+    setIsLoading(true);
+    try {
+      const response = await api.put("/api/user", updatedData);
+      setUser((prev) => (prev ? { ...prev, ...response.data } : response.data));
+      return response.data;
+    } catch (error) {
+      console.error("Failed to update user:", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deleteUser = async () => {
+    setIsLoading(true);
+    try {
+      await api.delete("/api/user");
+      setUser(null);
+      setIsAuthenticated(false);
+    } catch (error) {
+      console.error("Account deletion failed:", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -80,6 +130,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         setIsAuthenticated,
         isLoading,
         logout,
+        updateUser,
+        deleteUser,
+        salon,
+        setSalon,
       }}
     >
       {children}

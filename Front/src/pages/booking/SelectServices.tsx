@@ -53,7 +53,7 @@ const SelectServices = () => {
     setError(null);
 
     try {
-      const response = await api.get<CategoryRes>("/visitor/categories");
+      const response = await api.get<CategoryRes>("/nonauth/categories");
 
       const fetchedCategories = response.data.categories;
       if (!fetchedCategories?.length) {
@@ -83,7 +83,7 @@ const SelectServices = () => {
 
     try {
       const response = await api.get<ServicesRes>(
-        `/visitor/services/salon/${selectedSalon.id}`
+        `/nonauth/services/salon/${selectedSalon.id}`
       );
       setServices(response.data.data);
     } catch (err) {

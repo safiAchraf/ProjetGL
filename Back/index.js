@@ -68,7 +68,7 @@ app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.get("/", (req, res) => {
   res.json("Hello World");
 });
-app.use("/visitor", nonAuth);
+app.use("/nonauth", nonAuth);
 
 app.use("/api/chargily", chargilyRouter);
 app.use("/api/auth", authRouter);

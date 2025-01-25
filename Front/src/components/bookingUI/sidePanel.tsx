@@ -1,12 +1,16 @@
 /* Hooks */
-import { useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router";
 import useBooking from "../../hooks/useBooking";
+import useAuth from "../../hooks/useAuth";
 
 /* Components */
 import { Checkbox } from "../ui/checkbox";
 import { Label } from "../ui/label";
 import ReviewStars from "../review/ReviewStars";
+import { Button } from "../ui/button";
+import SignupModal from "../signupModal";
+import LoginModal from "../loginModal";
 
 /* Utils */
 import { format } from "date-fns";
@@ -27,6 +31,9 @@ const SidePanel = ({
   currentPage,
   onContinue,
 }: Props) => {
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
+  const [isSignupModalOpen, setIsSignupModalOpen] = useState<boolean>(false);
+
   const {
     selectedSalon,
     selectedServices,
@@ -34,6 +41,8 @@ const SidePanel = ({
     setInHouseServices,
   } = useBooking();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const { isAuthenticated } = useAuth();
 
   const calculateTotalPrice = () => {
     return selectedServices.reduce((sum, service) => {
@@ -157,14 +166,54 @@ const SidePanel = ({
           {selectedServices.length !== 1 ? "s" : ""} • {totalDuration} mins
         </p>
 
-        <button
-          className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-          onClick={onContinue}
-          disabled={isButtonDisabled()}
-        >
-          Continue
-        </button>
+        {isAuthenticated ? (
+          <Button
+            className="w-full"
+            onClick={onContinue}
+            disabled={isButtonDisabled()}
+          >
+            {pathname.includes("confirmation") ? "Order" : "Continue"}
+          </Button>
+        ) : (
+          <>
+            {pathname.includes("confirmation") ? (
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => setIsLoginModalOpen(true)}
+                >
+                  Login
+                </Button>
+                <Button
+                  className="w-full"
+                  onClick={() => setIsSignupModalOpen(true)}
+                >
+                  Signup
+                </Button>
+              </div>
+            ) : (
+              <Button
+                className="w-full"
+                onClick={onContinue}
+                disabled={isButtonDisabled()}
+              >
+                Continue
+              </Button>
+            )}
+          </>
+        )}
       </div>
+
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+      />
+
+      <SignupModal
+        isOpen={isSignupModalOpen}
+        onClose={() => setIsSignupModalOpen(false)}
+      />
     </div>
   );
 };

@@ -1,5 +1,6 @@
 /* Hooks */
 import useAuth from "../hooks/useAuth";
+import { useLocation } from "react-router";
 
 /* Providers */
 import { SidebarProvider } from "./ui/sidebar";
@@ -12,12 +13,9 @@ import UnauthorizedAccess from "../pages/UnauthorizedAccess";
 /* Icons */
 import { Loader2 } from "lucide-react";
 
-interface Props {
-  isUser?: boolean;
-}
-
-const ProtectedRoute: React.FC = ({ isUser = false }: Props) => {
+const ProtectedRoute: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
+  const { pathname } = useLocation();
 
   if (isLoading) {
     return (
@@ -34,7 +32,9 @@ const ProtectedRoute: React.FC = ({ isUser = false }: Props) => {
 
   return (
     <SidebarProvider defaultOpen>
-      {!isUser && <DashboardSidebar />}
+      {!(pathname.includes("orders") || pathname.includes("settings")) && (
+        <DashboardSidebar />
+      )}
       <main className="w-full h-full">
         <Outlet />
       </main>

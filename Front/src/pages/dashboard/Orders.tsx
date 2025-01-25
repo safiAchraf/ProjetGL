@@ -1,5 +1,6 @@
 /* Hooks */
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 
 /* Components */
 import {
@@ -33,7 +34,7 @@ import {
 import { Reservation } from "../../types/data";
 
 /* Icons */
-import { ArrowUpDown, Search, Trash2 } from "lucide-react";
+import { ArrowLeft, ArrowUpDown, Search, Trash2 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 
 const defaults: Reservation[] = [
@@ -212,6 +213,12 @@ const Orders = () => {
     "all" | Reservation["status"]
   >("all");
 
+  const navigate = useNavigate();
+
+  const handleGoBack = () => {
+    navigate("/dashboard");
+  };
+
   const handleSort = (key: keyof Reservation) => {
     let direction: "asc" | "desc" = "asc";
     if (
@@ -309,7 +316,19 @@ const Orders = () => {
     <div className="p-6 bg-white min-h-screen w-full space-y-6">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="text-2xl font-bold text-gray-900">My Appointments</h1>
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={handleGoBack}
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <h1 className="text-2xl font-bold text-gray-900">
+              My Appointments
+            </h1>
+          </div>
           <p className="text-sm text-gray-500">
             Showing {filteredReservations.length} appointments
           </p>

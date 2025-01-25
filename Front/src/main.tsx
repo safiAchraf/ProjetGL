@@ -19,6 +19,8 @@ import Layout from "./pages/booking/Layout.tsx";
 import SelectSalon from "./pages/booking/SelectSalon.tsx";
 import SelectServices from "./pages/booking/SelectServices.tsx";
 import SelectTime from "./pages/booking/SelectTime.tsx";
+import Confirmation from "./pages/booking/Confirmation.tsx";
+import Success from "./pages/booking/Success.tsx";
 
 /* Dashboard Page */
 import Dashboard from "./pages/dashboard/Dashboard.tsx";
@@ -106,6 +108,14 @@ const router = createBrowserRouter([
       {
         path: "reservation",
         element: <SelectTime />,
+      },
+      {
+        path: "confirmation",
+        element: <Confirmation />,
+      },
+      {
+        path: "success",
+        element: <Success />,
       },
     ],
   },

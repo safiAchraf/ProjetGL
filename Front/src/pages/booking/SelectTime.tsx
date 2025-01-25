@@ -8,8 +8,6 @@ import Header from "../../components/bookingUI/BookingHeader";
 import Calendar from "../../components/calendar/calendar";
 import TimePicker from "../../components/calendar/timePicker";
 import SidePanel from "../../components/bookingUI/sidePanel";
-import LoginModal from "../../components/loginModal";
-import SignupModal from "../../components/signupModal";
 
 /* Utils */
 import { toast } from "react-toastify";
@@ -17,8 +15,6 @@ import { toast } from "react-toastify";
 const SelectTime = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedTime, setSelectedTime] = useState<string>("");
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
-  const [isSignupModalOpen, setIsSignupModalOpen] = useState<boolean>(false);
 
   const { selectedSalon, selectedServices } = useBooking();
   const navigate = useNavigate();
@@ -29,7 +25,7 @@ const SelectTime = () => {
       return;
     }
 
-    setIsLoginModalOpen(true);
+    navigate("/booking/confirmation");
   };
 
   useEffect(() => {
@@ -80,16 +76,6 @@ const SelectTime = () => {
           </aside>
         </main>
       </div>
-
-      <LoginModal
-        isOpen={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-      />
-
-      <SignupModal
-        isOpen={isSignupModalOpen}
-        onClose={() => setIsSignupModalOpen(false)}
-      />
     </div>
   );
 };

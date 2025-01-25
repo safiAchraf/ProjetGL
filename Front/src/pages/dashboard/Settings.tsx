@@ -1,3 +1,7 @@
+/* Hooks */
+import { useNavigate } from "react-router";
+
+/* Components */
 import {
   Avatar,
   AvatarFallback,
@@ -7,11 +11,30 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 
+/* Icons */
+import { ArrowLeft } from "lucide-react";
+
 const Settings = () => {
+  const navigate = useNavigate();
+
+  const handleGoBack = () => {
+    navigate("/dashboard");
+  };
+
   return (
     <div className="max-w-7xl mx-auto p-6">
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold">User Profile</h2>
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={handleGoBack}
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h2 className="text-2xl font-bold">User Profile</h2>
+        </div>
 
         <div className="flex items-center gap-6">
           <Avatar className="h-24 w-24">

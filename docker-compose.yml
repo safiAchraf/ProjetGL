@@ -1,0 +1,20 @@
+version: "3.8"
+services:
+  backend:
+    build: ./back-end
+    image: dzBeauty-backend-image
+    container_name: dzBeauty-backend-container
+    ports:
+      - "3005:3005"
+    restart: always
+    env_file:
+      - back-end/.env
+  frontend:
+    build: ./front-end
+    image: dzBeauty-frontend-image
+    container_name: dzBeauty-frontend-container
+    ports:
+      - "5005:5005"
+    restart: always
+    env_file:
+      - front-end/.env

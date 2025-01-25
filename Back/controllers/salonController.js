@@ -181,7 +181,7 @@ const userHaveSalon = async (req, res) => {
   const alreadyExists = await prisma.$queryRaw`
     SELECT * FROM "Salon" WHERE "ownerId" = ${ownerId}`;
   if (alreadyExists.length > 0) {
-    return res.json({ message: "You already have a salon", data: true });
+    return res.json({ message: "You already have a salon", data: alreadyExists[0] });
   }
   return res.json({ message: "You don't have a salon", data: false });
 };

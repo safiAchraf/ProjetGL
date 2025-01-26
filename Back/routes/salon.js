@@ -50,6 +50,7 @@ const router = express.Router();
  *         description: No salons found
  */
 router.get("/", getAllSalons);
+router.get("/userHaveSalon", userHaveSalon);
 
 /**
  * @swagger
@@ -305,6 +306,5 @@ router.delete("/:id", deleteSalon);
  */
 router.post("/:id/pictures", addSalonPictures);
 
-router.get("/userHaveSalon", userHaveSalon);
 
 export default router;

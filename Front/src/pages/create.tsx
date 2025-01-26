@@ -19,6 +19,7 @@ import { Card } from "../components/ui/card";
 import { Textarea } from "../components/ui/textarea";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
+import { api } from "../api/axios";
 
 const CLOUD_NAME = import.meta.env.VITE_CLOUD_NAME;
 const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET;
@@ -101,8 +102,12 @@ const CreateSalon = () => {
       console.log({
         ...data,
         pictures: data.pictures?.map((p) => ({ url: p.url })),
-        ownerId: user?.id,
       });
+      await api.post("/api/salons", {
+        ...data,
+        pictures: data.pictures?.map((p) => ({ url: p.url })),
+      });
+
       toast.success("Salon created successfully!");
       navigate("/dashboard");
     } catch (error) {

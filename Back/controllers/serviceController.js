@@ -3,15 +3,15 @@ import { v4 as uuidv4 } from "uuid";
 
 const creatNewService = async (req, res) => {
   const ownerId = req.user.id;
-  const { name, description, price, pointPrice, duration, category , inHouse } = req.body;
+  const { name, description, price, pointPrice, duration, category  } = req.body;
 
-  const requiredFields = ["name", "description", "price", "pointPrice", "duration", "category", "inHouse"];
+  const requiredFields = ["name", "description", "price", "pointPrice", "duration", "category"];
   for (const field of requiredFields) {
     if (!req.body[field]) {
       return res.status(400).json({ error: `${field} is required` });
     }
   }
-  
+  const inHouse = req.body.inHouse || false;
 
   
   if (typeof price !== "number" || typeof pointPrice !== "number" || typeof duration !== "number") {

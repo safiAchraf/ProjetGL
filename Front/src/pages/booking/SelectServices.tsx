@@ -1,36 +1,27 @@
-/* Hooks */
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import useBooking from "../../hooks/useBooking";
-
-/* Components */
 import Header from "../../components/bookingUI/BookingHeader";
 import SidePanel from "../../components/bookingUI/sidePanel";
 import SalonInfo from "../../components/bookingUI/SalonInfo";
-import ServiceTabs from "../../components/bookingUI/ServiceTabs";
 import ServicesList from "../../components/bookingUI/ServicesList";
-
-/* Utils */
+import ReviewsList from "../../components/review/ReviewsList";
 import { api } from "../../api/axios";
 import { toast } from "react-toastify";
-
-/* Types */
+import { Loader2 } from "lucide-react";
 import type { AxiosError } from "axios";
-import type { Category, Review, Service } from "../../types/data";
-import type { CategoryRes, ErrorRes, ServicesRes } from "../../types/res";
+import type { Review, Service } from "../../types/data";
+import type { ErrorRes, ServicesRes } from "../../types/res";
 import type { Error } from "../../types/custom";
 
-/* Assets */
-import { Loader2 } from "lucide-react";
-import ReviewsList from "../../components/review/ReviewsList";
-
 const SelectServices = () => {
+  const categories = useMemo(
+    () => ["Hair", "Skin Care", "Nails", "Makeup", "Massage"],
+    []
+  );
   const [error, setError] = useState<Error | null>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [services, setServices] = useState<Service[]>([]);
-  const [activeCategory, setActiveCategory] = useState<string>("");
-  const [isLoadingServices, setIsLoadingServices] = useState<boolean>(true);
-  const [isLoadingCategories, setIsLoadingCategories] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [reviews] = useState<Review[]>([]);
 
   const { selectedSalon, selectedServices, setSelectedServices } = useBooking();
@@ -38,91 +29,51 @@ const SelectServices = () => {
 
   const handleServiceSelect = useCallback(
     (service: Service) => {
-      setSelectedServices((prevSelected: Service[]) => {
-        const isAlreadySelected = prevSelected.some((s) => s.id === service.id);
-        return isAlreadySelected
-          ? prevSelected.filter((s) => s.id !== service.id)
-          : [...prevSelected, service];
-      });
+      setSelectedServices((prev) =>
+        prev.some((s) => s.id === service.id)
+          ? prev.filter((s) => s.id !== service.id)
+          : [...prev, service]
+      );
     },
     [setSelectedServices]
   );
 
-  const fetchCategories = useCallback(async () => {
-    setIsLoadingCategories(true);
-    setError(null);
-
-    try {
-      const response = await api.get<CategoryRes>("/nonauth/categories");
-
-      const fetchedCategories = response.data.categories;
-      if (!fetchedCategories?.length) {
-        setError({ status: 404, message: "No service categories available." });
-        return;
-      }
-
-      setCategories(fetchedCategories);
-      setActiveCategory(fetchedCategories[0]?.name || "");
-    } catch (err) {
-      const error = err as AxiosError;
-      setError({ message: "Unable to fetch service categories." });
-      toast.error(
-        (error.response?.data as ErrorRes)?.message ||
-          "Failed to load categories. Please try again."
-      );
-    } finally {
-      setIsLoadingCategories(false);
-    }
-  }, []);
-
   const fetchServices = useCallback(async () => {
-    if (!selectedSalon.id) return;
+    if (!selectedSalon?.id) return;
 
-    setIsLoadingServices(true);
+    setIsLoading(true);
     setError(null);
 
     try {
-      const response = await api.get<ServicesRes>(
+      const { data } = await api.get<ServicesRes>(
         `/nonauth/services/salon/${selectedSalon.id}`
       );
-      setServices(response.data.data);
+      setServices(data.data);
     } catch (err) {
-      const error = err as AxiosError;
-      setError({ message: "Unable to fetch services." });
-      toast.error(
-        (error.response?.data as ErrorRes)?.message ||
-          "Failed to load services. Please try again."
-      );
+      const error = err as AxiosError<ErrorRes>;
+      const message =
+        error.response?.data?.message || "Failed to load services";
+
+      setError({
+        message,
+        status: error.response?.status || 500,
+      });
+      toast.error(message);
     } finally {
-      setIsLoadingServices(false);
+      setIsLoading(false);
     }
   }, [selectedSalon.id]);
 
   useEffect(() => {
-    Promise.all([fetchCategories(), fetchServices()]);
-  }, [fetchCategories, fetchServices]);
-
-  useEffect(() => {
     if (!selectedSalon.id) {
-      navigate("/booking/");
+      navigate("/booking", { replace: true });
+      return;
     }
-  }, [selectedSalon.id, navigate]);
-
-  const handleCategoryChange = useCallback(
-    (category: string) => {
-      setActiveCategory(category);
-      const categoryElement = document.getElementById(
-        categories.find((cat) => cat.name === category)?.id || ""
-      );
-      if (categoryElement) {
-        categoryElement.scrollIntoView({ behavior: "smooth" });
-      }
-    },
-    [categories]
-  );
+    fetchServices();
+  }, [fetchServices, selectedSalon.id, navigate]);
 
   const renderContent = () => {
-    if (isLoadingCategories || isLoadingServices) {
+    if (isLoading) {
       return (
         <div className="flex-1 flex items-center justify-center min-h-[400px]">
           <div className="flex flex-col items-center space-y-4">
@@ -138,16 +89,12 @@ const SelectServices = () => {
         <div className="flex-1 flex items-center justify-center min-h-[400px]">
           <div className="text-center space-y-4">
             <p className="text-gray-600">{error.message}</p>
-            {error.status !== 404 && (
-              <button
-                onClick={() =>
-                  Promise.all([fetchCategories(), fetchServices()])
-                }
-                className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
-              >
-                Retry
-              </button>
-            )}
+            <button
+              onClick={fetchServices}
+              className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+            >
+              Retry
+            </button>
           </div>
         </div>
       );
@@ -155,13 +102,7 @@ const SelectServices = () => {
 
     return (
       <>
-        <ServiceTabs
-          categories={categories.map((cat) => cat.name)}
-          activeCategory={activeCategory}
-          onCategoryChange={handleCategoryChange}
-        />
-
-        <main className="py-6 flex gap-6">
+        <main className="py-6 flex flex-col md:flex-row gap-6">
           <section className="flex-grow">
             <ServicesList
               categories={categories}
@@ -171,19 +112,20 @@ const SelectServices = () => {
             />
           </section>
 
-          <aside className="md:w-80 fixed bottom-0 left-0 right-0 md:static shadow-lg md:shadow-none">
-            <div className="md:sticky md:top-4">
-              <SidePanel
-                onContinue={() => navigate("/booking/reservation")}
-                currentPage="selectServices"
-              />
-            </div>
+          <aside className="md:w-80 w-full md:sticky md:top-4 h-fit">
+            <SidePanel
+              onContinue={() => navigate("/booking/reservation")}
+              currentPage="selectServices"
+            />
           </aside>
         </main>
-        <div id="reviews">
-          <h2 className="text-xl font-semibold mb-4">Reviews</h2>
-          <ReviewsList reviews={reviews} limit={3} orientation={"horizontal"} />
-        </div>
+
+        {reviews.length > 0 && (
+          <section id="reviews" className="mt-12">
+            <h2 className="text-xl font-semibold mb-4">Reviews</h2>
+            <ReviewsList reviews={reviews} limit={3} orientation="horizontal" />
+          </section>
+        )}
       </>
     );
   };
@@ -197,7 +139,7 @@ const SelectServices = () => {
       />
 
       <div className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8">
-        <SalonInfo salon={selectedSalon} />
+        {selectedSalon && <SalonInfo salon={selectedSalon} />}
         <h1 className="text-4xl font-medium mt-8 mb-4">Select Services</h1>
         {renderContent()}
       </div>

@@ -9,15 +9,15 @@ import { Link } from "react-scroll";
 /* Utils */
 import type { Review, Salon } from "../../types/data";
 import ReviewsList from "../review/ReviewsList";
+import BookingCarousel from "../bookingCarousel";
 
 interface SalonInfoProps {
   salon: Salon;
 }
 
 const SalonInfo = ({ salon }: SalonInfoProps) => {
-  const [reviews] = useState<Review[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const salonImages = salon.pictures.map((picture) => picture.url);
-  console.log(salonImages);
 
   return (
     <section>
@@ -40,7 +40,10 @@ const SalonInfo = ({ salon }: SalonInfoProps) => {
           </p>
         </div>
       ) : (
-        <Carousel images={salonImages} slidesToShow={salon.pictures.length} />
+        <BookingCarousel
+          images={salonImages}
+          slidesToShow={salon.pictures.length}
+        />
       )}
 
       <div className="text-right">

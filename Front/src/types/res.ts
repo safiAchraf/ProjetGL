@@ -1,4 +1,4 @@
-import { Category, Salon, Service, User } from "./data";
+import { Salon, Service, User } from "./data";
 
 export type RegisterRes = {
   message: string;
@@ -13,10 +13,6 @@ export type LoginRes = {
 export type SalonRes = {
   message: string;
   data: Salon[];
-};
-
-export type CategoryRes = {
-  categories: Category[];
 };
 
 export type ServicesRes = {

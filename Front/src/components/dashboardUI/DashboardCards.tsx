@@ -32,8 +32,9 @@ const DashboardCards = () => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-3">
-      {CardsData.map(({ title, value, subText, trend, percentage }) => (
+      {CardsData.map(({ title, value, subText, trend, percentage }, index) => (
         <StatCard
+          key={`${title}-${index}`}
           title={title}
           value={value}
           subText={subText}

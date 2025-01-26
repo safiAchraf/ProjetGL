@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
 import DashboardCards from "../../components/dashboardUI/DashboardCards";
 import DashboardCharts from "../../components/dashboardUI/DashboardCharts";
 import DashboardReviews from "../../components/dashboardUI/DashboardReviews";

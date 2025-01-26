@@ -28,7 +28,6 @@ jobs:
 
           # Install dependencies, build, and restart on the VPS
           ssh -i ~/.ssh/deploy_key ${{ secrets.SSH_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
-            set -e
             export NVM_DIR=$HOME/.nvm
             source $NVM_DIR/nvm.sh
             nvm use default

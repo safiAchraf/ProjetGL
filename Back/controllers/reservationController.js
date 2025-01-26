@@ -286,7 +286,7 @@ const getPriceAfterDiscount = async (req, res) => {
 		}
 	}
 
-	const finalPrice = priceBeforeCoupon* (existingCoupon.discount / 100);
+	const finalPrice = priceBeforeCoupon - priceBeforeCoupon* (existingCoupon.discount / 100);
 	res.json({ price: finalPrice });
 };
 

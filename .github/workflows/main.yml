@@ -26,16 +26,4 @@ jobs:
             ./ \
             ${{ secrets.SSH_USER }}@${{ secrets.VPS_HOST }}:~/app/
 
-          # Install dependencies, build, and restart on the VPS
-          ssh -i ~/.ssh/deploy_key ${{ secrets.SSH_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
-            export NVM_DIR=$HOME/.nvm
-            source $NVM_DIR/nvm.sh
-            nvm use default
-            cd ~/app
-            npm install
-            npm run build
-            echo 'NODE_ENV=development' > dist/.env
-            cd dist
-            pm2 delete dz_beauty_server || true
-            pm2 start main.js --name dz_beauty_server
-          EOF
+          

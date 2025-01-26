@@ -6,7 +6,9 @@ import {
   getAllServices,
   getService,
   getSalonServices,
-  getSalonServicesByCategory
+  getSalonServicesByCategory,
+  AuthgetSalonServices
+
 } from "../controllers/serviceController.js";
 
 const router = express.Router();
@@ -165,7 +167,7 @@ router.post("/", creatNewService);
  *       404:
  *         description: Salon not found or no services found for this salon
  */
-router.get("/salon", getSalonServices);
+router.get("/salon", AuthgetSalonServices);
 /**
  * @swagger
  * /api/services/salon/{salonId}/category/{category}:

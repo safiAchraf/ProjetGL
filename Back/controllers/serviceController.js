@@ -166,6 +166,30 @@ const getSalonServices = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const AuthgetSalonServices = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const salon = await prisma.$queryRaw`SELECT * FROM "Salon" WHERE "ownerId" = ${userId}`;
+    if (!salon) {
+      return res.status(404).json({ error: "Salon not found" });
+    }
+    const salonId = salon.id;
+    const services = await prisma.$queryRaw`SELECT * FROM "Service" WHERE "salonId" = ${salonId}`;
+
+    if (services.length === 0) {
+      return res.status(200).json({ msg: "No services found for this salon", data: [] });
+    }
+    for (const service of services) {
+      const [category] = await prisma.$queryRaw`SELECT * FROM "Category" WHERE "id" = ${service.categoryId}`;
+      service.category = category.name;
+    }
+
+
+    res.status(200).json({ msg: "All services of the salon", data: services });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 const getSalonServicesByCategory = async (req, res) => {
   const { salonId, category } = req.params;
@@ -201,4 +225,5 @@ export {
   getService,
   getSalonServices,
   getSalonServicesByCategory,
+  AuthgetSalonServices,
 };

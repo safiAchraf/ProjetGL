@@ -2,8 +2,14 @@ import bodyParser from "body-parser";
 import express from "express";
 import { verifySignature } from "@chargily/chargily-pay";
 import prisma from "../prisma/client.js";
+import Chargily from "@chargily/chargily-pay";
 
-const API_SECRET_KEY = process.env.CHARGILY_SECRET_KEY;
+const apiSecretKey = process.env.CHARGILY_SECRET_KEY;
+
+const client = new Chargily.ChargilyClient({
+	api_key: apiSecretKey,
+	mode: "test",
+});
 
 const router = express.Router();
 
@@ -21,6 +27,7 @@ router.get("/succuss", (req, res) => {
 router.get("/fail", (req, res) => {
 	res.json("Your payment failed");
 });
+
 
 router.post("/webhook", async (req, res) => {
 	const signature = req.get("signature") || "";

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import useAuth from "../hooks/useAuth";
@@ -18,6 +18,8 @@ import { Alert, AlertDescription } from "../components/ui/alert";
 import { Card } from "../components/ui/card";
 import { Textarea } from "../components/ui/textarea";
 import { toast } from "react-toastify";
+import UnauthorizedAccess from "./UnauthorizedAccess";
+import { Loader2 } from "lucide-react";
 
 const CLOUD_NAME = import.meta.env.VITE_CLOUD_NAME;
 const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET;
@@ -38,12 +40,6 @@ const CreateSalon = () => {
       pictures: [],
     },
   });
-
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      navigate("/");
-    }
-  }, [isAuthenticated, isLoading, navigate]);
 
   const uploadToCloudinary = async (file: File): Promise<string> => {
     const formData = new FormData();
@@ -112,13 +108,16 @@ const CreateSalon = () => {
     }
   };
 
+  if (!isLoading && !isAuthenticated) {
+    return <UnauthorizedAccess />;
+  }
+
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Button disabled variant="ghost">
-          <span className="animate-pulse">Loading...</span>
-        </Button>
-      </div>
+      <main className="w-full h-screen flex flex-col items-center justify-center gap-4">
+        <Loader2 className="animate-spin" size={64} />
+        <span>Moving at speed of light. Hold tight!</span>
+      </main>
     );
   }
 

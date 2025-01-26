@@ -79,12 +79,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     };
 
     if (isAuthenticated && !salon) getSalon();
-    else setHasCheckedSalon(true);
   }, [isAuthenticated, salon]);
 
   const logout = async () => {
     setIsLoading(true);
-
     try {
       await api.get("/api/auth/logout");
       setIsAuthenticated(false);

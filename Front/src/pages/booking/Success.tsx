@@ -76,7 +76,7 @@ const Success = () => {
               </Card>
 
               <div className="flex flex-col md:flex-row gap-4 justify-center pt-8">
-                <Button size="lg" className="w-full  md:w-auto">
+                <Button size="lg" className="w-full md:w-auto">
                   <Link
                     to={checkoutLink}
                     target="_blank"

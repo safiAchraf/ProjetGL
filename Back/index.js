@@ -26,9 +26,9 @@ app.use(
   cors({
     credentials: true,
     origin: 
-    	process.env.NODE_ENV == "development"
+    	process.env.NODE_ENV === "development"
     		? "http://localhost:5173"
-    		: "https://projet-gl-jet.vercel.app",
+    		: "https://projet-gl-jet.vercel.app"
   })
 );
 

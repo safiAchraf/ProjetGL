@@ -90,7 +90,7 @@ const updateSalon = async (req, res) => {
       .status(403)
       .json({ error: "You are not authorized to update this salon" });
   }
-
+  const id = salon[0].id;
   try {
     const updatedSalon = await prisma.$queryRaw`
       UPDATE "Salon"
@@ -104,6 +104,8 @@ const updateSalon = async (req, res) => {
       WHERE id = ${id}
       RETURNING *`;
     if (updatedSalon) {
+      const pics = await prisma.$queryRaw`SELECT * FROM "Picture" WHERE "salonId" = ${id}`;
+      updatedSalon.pictures = pics;
       res.json(updatedSalon);
     } else {
       res.status(404).json({ error: "Salon not found" });

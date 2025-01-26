@@ -9,8 +9,6 @@ const client = new Chargily.ChargilyClient({
 	mode: "test",
 });
 
-
-
 const getCancelledReservations = async (req, res) => {
 	try {
 		const cancelledReservations = await prisma.$queryRaw`
@@ -81,7 +79,7 @@ const getReservationById = async (req, res) => {
 };
 
 const createReservation = async (req, res) => {
-	const { startTime, coupon, paymentType , inHouse } = req.body;
+	const { startTime, coupon, paymentType, inHouse } = req.body;
 	const customerId = req.user.id;
 	const serviceId = req.params.serviceId;
 	const [service] = await prisma.$queryRaw`
@@ -261,6 +259,37 @@ const getAvailableHours = async (req, res) => {
 		res.status(500).json({ error: error.message });
 	}
 };
+
+const getPriceAfterDiscount = async (req, res) => {
+	const { coupon, serviceIds, priceBeforeCoupon } = req.body;
+	let totalDiscount = 0;
+	const[existingCoupon] = await prisma.$queryRaw`
+			SELECT * FROM "Coupon" WHERE code = ${coupon}`;
+	if (!existingCoupon) {
+		return res.status(404).json({ error: "Coupon not found" });
+	}
+
+	for (const serviceId of serviceIds) {
+		const [service] = await prisma.$queryRaw`
+		SELECT * FROM "Service" WHERE id = ${serviceId}`;
+		if (!service) {
+			return res
+				.status(404)
+				.json({ error: `Service with id ${serviceId} not found` });
+		}
+		if (coupon) {
+			if (existingCoupon.salonId !== service.salonId) {
+				return res
+					.status(400)
+					.json({ error: "Coupon not valid for this salon" });
+			}
+		}
+	}
+
+	const finalPrice = priceBeforeCoupon* (existingCoupon.discount / 100);
+	res.json({ price: finalPrice });
+};
+
 export {
 	getAllReservations,
 	getReservationById,
@@ -272,4 +301,5 @@ export {
 	getCancelledReservations,
 	reservationHistory,
 	getAvailableHours,
+	getPriceAfterDiscount,
 };

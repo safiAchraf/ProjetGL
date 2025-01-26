@@ -1,12 +1,14 @@
 import express from "express";
 import { getService, getSalonServicesByCategory, getSalonServices } from "../controllers/serviceController.js";
 import { getAllSalons, getSalonById } from "../controllers/salonController.js";
-import { getAvailableHours } from "../controllers/reservationController.js";
+import { getAvailableHours , getPriceAfterDiscount } from "../controllers/reservationController.js";
 import { getCategories } from "../controllers/categoryController.js";
 import { getSalonReviews } from "../controllers/reviewController.js";
 
 const router = express.Router();
 
+
+router.get("/applycoupon" , getPriceAfterDiscount);
 /**
  * @swagger
  * /api/nonauth/salons:

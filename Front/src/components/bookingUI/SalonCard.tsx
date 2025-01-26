@@ -14,7 +14,7 @@ interface Props {
 }
 
 const SalonCard = ({ salon, isSelected, onSelect }: Props) => {
-  console.log(salon);
+  
   const handleCardClick = (event: React.MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
@@ -29,8 +29,9 @@ const SalonCard = ({ salon, isSelected, onSelect }: Props) => {
 
     return <ReviewStars rating={salon.rating} />;
   };
-
+  console.log(salon)
   return (
+    
     <div
       onClick={handleCardClick}
       className={`p-3 border rounded-lg transition-all relative cursor-pointer ${
@@ -39,11 +40,13 @@ const SalonCard = ({ salon, isSelected, onSelect }: Props) => {
           : "border-gray-200 hover:border-gray-300 hover:shadow"
       }`}
     >
+      
       <div className="flex items-start space-x-3">
         {/* Image Section */}
         <div className="flex-shrink-0">
           <img
-            src={salon.pictures[0].url}
+            
+            src={salon.pictures[0]?.url}
             className="w-16 h-16 rounded-lg object-cover"
           />
         </div>

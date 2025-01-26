@@ -17,6 +17,7 @@ interface SalonInfoProps {
 const SalonInfo = ({ salon }: SalonInfoProps) => {
   const [reviews] = useState<Review[]>([]);
   const salonImages = salon.pictures.map((picture) => picture.url);
+  console.log(salonImages);
 
   return (
     <section>
@@ -39,7 +40,7 @@ const SalonInfo = ({ salon }: SalonInfoProps) => {
           </p>
         </div>
       ) : (
-        <Carousel images={salonImages} slidesToShow={1} />
+        <Carousel images={salonImages} slidesToShow={salon.pictures.length} />
       )}
 
       <div className="text-right">

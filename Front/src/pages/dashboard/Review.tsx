@@ -1,8 +1,12 @@
 import { Card } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
-import { Star, ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Star, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "../../components/ui/button";
+import { api } from "../../api/axios";
+import { AxiosError } from "axios";
+import { toast } from "react-toastify";
+import { useLocation } from "react-router";
 
 interface Review {
   id: string;
@@ -13,175 +17,13 @@ interface Review {
   serviceUsed: string;
 }
 
-const defaults = [
-  {
-    id: "1",
-    clientName: "Sarah Johnson",
-    rating: 5,
-    comment:
-      "Amazing experience! The stylist was very professional and gave me exactly the haircut I wantedAmazing experience! The stylist was very professional and gave me exactly the haircut I wanted.",
-    date: "2024-05-15",
-    serviceUsed: "Women's Haircut",
-  },
-  {
-    id: "2",
-    clientName: "Michael Chen",
-    rating: 4,
-    comment:
-      "Good service overall, but the wait time was a bit longer than expected.",
-    date: "2024-05-14",
-    serviceUsed: "Men's Coloring",
-  },
-  {
-    id: "3",
-    clientName: "Emma Wilson",
-    rating: 5,
-    comment: "Best facial treatment I've ever had! My skin feels rejuvenated.",
-    date: "2024-05-13",
-    serviceUsed: "Facial Treatment",
-  },
-  {
-    id: "4",
-    clientName: "David Thompson",
-    rating: 3,
-    comment: "Decent haircut but the stylist seemed rushed. Could be better.",
-    date: "2024-05-12",
-    serviceUsed: "Men's Haircut",
-  },
-  {
-    id: "5",
-    clientName: "Olivia Martinez",
-    rating: 5,
-    comment: "Absolutely loved my balayage! The color is perfect for summer.",
-    date: "2024-05-11",
-    serviceUsed: "Hair Coloring",
-  },
-  {
-    id: "6",
-    clientName: "James Wilson",
-    rating: 4,
-    comment: "Good beard trim, but the waiting area could use more seating.",
-    date: "2024-05-10",
-    serviceUsed: "Beard Trim",
-  },
-  {
-    id: "7",
-    clientName: "Sophia Lee",
-    rating: 5,
-    comment: "Fantastic spa day! The massage was incredibly relaxing.",
-    date: "2024-05-09",
-    serviceUsed: "Full Spa Package",
-  },
-  {
-    id: "8",
-    clientName: "Ethan Brown",
-    rating: 2,
-    comment: "Disappointing experience. Color didn't turn out as expected.",
-    date: "2024-05-08",
-    serviceUsed: "Hair Coloring",
-  },
-  {
-    id: "9",
-    clientName: "Ava Garcia",
-    rating: 5,
-    comment: "Perfect eyebrow shaping! Will definitely come back.",
-    date: "2024-05-07",
-    serviceUsed: "Eyebrow Shaping",
-  },
-  {
-    id: "10",
-    clientName: "Noah Rodriguez",
-    rating: 4,
-    comment: "Good haircut, but the shampoo station was a bit uncomfortable.",
-    date: "2024-05-06",
-    serviceUsed: "Men's Haircut",
-  },
-  {
-    id: "11",
-    clientName: "Isabella Smith",
-    rating: 5,
-    comment: "Amazing keratin treatment! My hair has never been smoother.",
-    date: "2024-05-05",
-    serviceUsed: "Keratin Treatment",
-  },
-  {
-    id: "12",
-    clientName: "Liam Johnson",
-    rating: 4,
-    comment: "Solid service, but the music was a bit too loud.",
-    date: "2024-05-04",
-    serviceUsed: "Men's Grooming",
-  },
-  {
-    id: "13",
-    clientName: "Mia Davis",
-    rating: 5,
-    comment: "Wonderful bridal makeup! Looked perfect all day.",
-    date: "2024-05-03",
-    serviceUsed: "Bridal Makeup",
-  },
-  {
-    id: "14",
-    clientName: "Lucas Miller",
-    rating: 3,
-    comment: "Average experience. Staff was friendly but rushed.",
-    date: "2024-05-02",
-    serviceUsed: "Haircut & Shave",
-  },
-  {
-    id: "15",
-    clientName: "Charlotte Wilson",
-    rating: 5,
-    comment: "Best manicure I've ever had! Nails look flawless.",
-    date: "2024-05-01",
-    serviceUsed: "Gel Manicure",
-  },
-  {
-    id: "16",
-    clientName: "Benjamin Moore",
-    rating: 4,
-    comment: "Good service, but parking was challenging.",
-    date: "2024-04-30",
-    serviceUsed: "Beard Trim",
-  },
-  {
-    id: "17",
-    clientName: "Amelia Taylor",
-    rating: 5,
-    comment: "Fantastic haircut! Exactly what I asked for.",
-    date: "2024-04-28",
-    serviceUsed: "Women's Haircut",
-  },
-  {
-    id: "18",
-    clientName: "William Anderson",
-    rating: 4,
-    comment: "Quality service, but the appointment started 15 minutes late.",
-    date: "2024-04-27",
-    serviceUsed: "Hair Coloring",
-  },
-  {
-    id: "19",
-    clientName: "Harper Thomas",
-    rating: 5,
-    comment: "Outstanding facial! Skin feels amazing.",
-    date: "2024-04-25",
-    serviceUsed: "Deep Cleansing Facial",
-  },
-  {
-    id: "20",
-    clientName: "Daniel White",
-    rating: 4,
-    comment: "Good experience overall, would recommend to friends.",
-    date: "2024-04-24",
-    serviceUsed: "Men's Haircut",
-  },
-];
-
 const Reviews = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
+
+  const { pathname } = useLocation();
 
   const RatingStars = ({ rating }: { rating: number }) => (
     <div className="flex gap-1">
@@ -198,15 +40,42 @@ const Reviews = () => {
     </div>
   );
 
-  useEffect(() => {
-    setReviews(defaults);
+  const fetchCoupons = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { data } = await api.get("/api/review/salonReviews");
+      setReviews(data.data);
+    } catch (error) {
+      if ((error as AxiosError).status !== 404) {
+        toast.error("Failed to load reviews");
+        console.error(error);
+      }
+      setReviews([]);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    if (pathname.includes("reviews")) fetchCoupons();
+  }, [pathname, fetchCoupons]);
 
   // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentReviews = reviews.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(reviews.length / itemsPerPage);
+
+  if (isLoading) {
+    return (
+      <div className="h-screen flex-1 flex items-center justify-center">
+        <div className="flex flex-col items-center space-y-4">
+          <Loader2 className="w-16 h-16 animate-spin text-gray-700" />
+          <p className="text-gray-600">Loading reviews...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 max-w-7xl mx-auto">

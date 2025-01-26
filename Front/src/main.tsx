@@ -31,7 +31,7 @@ import Coupons from "./pages/dashboard/Coupons.tsx";
 import Salon from "./pages/dashboard/Salon.tsx";
 
 /* User Page */
-import Orders from "./pages/dashboard/Orders.tsx";
+import History from "./pages/dashboard/History.tsx";
 import Services from "./pages/dashboard/Services.tsx";
 
 /* Create Salon */
@@ -80,8 +80,8 @@ const router = createBrowserRouter([
         element: <Services />,
       },
       {
-        path: "orders",
-        element: <Orders />,
+        path: "history",
+        element: <History />,
       },
       {
         path: "reviews",

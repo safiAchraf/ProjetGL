@@ -144,7 +144,7 @@ const Settings = () => {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => navigate("/dashboard")}
+          onClick={() => navigate("/")}
           className="rounded-full"
         >
           <ArrowLeft className="h-5 w-5" />
@@ -264,11 +264,7 @@ const Settings = () => {
         </div>
 
         <div className="flex gap-4 justify-end pt-8">
-          <Button
-            variant="outline"
-            type="button"
-            onClick={() => navigate("/dashboard")}
-          >
+          <Button variant="outline" type="button" onClick={() => navigate("/")}>
             Cancel
           </Button>
           <Button type="submit">Save Changes</Button>

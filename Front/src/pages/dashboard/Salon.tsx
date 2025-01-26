@@ -11,6 +11,7 @@ import { Label } from "../../components/ui/label";
 
 /* Utils */
 import { toast } from "react-toastify";
+import { api } from "../../api/axios";
 
 /* Types */
 import type { Salon, Picture } from "../../types/data";
@@ -20,7 +21,6 @@ import { Loader2, Trash2, Upload } from "lucide-react";
 
 const Salon = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-
   const { salon, setSalon, isLoading } = useAuth();
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -35,11 +35,14 @@ const Salon = () => {
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setSalon({ ...salon, [e.target.name]: e.target.value });
+    setSalon((prev) => {
+      if (!prev) return null;
+      return { ...prev, [e.target.name]: e.target.value };
+    });
   };
 
   const uploadImages = async () => {
-    if (!selectedFiles.length) return;
+    if (!selectedFiles.length || !salon) return;
 
     try {
       const uploadPromises = selectedFiles.map(async (file) => {
@@ -62,21 +65,22 @@ const Salon = () => {
         const data = await response.json();
 
         return {
-          id: data.public_id,
           url: data.secure_url,
-          salonId: salon.id,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
         } as Picture;
       });
 
       const newPictures = await Promise.all(uploadPromises);
-      setSalon((prev) => ({
-        ...prev,
-        pictures: [...prev.pictures, ...newPictures],
-      }));
+
+      await api.post("/api/salons/pictures", {
+        pictures: newPictures,
+      });
+
+      setSalon((prev) => {
+        if (!prev) return null;
+        return { ...prev, pictures: [...prev.pictures, ...newPictures] };
+      });
       setSelectedFiles([]);
-      toast.success("Images uploaded to Cloudinary");
+      toast.success("Images uploaded");
     } catch (error) {
       console.error(error);
       toast.error("Image upload failed");
@@ -84,6 +88,8 @@ const Salon = () => {
   };
 
   const deleteImage = async (pictureId: string) => {
+    if (!salon) return;
+
     try {
       const timestamp = Date.now();
       const signature = await createSignature(pictureId, timestamp);
@@ -106,13 +112,17 @@ const Salon = () => {
         }
       );
 
+      await api.delete("/api/salons/pictures/" + pictureId);
+
       if (!response.ok) throw new Error("Cloudinary deletion failed");
 
-      // Then update local state
-      setSalon((prev) => ({
-        ...prev,
-        pictures: prev.pictures.filter((pic) => pic.id !== pictureId),
-      }));
+      setSalon((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          pictures: prev.pictures.filter((pic) => pic.id !== pictureId),
+        };
+      });
 
       toast.success("Image deleted from gallery");
     } catch (error) {
@@ -134,17 +144,31 @@ const Salon = () => {
     return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
   };
 
-  const saveSalonInfo = () => {
-    console.log(salon);
-    toast.success("Salon information updated successfully");
+  const saveSalonInfo = async () => {
+    if (!salon) return;
+
+    try {
+      const response = await api.put<Salon>("/api/salons", salon);
+      setSalon(response.data);
+      toast.success("Salon information updated successfully");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Failed to update salon:", error);
+
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please login again.");
+      } else {
+        toast.error("Failed to update salon");
+      }
+    }
   };
 
-  if (isLoading) {
+  if (isLoading || !salon) {
     return (
-      <div className="flex-1 flex items-center justify-center">
+      <div className="h-screen flex-1 flex items-center justify-center">
         <div className="flex flex-col items-center space-y-4">
-          <Loader2 className="w-8 h-8 animate-spin text-gray-700" />
-          <p className="text-gray-600">Loading salon info...</p>
+          <Loader2 className="w-16 h-16 animate-spin text-gray-700" />
+          <p className="text-gray-600">Loading coupons...</p>
         </div>
       </div>
     );
@@ -161,7 +185,7 @@ const Salon = () => {
             <Input
               className="rounded-lg h-12"
               name="name"
-              value={salon!.name}
+              value={salon.name}
               onChange={handleInputChange}
             />
           </div>
@@ -171,7 +195,7 @@ const Salon = () => {
             <Input
               className="rounded-lg h-12"
               name="phoneNumber"
-              value={salon!.phoneNumber}
+              value={salon.phoneNumber}
               onChange={handleInputChange}
             />
           </div>
@@ -182,7 +206,7 @@ const Salon = () => {
           <Textarea
             className="rounded-lg min-h-[120px]"
             name="description"
-            value={salon!.description}
+            value={salon.description}
             onChange={handleInputChange}
           />
         </div>
@@ -193,7 +217,7 @@ const Salon = () => {
             <Input
               className="rounded-lg h-12"
               name="address"
-              value={salon!.address}
+              value={salon.address}
               onChange={handleInputChange}
             />
           </div>
@@ -203,7 +227,7 @@ const Salon = () => {
             <Input
               className="rounded-lg h-12"
               name="city"
-              value={salon!.city}
+              value={salon.city}
               onChange={handleInputChange}
             />
           </div>
@@ -213,12 +237,12 @@ const Salon = () => {
           <Label className="text-sm font-medium">Salon Gallery</Label>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {salon!.pictures.map((picture) => (
+            {salon.pictures.map((picture) => (
               <div key={picture.id} className="relative group">
                 <img
                   src={picture.url}
                   className="w-full h-48 object-cover rounded-lg shadow-sm"
-                  alt="Salon image"
+                  alt="Salon"
                 />
                 <Button
                   variant="link"
@@ -235,12 +259,11 @@ const Salon = () => {
           <div className="space-y-4">
             <div
               {...getRootProps()}
-              className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors
-                ${
-                  isDragActive
-                    ? "border-primary bg-primary/10"
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
+              className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
+                isDragActive
+                  ? "border-primary bg-primary/10"
+                  : "border-gray-200 hover:border-gray-300"
+              }`}
             >
               <input {...getInputProps()} />
               <div className="space-y-2">

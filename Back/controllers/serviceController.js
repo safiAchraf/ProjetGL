@@ -175,7 +175,7 @@ const AuthgetSalonServices = async (req, res) => {
     }
     const salonId = salon.id;
     const services = await prisma.$queryRaw`SELECT * FROM "Service" WHERE "salonId" = ${salonId}`;
-
+    
     if (services.length === 0) {
       return res.status(200).json({ msg: "No services found for this salon", data: [] });
     }

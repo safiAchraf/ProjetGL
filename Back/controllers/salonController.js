@@ -71,7 +71,6 @@ const createSalon = async (req, res) => {
 };
 
 const updateSalon = async (req, res) => {
-  const { id } = req.params;
   const {
     name,
     description,
@@ -80,7 +79,7 @@ const updateSalon = async (req, res) => {
     phoneNumber,
   } = req.body;
   const ownerId = req.user.id;
-  const salon = await prisma.$queryRaw`SELECT * FROM "Salon" WHERE id = ${id}`;
+  const salon = await prisma.$queryRaw`SELECT * FROM "Salon" WHERE ownerId = ${ownerId}`;
   if (salon.length === 0) {
     return res.status(404).json({ error: "Salon not found" });
   }
@@ -113,7 +112,17 @@ const updateSalon = async (req, res) => {
 };
 
 const deleteSalon = async (req, res) => {
-  const { id } = req.params;
+  const userId = req.user.id;
+    cosnt [salon ] = await prisma.$queryRaw`SELECT * FROM "Salon" WHERE "ownerId" = ${userId}`;
+  if (salon.length === 0) {
+    return res.status(404).json({ error: "Salon not found" });
+  }
+  if (salon[0].ownerId !== userId) {
+    return res
+      .status(403)
+      .json({ error: "You are not authorized to delete this salon" });
+  }
+  const id = salon[0].id;
   try {
     const deletedSalon = await prisma.$queryRaw`DELETE FROM "Salon" WHERE id = ${id} RETURNING *`;
     if (deletedSalon.length > 0) {
@@ -178,12 +187,16 @@ const deleteSalonPicture = async (req, res) => {
 
 const userHaveSalon = async (req, res) => {
   const ownerId = req.user.id;
-  const alreadyExists = await prisma.$queryRaw`
+  const [alreadyExists] = await prisma.$queryRaw`
     SELECT * FROM "Salon" WHERE "ownerId" = ${ownerId}`;
-  if (alreadyExists.length > 0) {
-    return res.json({ message: "You already have a salon", data: alreadyExists[0] });
-  }
-  return res.json({ message: "You don't have a salon", data: false });
+  if (!alreadyExists)
+    return res.json({ message: "You don't have a salon", data: false });
+
+  const pictures = await prisma.$queryRaw`SELECT * FROM "Picture" WHERE "salonId" = ${alreadyExists[0].id}`;
+  alreadyExists.pictures = pictures;
+
+  
+  return res.json({ message: "Here is your shit", data: alreadyExists });
 };
 
 

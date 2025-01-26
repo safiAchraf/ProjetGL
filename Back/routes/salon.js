@@ -251,7 +251,7 @@ router.post("/", createSalon);
  *       403:
  *         description: Unauthorized to update this salon
  */
-router.put("/:id", updateSalon);
+router.put("/", updateSalon);
 
 /**
  * @swagger
@@ -271,7 +271,7 @@ router.put("/:id", updateSalon);
  *       404:
  *         description: Salon not found
  */
-router.delete("/:id", deleteSalon);
+router.delete("/", deleteSalon);
 
 /**
  * @swagger

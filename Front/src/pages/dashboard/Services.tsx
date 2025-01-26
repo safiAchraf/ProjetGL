@@ -167,6 +167,7 @@ const Services = () => {
                   value={serviceFormData.price}
                   onChange={handleServiceInputChange}
                   required
+                  min={100}
                 />
                 <Input
                   name="duration"

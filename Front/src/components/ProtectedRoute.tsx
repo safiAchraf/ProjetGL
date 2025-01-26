@@ -23,7 +23,7 @@ const ProtectedRoute: React.FC = () => {
   useEffect(() => {
     const timeout = setTimeout(() => setFakeLoading(false), 1000);
     return () => clearTimeout(timeout);
-  }, [fakeLoading]);
+  }, []);
 
   if (isLoading || (isAuthenticated && !hasCheckedSalon) || fakeLoading) {
     return (

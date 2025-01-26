@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import useAuth from "../hooks/useAuth";
@@ -32,6 +32,7 @@ const CreateSalon = () => {
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [previewImages, setPreviewImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [fakeLoading, setFakeLoading] = useState(true);
 
   const form = useForm<Partial<Salon>>({
     defaultValues: {
@@ -116,6 +117,11 @@ const CreateSalon = () => {
     }
   };
 
+  useEffect(() => {
+    const timeout = setTimeout(() => setFakeLoading(false), 1000);
+    return () => clearTimeout(timeout);
+  }, []);
+
   if (!isLoading && !isAuthenticated) {
     return <UnauthorizedAccess />;
   }
@@ -124,7 +130,7 @@ const CreateSalon = () => {
     navigate("/dashboard");
   }
 
-  if (isLoading || (isAuthenticated && !hasCheckedSalon)) {
+  if (isLoading || (isAuthenticated && !hasCheckedSalon) || fakeLoading) {
     return (
       <main className="w-full h-screen flex flex-col items-center justify-center gap-4">
         <Loader2 className="animate-spin" size={64} />

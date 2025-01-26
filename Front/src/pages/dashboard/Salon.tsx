@@ -169,7 +169,7 @@ const Salon = () => {
       const timeout = setTimeout(() => setFakeLoading(false), 1000);
       return () => clearTimeout(timeout);
     }
-  }, [fakeLoading, salon]);
+  }, [salon]);
 
   if (isLoading || !salon || fakeLoading) {
     return (

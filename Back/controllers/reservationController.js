@@ -82,7 +82,7 @@ const createReservation = async (req, res) => {
 	const { startTime, coupon, paymentType, serviceIds } = req.body;
 	const customerId = req.user.id;
   
-	if (!startTime || !paymentType || !Array.isArray(serviceIds) || serviceIds.length === 0) {
+	if (!startTime || !paymentType  || serviceIds.length === 0) {
 	  return res.status(400).json({ error: "Missing required fields or invalid serviceIds" });
 	}
   

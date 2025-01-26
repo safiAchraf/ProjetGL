@@ -3,6 +3,7 @@ import { getService, getSalonServicesByCategory, getSalonServices } from "../con
 import { getAllSalons, getSalonById } from "../controllers/salonController.js";
 import { getAvailableHours } from "../controllers/reservationController.js";
 import { getCategories } from "../controllers/categoryController.js";
+import { getSalonReviews } from "../controllers/reviewController.js";
 
 const router = express.Router();
 
@@ -320,5 +321,47 @@ router.get("/available/:salonId/:day/:month", getAvailableHours);
  *         description: No categories found
  */
 router.get("/categories", getCategories);
+
+/**
+ * @swagger
+ * /api/nonauth/reviews/{salonId}:
+ *   get:
+ *     summary: Get all reviews for a salon
+ *     parameters:
+ *       - in: path
+ *         name: salonId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The salon ID
+ *     responses:
+ *       200:
+ *         description: All reviews for the salon retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       rating:
+ *                         type: number
+ *                       comment:
+ *                         type: string
+ *                       customerId:
+ *                         type: string
+ *                       salonId:
+ *                         type: string
+ *       404:
+ *         description: No reviews found for this salon
+ */
+router.get("/reviews/:salonId", getSalonReviews);
 
 export default router;

@@ -3,7 +3,7 @@ import axios, { AxiosInstance, InternalAxiosRequestConfig } from "axios";
 const DEBUG_URL = "http://localhost:3000";
 const RELEASE_URL = "https://gl-backend-32cy.onrender.com/";
 const BASE_URL =
-  import.meta.env.VITE_NODE_ENV === "development" ? DEBUG_URL : RELEASE_URL;
+import.meta.env.VITE_NODE_ENV === "development" ? DEBUG_URL : RELEASE_URL;
 export const api: AxiosInstance = axios.create({
   baseURL: BASE_URL,
   timeout: 10000,

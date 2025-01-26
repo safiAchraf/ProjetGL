@@ -81,127 +81,120 @@ const getReservationById = async (req, res) => {
 const createReservation = async (req, res) => {
 	const { startTime, coupon, paymentType, serviceIds } = req.body;
 	const customerId = req.user.id;
-
-	if (!startTime || !paymentType || !serviceIds) {
-		return res.status(400).json({ error: "Missing required fields" });
+  
+	if (!startTime || !paymentType || !Array.isArray(serviceIds) || serviceIds.length === 0) {
+	  return res.status(400).json({ error: "Missing required fields or invalid serviceIds" });
 	}
-
-	const startDateTime = new Date(startTime);
-	const endDateTime = new Date(
-		startDateTime.getTime() + service.duration * 60000
-	);
+  
 	if (paymentType !== "Points" && paymentType !== "Money") {
-		return res.status(400).json({ error: "Invalid payment type" });
+	  return res.status(400).json({ error: "Invalid payment type" });
 	}
-
-	const [existingReservation] = await prisma.$queryRaw`
-    SELECT * FROM "Booking" WHERE "startTime" = ${startDateTime} AND "endTime" = ${endDateTime} AND "serviceId" = ${serviceId}`;
-
-	if (existingReservation) {
-		return res
-			.status(400)
-			.json({ error: "There is already a reservation for this time" });
-	}
+  
+	const startDateTime = new Date(startTime);
 	if (startDateTime < new Date()) {
-		return res
-			.status(400)
-			.json({ error: "You can't book a reservation in the past" });
+	  return res.status(400).json({ error: "You can't book a reservation in the past" });
 	}
-	if (startDateTime >= endDateTime) {
-		return res
-			.status(400)
-			.json({ error: "End time must be greater than start time" });
-	}
-	let price = 0;
-	let pointPrice = 0;
-	for (const serviceId of serviceIds) {
-		const [service] =
-			await prisma.$queryRaw`SELECT * FROM "Service" WHERE id = ${serviceId.id}`;
-		if (!service) {
-			return res
-				.status(404)
-				.json({ error: `Service with id ${serviceId} not found` });
-		}
-
-		price += service.price + (serviceId.inHouse ? 100 : 0);
-		pointPrice += service.pointPrice;
-	}
-
-	if (paymentType === "Points") {
-		const [points] = await prisma.$queryRaw`
-      SELECT * FROM "Points" WHERE "customerId" = ${customerId} AND "salonId" = ${salonId}`;
-		if (!points) {
-			return res.status(400).json({ error: "You don't have enough points" });
-		}
-		if (points.balance < pointPrice) {
-			return res.status(400).json({ error: "You don't have enough points" });
-		}
-		await prisma.$queryRaw`
-      UPDATE "Points" SET balance = balance - ${price} 
-      WHERE "customerId" = ${customerId} AND "salonId" = ${salonId}`;
-	}
-	if (paymentType === "Money") {
-		if (coupon) {
-			const [existingCoupon] = await prisma.$queryRaw`
-		SELECT * FROM "Coupon" WHERE code = ${coupon}`;
-			if (!existingCoupon) {
-				return res.status(404).json({ error: "Coupon not found" });
-			}
-			for (const serviceId of serviceIds) {
-				if (existingCoupon.salonId !== serviceId.id) {
-					return res
-						.status(400)
-						.json({ error: "Coupon not valid for this salon" });
-				}
-			}
-			price -= price * (existingCoupon.discount / 100);
-		}
-	}
+  
 	try {
-		if (paymentType === "Money") {
-			const reservationIds = [];
-			for (const serviceId of serviceIds) {
-				const [service] =
-					await prisma.$queryRaw`SELECT * FROM "Service" WHERE id = ${serviceId.id}`;
-				const salonId = service.salonId;
-				const [newReservation] = await prisma.$queryRaw`
-      INSERT} INTO "Booking" (id, "startTime", "endTime", "status", "customerId", "serviceId", "price", "salonId", "coupon", "paymentType", "createdAt", "updatedAt" , "inHouse")
-      VALUES (${uuidv4()}, ${startDateTime}, ${endDateTime}, 'PENDING', ${customerId}, ${
-					serviceId.id
-				}, ${price}, ${salonId}, ${coupon}, ${paymentType}::"PaymentType", NOW(), NOW() , ${
-					serviceId.inHouse
-				})
-      RETURNING *`;
-				reservationIds.push(newReservation.id);
-			}
-			console.log(reservationIds);
-			console.log(price);
-			const newCheckout = await client.createCheckout({
-				amount: price,
-				currency: "dzd",
-				metadata: reservationIds.map((id) => ({ reservationId: id })),
-				success_url: "http://localhost:3000/success",
-				failure_url: "http://localhost:3000/failure",
-			});
-			res.status(201).json({
-				message: "Reservation created",
-				checkout: newCheckout.checkout_url,
-			});
+	  // Fetch all services at once
+	  const serviceIdsArray = serviceIds.map((s) => s.id);
+	  const services = await prisma.$queryRaw`
+		SELECT * FROM "Service" WHERE id = ANY(${serviceIdsArray})`;
+  
+	  if (services.length !== serviceIds.length) {
+		return res.status(404).json({ error: "One or more services not found" });
+	  }
+  
+	  const salonId = services[0].salonId; // Assuming all services belong to the same salon
+	  let totalPrice = 0;
+	  let totalPointPrice = 0;
+  
+	  for (const serviceId of serviceIds) {
+		const service = services.find((s) => s.id === serviceId.id);
+		const endDateTime = new Date(startDateTime.getTime() + service.duration * 60000);
+  
+		// Check for conflicting reservations
+		const [existingReservation] = await prisma.$queryRaw`
+		  SELECT * FROM "Booking" 
+		  WHERE "startTime" = ${startDateTime} AND "endTime" = ${endDateTime} AND "serviceId" = ${service.id}`;
+		if (existingReservation) {
+		  return res.status(400).json({ error: `Service ${service.id} is already booked for this time` });
 		}
-		if (paymentType === "Points") {
-			const [newReservation] = await prisma.$queryRaw`
-      INSERT INTO "Booking" (id, "startTime", "endTime", "status", "customerId", "serviceId", "price", "salonId", "coupon", "paymentType", "createdAt", "updatedAt" , "inHouse")
-      VALUES (${uuidv4()}, ${startDateTime}, ${endDateTime}, 'CONFIRMED', ${customerId}, ${serviceId}, ${price}, ${salonId}, ${coupon}, ${paymentType}::"PaymentType", NOW(), NOW() , ${inHouse})
-      RETURNING *`;
-			res.status(201).json({
-				message: "Reservation created",
-				data: newReservation,
-			});
+  
+		totalPrice += service.price + (serviceId.inHouse ? 100 : 0);
+		totalPointPrice += service.pointPrice;
+	  }
+  
+	  // Handle payment with Points
+	  if (paymentType === "Points") {
+		const [points] = await prisma.$queryRaw`
+		  SELECT * FROM "Points" WHERE "customerId" = ${customerId} AND "salonId" = ${salonId}`;
+  
+		if (!points || points.balance < totalPointPrice) {
+		  return res.status(400).json({ error: "You don't have enough points" });
 		}
+  
+		await prisma.$queryRaw`
+		  UPDATE "Points" SET balance = balance - ${totalPointPrice} 
+		  WHERE "customerId" = ${customerId} AND "salonId" = ${salonId}`;
+	  }
+  
+	  // Handle payment with Money and coupon
+	  if (paymentType === "Money" && coupon) {
+		const [existingCoupon] = await prisma.$queryRaw`
+		  SELECT * FROM "Coupon" WHERE code = ${coupon}`;
+		if (!existingCoupon) {
+		  return res.status(404).json({ error: "Coupon not found" });
+		}
+  
+		if (existingCoupon.salonId !== salonId) {
+		  return res.status(400).json({ error: "Coupon not valid for this salon" });
+		}
+  
+		totalPrice -= totalPrice * (existingCoupon.discount / 100);
+	  }
+  
+	  // Create reservations
+	  const reservations = [];
+	  for (const serviceId of serviceIds) {
+		const service = services.find((s) => s.id === serviceId.id);
+		const endDateTime = new Date(startDateTime.getTime() + service.duration * 60000);
+  
+		const [newReservation] = await prisma.$queryRaw`
+		  INSERT INTO "Booking" (id, "startTime", "endTime", "status", "customerId", "serviceId", "price", "salonId", "coupon", "paymentType", "createdAt", "updatedAt", "inHouse")
+		  VALUES (${uuidv4()}, ${startDateTime}, ${endDateTime}, 'PENDING', ${customerId}, ${service.id}, ${service.price}, ${salonId}, ${coupon}, ${paymentType}::"PaymentType", NOW(), NOW(), ${serviceId.inHouse})
+		  RETURNING *`;
+  
+		reservations.push(newReservation);
+	  }
+  
+	  // Handle checkout for Money
+	  if (paymentType === "Money") {
+		const checkout = await client.createCheckout({
+		  amount: totalPrice,
+		  currency: "dzd",
+		  metadata: reservations.map((r) => ({ reservationId: r.id })),
+		  success_url: "http://localhost:3000/success",
+		  failure_url: "http://localhost:3000/failure",
+		});
+  
+		return res.status(201).json({
+		  message: "Reservations created",
+		  checkout: checkout.checkout_url,
+		  reservations,
+		});
+	  }
+  
+	  res.status(201).json({
+		message: "Reservations created",
+		reservations,
+	  });
 	} catch (error) {
-		res.status(500).json({ error: error.message });
+	  console.error(error);
+	  res.status(500).json({ error: error.message });
 	}
-};
+  };
+  
 
 const updateReservation = async (req, res) => {
 	const { id } = req.params;

@@ -81,7 +81,7 @@ const updateSalon = async (req, res) => {
     phoneNumber,
   } = req.body;
   const ownerId = req.user.id;
-  const salon = await prisma.$queryRaw`SELECT * FROM "Salon" WHERE ownerId = ${ownerId}`;
+  const salon = await prisma.$queryRaw`SELECT * FROM "Salon" WHERE "ownerId" = ${ownerId}`;
   if (salon.length === 0) {
     return res.status(404).json({ error: "Salon not found" });
   }

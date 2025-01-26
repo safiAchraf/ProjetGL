@@ -185,7 +185,6 @@ const createReservation = async (req, res) => {
 			});
 			res.status(201).json({
 				message: "Reservation created",
-				data: newReservation,
 				checkout: newCheckout.checkout_url,
 			});
 		}

@@ -23,7 +23,7 @@ const BookingCarousel = ({
     {
       loop: true,
       align: "start",
-      slidesToScroll: slidesToShow, // Actually use slidesToShow parameter
+      slidesToScroll: slidesToShow,
     },
     autoplay ? [Autoplay({ delay: autoplaySpeed })] : []
   );
@@ -58,7 +58,7 @@ const BookingCarousel = ({
               key={index}
               className="relative flex-[0_0_calc(100%/${slidesToShow})] min-w-0"
               style={{
-                flex: `0 0 calc(100% / ${slidesToShow})`, // Actually use slidesToShow
+                flex: `0 0 calc(100% / ${slidesToShow})`,
                 transition: "transform 0.5s ease-out",
                 transform: `scale(${index === selectedIndex ? 1.05 : 1})`,
               }}

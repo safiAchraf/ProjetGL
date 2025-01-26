@@ -166,11 +166,11 @@ const DashboardSidebar = () => {
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild className="cursor-pointer">
                     <Link
-                      to="/dashboard/orders"
+                      to="/dashboard/history"
                       className="flex items-center gap-2"
                     >
                       <ShoppingCart />
-                      <span>Orders</span>
+                      <span>History</span>
                     </Link>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>

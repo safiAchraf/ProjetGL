@@ -14,11 +14,11 @@ import UnauthorizedAccess from "../pages/UnauthorizedAccess";
 import { Loader2 } from "lucide-react";
 
 const ProtectedRoute: React.FC = () => {
-  const { isAuthenticated, isLoading, salon } = useAuth();
+  const { isAuthenticated, isLoading, salon, hasCheckedSalon } = useAuth();
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
-  if (isLoading) {
+  if (isLoading || (isAuthenticated && !hasCheckedSalon)) {
     return (
       <main className="w-full h-screen flex flex-col items-center justify-center gap-4">
         <Loader2 className="animate-spin" size={64} />
@@ -31,13 +31,13 @@ const ProtectedRoute: React.FC = () => {
     return <UnauthorizedAccess />;
   }
 
-  if (isAuthenticated && !salon) {
+  if (isAuthenticated && !salon && hasCheckedSalon) {
     navigate("/create");
   }
 
   return (
     <SidebarProvider defaultOpen>
-      {!(pathname.includes("orders") || pathname.includes("settings")) && (
+      {!(pathname.includes("history") || pathname.includes("settings")) && (
         <DashboardSidebar />
       )}
       <main className="w-full h-full">

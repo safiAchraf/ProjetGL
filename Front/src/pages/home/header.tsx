@@ -1,5 +1,5 @@
 /* Hooks */
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import useAuth from "../../hooks/useAuth";
 
 /* Components */
@@ -52,10 +52,6 @@ const Header: React.FC = () => {
     { to: "Contacts", label: "Contacts" },
   ];
 
-  useEffect(() => {
-    console.log(salon);
-  }, [salon]);
-
   const UserDropdown = () => (
     <div className="relative">
       <button
@@ -98,10 +94,10 @@ const Header: React.FC = () => {
               Settings
             </button>
           </RouterLink>
-          <RouterLink to="/dashboard/Orders">
+          <RouterLink to="/dashboard/history">
             <button className="flex items-center gap-2 px-4 py-2 text-sm w-full hover:bg-gray-100">
               <ShoppingCart className="w-4 h-4" />
-              Orders
+              History
             </button>
           </RouterLink>
           <button

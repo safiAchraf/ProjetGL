@@ -200,7 +200,7 @@ const defaults: Reservation[] = [
   },
 ];
 
-const Orders = () => {
+const History = () => {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Reservation;
@@ -216,7 +216,7 @@ const Orders = () => {
   const navigate = useNavigate();
 
   const handleGoBack = () => {
-    navigate("/dashboard");
+    navigate("/");
   };
 
   const handleSort = (key: keyof Reservation) => {
@@ -547,4 +547,4 @@ const Orders = () => {
   );
 };
 
-export default Orders;
+export default History;

@@ -22,29 +22,22 @@ export type Salon = {
 };
 
 export type Service = {
-  id: string;
+  id?: string;
   name: string;
   description: string;
   price: number;
   pointPrice: number;
   duration: number;
-  categoryId: string;
+  category: Categories;
   inHouse: boolean;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export type Review = {
   user: string;
   rating: number;
   review: string;
-};
-
-export type Category = {
-  id: string;
-  name: string;
-  createdAt: string;
-  updatedAt: string;
 };
 
 export type User = {
@@ -66,13 +59,7 @@ export type Reservation = {
   status: "Pending" | "Confirmed" | "Cancelled" | "Completed";
 };
 
-export type Categories =
-  | "Hair"
-  | "Skin Care"
-  | "Nails"
-  | "Makeup"
-  | "Massage"
-  | "";
+export type Categories = "Hair" | "Skin Care" | "Nails" | "Makeup" | "Massage";
 
 export type UpdateUserPayload = Partial<User> & {
   currentPassword?: string;
@@ -80,8 +67,10 @@ export type UpdateUserPayload = Partial<User> & {
 };
 
 export type Coupon = {
-  id: "string";
-  code: "string";
-  discount: 0;
-  salonId: "string";
+  id?: string;
+  code: string;
+  discount: number;
+  salonId?: string;
+  createdAt?: string;
+  updatedAt?: string;
 };

@@ -18,6 +18,7 @@ type AuthContextType = {
   deleteUser: () => Promise<void>;
   salon: Salon | null;
   setSalon: React.Dispatch<React.SetStateAction<Salon | null>>;
+  hasCheckedSalon: boolean;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -27,6 +28,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const [salon, setSalon] = useState<Salon | null>(null);
+  const [hasCheckedSalon, setHasCheckedSalon] = useState<boolean>(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -36,7 +38,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         await api.get("/api/auth/check");
         setIsAuthenticated(true);
       } catch (error) {
-        console.log("Failed to login: " + error);
+        console.error("Failed to login: " + error);
         setIsAuthenticated(false);
       } finally {
         setIsLoading(false);
@@ -52,7 +54,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         const response = await api.get("/api/user");
         setUser(response.data);
       } catch (error) {
-        console.log("Failed to fetch user data: " + error);
+        console.error("Failed to fetch user data: " + error);
         setIsAuthenticated(false);
       } finally {
         setIsLoading(false);
@@ -65,35 +67,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   useEffect(() => {
     const getSalon = async () => {
       try {
-        const response = await api.get("/api/salons");
-        setSalon(response.data);
+        const response = await api.get("/api/salons/userHaveSalon");
+        const data = await response.data;
+        setSalon(data.data);
       } catch (error) {
-        console.log("Failed to fetch user salon: " + error);
-        setIsAuthenticated(false);
+        console.error("Failed to fetch user salon: " + error);
       } finally {
+        setHasCheckedSalon(true);
         setIsLoading(false);
       }
     };
 
     if (isAuthenticated && !salon) getSalon();
+    else setHasCheckedSalon(true);
   }, [isAuthenticated, salon]);
-
-  useEffect(() => {
-    const getSalon = async () => {
-      setIsLoading(true);
-      try {
-        const response = await api.get("/api/userHaveSalon");
-        setSalon(response.data);
-      } catch (error) {
-        console.error("Failed to fetch salon: ", error);
-        throw error;
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (user) getSalon();
-  }, [user]);
 
   const logout = async () => {
     setIsLoading(true);
@@ -106,6 +93,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     } finally {
       setIsLoading(false);
       setUser(null);
+      setSalon(null);
     }
   };
 
@@ -150,6 +138,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         deleteUser,
         salon,
         setSalon,
+        hasCheckedSalon,
       }}
     >
       {children}

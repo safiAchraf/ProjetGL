@@ -27,9 +27,11 @@ const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET;
 
 const CreateSalon = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, isLoading, setSalon, salon } = useAuth();
+  const { isAuthenticated, isLoading, setSalon, salon, hasCheckedSalon } =
+    useAuth();
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [previewImages, setPreviewImages] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
 
   const form = useForm<Partial<Salon>>({
     defaultValues: {
@@ -58,6 +60,7 @@ const CreateSalon = () => {
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
+    setUploading(true);
 
     const files = Array.from(e.target.files);
     const uploadedPictures: Picture[] = [];
@@ -89,16 +92,16 @@ const CreateSalon = () => {
         message: "Failed to upload images. Please try again.",
       });
       console.error(error);
+    } finally {
+      setUploading(false);
     }
   };
 
   const onSubmit = async (data: Partial<Salon>) => {
     try {
-      console.log(data, data.pictures);
-
       const res = await api.post("/api/salons", {
         ...data,
-        pictures: data.pictures?.map((p) => ({ url: p.url })),
+        pictures: data.pictures,
       });
 
       setSalon(res.data);
@@ -121,7 +124,7 @@ const CreateSalon = () => {
     navigate("/dashboard");
   }
 
-  if (isLoading) {
+  if (isLoading || (isAuthenticated && !hasCheckedSalon)) {
     return (
       <main className="w-full h-screen flex flex-col items-center justify-center gap-4">
         <Loader2 className="animate-spin" size={64} />
@@ -301,12 +304,19 @@ const CreateSalon = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => navigate(-1)}
+                  onClick={() => navigate("/")}
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={form.formState.isSubmitting}>
-                  {form.formState.isSubmitting ? "Creating..." : "Create Salon"}
+                <Button
+                  type="submit"
+                  disabled={form.formState.isSubmitting || uploading}
+                >
+                  {form.formState.isSubmitting || uploading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Create"
+                  )}
                 </Button>
               </div>
             </form>

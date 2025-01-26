@@ -156,7 +156,7 @@ const addSalonPictures = async (req, res) => {
     for (const pic of pictures) {
       await prisma.$queryRaw`
         INSERT INTO "Picture" (id, url, "salonId", "createdAt", "updatedAt")
-        VALUES (${uuidv4()}, ${pic.url}, ${id}, NOW(), NOW())`;
+        VALUES (${uuidv4()}, ${pic.url}, ${salon[0].id}, NOW(), NOW())`;
     }
     res.json({ message: "Pictures added successfully" });
   } catch (error) {

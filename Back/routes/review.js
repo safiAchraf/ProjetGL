@@ -49,6 +49,48 @@ router.get("/", getAllReviews);
 
 /**
  * @swagger
+ * /api/reviews/salonReviews/{id}:
+ *   get:
+ *     summary: Get all reviews for a salon
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The salon ID
+ *     responses:
+ *       200:
+ *         description: All reviews for the salon retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       rating:
+ *                         type: number
+ *                       comment:
+ *                         type: string
+ *                       customerId:
+ *                         type: string
+ *                       salonId:
+ *                         type: string
+ *       404:
+ *         description: No reviews found for this salon
+ */
+router.get("/salonReviews", getSalonReviews);
+
+/**
+ * @swagger
  * /api/reviews/{id}:
  *   post:
  *     summary: Create a new review
@@ -247,47 +289,7 @@ router.get("/:id", getReview);
  */
 router.get("/personalReviews", getPersonalReviews);
 
-/**
- * @swagger
- * /api/reviews/salonReviews/{id}:
- *   get:
- *     summary: Get all reviews for a salon
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: The salon ID
- *     responses:
- *       200:
- *         description: All reviews for the salon retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 msg:
- *                   type: string
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                       rating:
- *                         type: number
- *                       comment:
- *                         type: string
- *                       customerId:
- *                         type: string
- *                       salonId:
- *                         type: string
- *       404:
- *         description: No reviews found for this salon
- */
-router.get("/salonReviews/:id", getSalonReviews);
+
 
 /**
  * @swagger

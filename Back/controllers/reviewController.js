@@ -174,7 +174,9 @@ const getPersonalReviews = async (req, res) => {
 
 const getSalonReviews = async (req, res) => {
 	try {
-		const salonId = req.params.id;
+		const userId = req.user.id;
+		const [salon] = await prisma.$queryRaw`SELECT * FROM "Salon" WHERE "ownerId" = ${userId}`;
+		const salonId = salon.id;
 		const reviews = await prisma.$queryRaw`
       SELECT * FROM "Review" 
       WHERE "salonId" = ${salonId}`;

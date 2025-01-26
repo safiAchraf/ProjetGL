@@ -8,21 +8,15 @@ import { Card } from "../../components/ui/card";
 import { CheckCircle2 } from "lucide-react";
 import Header from "../../components/bookingUI/BookingHeader";
 
-/* Utils */
-/* import { toast } from "react-toastify"; */
-
 const Success = () => {
-  const { selectedSalon, selectedServices } = useBooking();
+  const {
+    selectedSalon,
+    selectedServices,
+    selectedDate,
+    selectedTime,
+    checkoutLink,
+  } = useBooking();
   const navigate = useNavigate();
-
-  /*   useEffect(() => {
-    if (!selectedSalon.id || !selectedDate) {
-      toast.error("Invalid booking data");
-      navigate("/booking/");
-    }
-
-    return () => clearBooking();
-  }, [clearBooking, navigate, selectedDate, selectedSalon.id]); */
 
   return (
     <div className="h-full pb-8">
@@ -30,7 +24,6 @@ const Success = () => {
         title="Booking Confirmed"
         breadcrumbs={["Salons", "Services", "Reservation", "Confirm"]}
         selectedCrumbs={["Success"]}
-        /* hideBackButton */
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -59,17 +52,17 @@ const Success = () => {
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Date:</span>
                     <span className="font-medium">
-                      {/*  {selectedDate?.toLocaleDateString("en-US", {
+                      {selectedDate?.toLocaleDateString("en-US", {
                         weekday: "long",
                         year: "numeric",
                         month: "long",
                         day: "numeric",
-                      })} */}
+                      })}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Time:</span>
-                    {/* <span className="font-medium">{selectedTime}</span> */}
+                    {<span className="font-medium">{selectedTime}</span>}
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Services:</span>
@@ -86,17 +79,17 @@ const Success = () => {
                 <Button
                   size="lg"
                   className="w-full md:w-auto"
-                  onClick={() => navigate("/dashboard/orders")}
+                  onClick={() => navigate(checkoutLink)}
                 >
-                  View My Bookings
+                  Processed with checkout
                 </Button>
                 <Button
                   variant="outline"
                   size="lg"
                   className="w-full md:w-auto"
-                  onClick={() => navigate("/")}
+                  onClick={() => navigate("/dashboard/orders")}
                 >
-                  Back to Home
+                  View my bookings
                 </Button>
               </div>
             </div>

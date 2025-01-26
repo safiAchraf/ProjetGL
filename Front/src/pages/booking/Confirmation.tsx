@@ -27,6 +27,7 @@ const Confirmation = () => {
     inHouseServices,
     selectedTime,
     selectedDate,
+    setCheckoutLink,
   } = useBooking();
   const { user } = useAuth();
   const [couponApplied, setCouponApplied] = useState(false);
@@ -106,7 +107,7 @@ const Confirmation = () => {
 
       // API call
       const response = await api.post("/api/reservation/", bookingPayload);
-      console.log(response);
+      setCheckoutLink(response.data.checkout);
 
       if (response.status === 201) {
         navigate("/booking/success");

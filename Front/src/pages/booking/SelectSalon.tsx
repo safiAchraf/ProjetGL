@@ -33,7 +33,7 @@ const SelectSalon = () => {
 
     try {
       const response = await api.get<SalonRes>("/nonauth/salons");
-      const fetchedSalons = response.data.data;
+      const fetchedSalons = await response.data.data;
 
       if (fetchedSalons.length === 0) {
         setError({

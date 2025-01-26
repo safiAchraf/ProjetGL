@@ -14,6 +14,7 @@ interface Props {
 }
 
 const SalonCard = ({ salon, isSelected, onSelect }: Props) => {
+  console.log(salon);
   const handleCardClick = (event: React.MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();

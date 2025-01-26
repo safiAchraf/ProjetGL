@@ -1,4 +1,5 @@
 /* Hooks */
+import { useEffect, useState } from "react";
 import useAuth from "../hooks/useAuth";
 import { useLocation, useNavigate } from "react-router";
 
@@ -17,8 +18,14 @@ const ProtectedRoute: React.FC = () => {
   const { isAuthenticated, isLoading, salon, hasCheckedSalon } = useAuth();
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const [fakeLoading, setFakeLoading] = useState(true);
 
-  if (isLoading || (isAuthenticated && !hasCheckedSalon)) {
+  useEffect(() => {
+    const timeout = setTimeout(() => setFakeLoading(false), 1000);
+    return () => clearTimeout(timeout);
+  }, []);
+
+  if (isLoading || (isAuthenticated && !hasCheckedSalon) || fakeLoading) {
     return (
       <main className="w-full h-screen flex flex-col items-center justify-center gap-4">
         <Loader2 className="animate-spin" size={64} />

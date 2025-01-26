@@ -1,5 +1,6 @@
 /* Hooks */
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import useAuth from "../../hooks/useAuth";
 
 /* Components */
 import { Button } from "../../components/ui/button";
@@ -25,7 +26,13 @@ import {
 import { Reservation } from "../../types/data";
 
 /* Icons */
-import { CheckCircle2, XCircle, Search, ArrowUpDown } from "lucide-react";
+import {
+  CheckCircle2,
+  XCircle,
+  Search,
+  ArrowUpDown,
+  Loader2,
+} from "lucide-react";
 
 const defaultData: Reservation[] = [
   {
@@ -192,6 +199,8 @@ const defaultData: Reservation[] = [
 
 const Reservations = () => {
   const [reservations, setReservations] = useState<Reservation[]>(defaultData);
+  const [fakeLoading, setFakeLoading] = useState(true);
+  const { isLoading } = useAuth();
 
   // Sorting state
   const [sortKey, setSortKey] = useState<keyof Reservation | null>(null);
@@ -282,6 +291,22 @@ const Reservations = () => {
       minute: "2-digit",
     });
   };
+
+  useEffect(() => {
+    const timeout = setTimeout(() => setFakeLoading(false), 1000);
+    return () => clearTimeout(timeout);
+  }, []);
+
+  if (isLoading || fakeLoading) {
+    return (
+      <div className="h-screen flex-1 flex items-center justify-center">
+        <div className="flex flex-col items-center space-y-4">
+          <Loader2 className="w-16 h-16 animate-spin text-gray-700" />
+          <p className="text-gray-600">Loading reservations...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 bg-white min-h-screen w-full space-y-6">

@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import DashboardCards from "../../components/dashboardUI/DashboardCards";
 import DashboardCharts from "../../components/dashboardUI/DashboardCharts";
@@ -9,19 +8,8 @@ import { Loader2 } from "lucide-react";
 export default function Dashboard() {
   const navigate = useNavigate();
   const { isLoading, isAuthenticated, salon, hasCheckedSalon } = useAuth();
-  const [isChecking, setIsChecking] = useState(true);
 
-  // Always place hooks at the top level
-  useEffect(() => {
-    if (hasCheckedSalon) {
-      // Add slight delay for smooth transition
-      const timeout = setTimeout(() => setIsChecking(false), 500);
-      return () => clearTimeout(timeout);
-    }
-  }, [hasCheckedSalon]);
-
-  // Show loader during initial checks
-  if (isLoading || !hasCheckedSalon || isChecking) {
+  if (isLoading || !hasCheckedSalon) {
     return (
       <div className="h-screen flex-1 flex items-center justify-center">
         <div className="flex flex-col items-center space-y-4">

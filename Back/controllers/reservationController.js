@@ -262,7 +262,7 @@ const getAvailableHours = async (req, res) => {
 
 const getPriceAfterDiscount = async (req, res) => {
 	const { coupon, serviceIds, priceBeforeCoupon } = req.body;
-	let totalDiscount = 0;
+
 	const[existingCoupon] = await prisma.$queryRaw`
 			SELECT * FROM "Coupon" WHERE code = ${coupon}`;
 	if (!existingCoupon) {

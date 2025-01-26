@@ -187,7 +187,6 @@ const updateCoupon = async (req, res) => {
 };
 
 
-const check
 
 export {
 	createNewCoupon,

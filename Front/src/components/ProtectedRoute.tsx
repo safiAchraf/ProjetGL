@@ -1,6 +1,6 @@
 /* Hooks */
 import useAuth from "../hooks/useAuth";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 /* Providers */
 import { SidebarProvider } from "./ui/sidebar";
@@ -14,8 +14,9 @@ import UnauthorizedAccess from "../pages/UnauthorizedAccess";
 import { Loader2 } from "lucide-react";
 
 const ProtectedRoute: React.FC = () => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, salon } = useAuth();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
 
   if (isLoading) {
     return (
@@ -28,6 +29,10 @@ const ProtectedRoute: React.FC = () => {
 
   if (!isLoading && !isAuthenticated) {
     return <UnauthorizedAccess />;
+  }
+
+  if (isAuthenticated && !salon) {
+    navigate("/create");
   }
 
   return (

@@ -1,10 +1,10 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from "axios";
 
-// const DEBUG_URL = "http://localhost:3000";
-const RELEASE_URL = "https://gl-backend-32cy.onrender.com/";
+const URL = "http://localhost:3000";
+// const URL = "https://gl-backend-32cy.onrender.com/";
 
 export const api: AxiosInstance = axios.create({
-  baseURL: RELEASE_URL,
+  baseURL: URL,
   timeout: 10000,
   withCredentials: true,
   headers: {

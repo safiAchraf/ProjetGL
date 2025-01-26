@@ -117,7 +117,55 @@ router.get("/", getAllServices);
  *         description: Service already exists for this salon
  */
 router.post("/", creatNewService);
-
+/**
+ * @swagger
+ * /api/services/salon/{id}:
+ *   get:
+ *     summary: Get all services for a salon
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The salon ID
+ *     responses:
+ *       200:
+ *         description: All services for the salon retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *                       description:
+ *                         type: string
+ *                       price:
+ *                         type: number
+ *                       pointPrice:
+ *                         type: number
+ *                       duration:
+ *                         type: number
+ *                       salonId:
+ *                         type: string
+ *                       categoryId:
+ *                         type: string
+ *                       inHouse:
+ *                         type: boolean
+ *       404:
+ *         description: Salon not found or no services found for this salon
+ */
+router.get("/salon", getSalonServices);
 /**
  * @swagger
  * /api/services/salon/{salonId}/category/{category}:
@@ -174,55 +222,7 @@ router.post("/", creatNewService);
  */
 router.get("/salon/:salonId/category/:category", getSalonServicesByCategory);
 
-/**
- * @swagger
- * /api/services/salon/{id}:
- *   get:
- *     summary: Get all services for a salon
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: The salon ID
- *     responses:
- *       200:
- *         description: All services for the salon retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 msg:
- *                   type: string
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                       name:
- *                         type: string
- *                       description:
- *                         type: string
- *                       price:
- *                         type: number
- *                       pointPrice:
- *                         type: number
- *                       duration:
- *                         type: number
- *                       salonId:
- *                         type: string
- *                       categoryId:
- *                         type: string
- *                       inHouse:
- *                         type: boolean
- *       404:
- *         description: Salon not found or no services found for this salon
- */
-router.get("/salon", getSalonServices);
+
 
 /**
  * @swagger

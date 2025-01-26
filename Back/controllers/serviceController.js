@@ -76,7 +76,7 @@ const updateService = async (req, res) => {
         name = COALESCE(${name}, name), 
         description = COALESCE(${description}, description), 
         price = COALESCE(${price}, price), 
-        pointPrice = COALESCE(${pointPrice}, pointPrice), 
+        "pointPrice" = COALESCE(${pointPrice}, "pointPrice"), 
         duration = COALESCE(${duration}, duration), 
         "categoryId" = COALESCE(${categoryId}, "categoryId"), 
         "inHouse" = COALESCE(${inHouse}, "inHouse"),

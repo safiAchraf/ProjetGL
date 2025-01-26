@@ -52,8 +52,6 @@ const registerController = async (req, res) => {
     RETURNING *
   `;
 
-	console.log(user);
-
 	const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
 		expiresIn: "30d",
 	});

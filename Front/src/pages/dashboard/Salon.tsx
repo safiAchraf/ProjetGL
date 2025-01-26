@@ -1,5 +1,5 @@
 /* Hooks */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import useAuth from "../../hooks/useAuth";
 
@@ -22,6 +22,7 @@ import { Loader2, Trash2, Upload } from "lucide-react";
 const Salon = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const { salon, setSalon, isLoading } = useAuth();
+  const [fakeLoading, setFakeLoading] = useState(true);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
@@ -163,12 +164,19 @@ const Salon = () => {
     }
   };
 
-  if (isLoading || !salon) {
+  useEffect(() => {
+    if (salon) {
+      const timeout = setTimeout(() => setFakeLoading(false), 1000);
+      return () => clearTimeout(timeout);
+    }
+  }, [fakeLoading, salon]);
+
+  if (isLoading || !salon || fakeLoading) {
     return (
       <div className="h-screen flex-1 flex items-center justify-center">
         <div className="flex flex-col items-center space-y-4">
           <Loader2 className="w-16 h-16 animate-spin text-gray-700" />
-          <p className="text-gray-600">Loading coupons...</p>
+          <p className="text-gray-600">Loading salon info...</p>
         </div>
       </div>
     );

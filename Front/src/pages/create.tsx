@@ -19,6 +19,8 @@ import { Card } from "../components/ui/card";
 import { Textarea } from "../components/ui/textarea";
 import { toast } from "react-toastify";
 import { api } from "../api/axios";
+import { Loader2 } from "lucide-react";
+import UnauthorizedAccess from "./UnauthorizedAccess";
 
 const CLOUD_NAME = import.meta.env.VITE_CLOUD_NAME;
 const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET;

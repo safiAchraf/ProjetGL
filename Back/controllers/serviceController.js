@@ -5,9 +5,15 @@ const creatNewService = async (req, res) => {
   const ownerId = req.user.id;
   const { name, description, price, pointPrice, duration, category , inHouse } = req.body;
 
-  if (!name || !description || !price || !pointPrice || !duration || !category  || !inHouse) {
-    return res.status(400).json({ msg: "Missing required fields" });
+  const requiredFields = ["name", "description", "price", "pointPrice", "duration", "category", "inHouse"];
+  for (const field of requiredFields) {
+    if (!req.body[field]) {
+      return res.status(400).json({ error: `${field} is required` });
+    }
   }
+  
+
+  
   if (typeof price !== "number" || typeof pointPrice !== "number" || typeof duration !== "number") {
     return res.status(400).json({ msg: "Price, pointPrice and duration must be numbers" });
   }

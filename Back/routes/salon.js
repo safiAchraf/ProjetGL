@@ -51,6 +51,38 @@ const router = express.Router();
  */
 router.get("/", getAllSalons);
 router.get("/userHaveSalon", userHaveSalon);
+/**
+ * @swagger
+ * /api/salons/{id}/pictures:
+ *   post:
+ *     summary: Add pictures to a salon
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The salon ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               pictures:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       200:
+ *         description: Pictures added successfully
+ *       404:
+ *         description: Salon not found
+ *       403:
+ *         description: Unauthorized to add pictures to this salon
+ */
+router.post("/pictures", addSalonPictures);
 
 /**
  * @swagger
@@ -273,38 +305,7 @@ router.put("/", updateSalon);
  */
 router.delete("/", deleteSalon);
 
-/**
- * @swagger
- * /api/salons/{id}/pictures:
- *   post:
- *     summary: Add pictures to a salon
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: The salon ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               pictures:
- *                 type: array
- *                 items:
- *                   type: string
- *     responses:
- *       200:
- *         description: Pictures added successfully
- *       404:
- *         description: Salon not found
- *       403:
- *         description: Unauthorized to add pictures to this salon
- */
-router.post("/pictures", addSalonPictures);
+
 
 
 export default router;

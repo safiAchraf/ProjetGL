@@ -79,23 +79,20 @@ const getReservationById = async (req, res) => {
 };
 
 const createReservation = async (req, res) => {
-	const { startTime, coupon, paymentType, inHouse } = req.body;
+	const { startTime, coupon, paymentType, serviceIds } = req.body;
 	const customerId = req.user.id;
-	const serviceId = req.params.serviceId;
-	const [service] = await prisma.$queryRaw`
-    SELECT * FROM "Service" WHERE id = ${serviceId}`;
-	if (!service) {
-		return res.status(404).json({ error: "Service not found" });
-	}
-	const salonId = service.salonId;
-	if (!startTime || !customerId || !serviceId || !salonId) {
-		return res.status(400).json({ error: "All fields are required" });
+
+	if (!startTime || !paymentType || !serviceIds) {
+		return res.status(400).json({ error: "Missing required fields" });
 	}
 
 	const startDateTime = new Date(startTime);
 	const endDateTime = new Date(
 		startDateTime.getTime() + service.duration * 60000
 	);
+	if (paymentType !== "Points" && paymentType !== "Money") {
+		return res.status(400).json({ error: "Invalid payment type" });
+	}
 
 	const [existingReservation] = await prisma.$queryRaw`
     SELECT * FROM "Booking" WHERE "startTime" = ${startDateTime} AND "endTime" = ${endDateTime} AND "serviceId" = ${serviceId}`;
@@ -115,17 +112,19 @@ const createReservation = async (req, res) => {
 			.status(400)
 			.json({ error: "End time must be greater than start time" });
 	}
-	let price = service.price;
-	if (coupon && paymentType === "Money") {
-		const [existingCoupon] = await prisma.$queryRaw`
-        SELECT * FROM "Coupon" WHERE code = ${coupon}`;
-		if (!existingCoupon) {
-			return res.status(404).json({ error: "Coupon not found" });
+	let price = 0;
+	let pointPrice = 0;
+	for (const serviceId of serviceIds) {
+		const [service] =
+			await prisma.$queryRaw`SELECT * FROM "Service" WHERE id = ${serviceId.id}`;
+		if (!service) {
+			return res
+				.status(404)
+				.json({ error: `Service with id ${serviceId} not found` });
 		}
-		if (existingCoupon.salonId !== salonId) {
-			return res.status(400).json({ error: "Coupon not valid for this salon" });
-		}
-		price = price - existingCoupon.discount;
+
+		price += service.price + (serviceId.inHouse ? 100 : 0);
+		pointPrice += service.pointPrice;
 	}
 
 	if (paymentType === "Points") {
@@ -134,28 +133,53 @@ const createReservation = async (req, res) => {
 		if (!points) {
 			return res.status(400).json({ error: "You don't have enough points" });
 		}
-		if (points.balance < service.pointPrice) {
+		if (points.balance < pointPrice) {
 			return res.status(400).json({ error: "You don't have enough points" });
 		}
 		await prisma.$queryRaw`
       UPDATE "Points" SET balance = balance - ${price} 
       WHERE "customerId" = ${customerId} AND "salonId" = ${salonId}`;
 	}
-	if (paymentType !== "Points" && paymentType !== "Money") {
-		return res.status(400).json({ error: "Invalid payment type" });
+	if (paymentType === "Money") {
+		if (coupon) {
+			const [existingCoupon] = await prisma.$queryRaw`
+		SELECT * FROM "Coupon" WHERE code = ${coupon}`;
+			if (!existingCoupon) {
+				return res.status(404).json({ error: "Coupon not found" });
+			}
+			for (const serviceId of serviceIds) {
+				if (existingCoupon.salonId !== serviceId.id) {
+					return res
+						.status(400)
+						.json({ error: "Coupon not valid for this salon" });
+				}
+			}
+			price -= price * (existingCoupon.discount / 100);
+		}
 	}
 	try {
 		if (paymentType === "Money") {
-			const [newReservation] = await prisma.$queryRaw`
-      INSERT INTO "Booking" (id, "startTime", "endTime", "status", "customerId", "serviceId", "price", "salonId", "coupon", "paymentType", "createdAt", "updatedAt" , "inHouse")
-      VALUES (${uuidv4()}, ${startDateTime}, ${endDateTime}, 'PENDING', ${customerId}, ${serviceId}, ${price}, ${salonId}, ${coupon}, ${paymentType}::"PaymentType", NOW(), NOW() , ${inHouse})
+			const reservationIds = [];
+			for (const serviceId of serviceIds) {
+				const [service] =
+					await prisma.$queryRaw`SELECT * FROM "Service" WHERE id = ${serviceId.id}`;
+				const salonId = service.salonId;
+				const [newReservation] = await prisma.$queryRaw`
+      INSERT} INTO "Booking" (id, "startTime", "endTime", "status", "customerId", "serviceId", "price", "salonId", "coupon", "paymentType", "createdAt", "updatedAt" , "inHouse")
+      VALUES (${uuidv4()}, ${startDateTime}, ${endDateTime}, 'PENDING', ${customerId}, ${
+					serviceId.id
+				}, ${price}, ${salonId}, ${coupon}, ${paymentType}::"PaymentType", NOW(), NOW() , ${
+					serviceId.inHouse
+				})
       RETURNING *`;
-			console.log(newReservation);
+				reservationIds.push(newReservation.id);
+			}
+			console.log(reservationIds);
 			console.log(price);
 			const newCheckout = await client.createCheckout({
 				amount: price,
 				currency: "dzd",
-				metadata: [{ reservationId: newReservation.id }],
+				metadata: reservationIds.map((id) => ({ reservationId: id })),
 				success_url: "http://localhost:3000/success",
 				failure_url: "http://localhost:3000/failure",
 			});
@@ -263,7 +287,7 @@ const getAvailableHours = async (req, res) => {
 const getPriceAfterDiscount = async (req, res) => {
 	const { coupon, serviceIds, priceBeforeCoupon } = req.body;
 
-	const[existingCoupon] = await prisma.$queryRaw`
+	const [existingCoupon] = await prisma.$queryRaw`
 			SELECT * FROM "Coupon" WHERE code = ${coupon}`;
 	if (!existingCoupon) {
 		return res.status(404).json({ error: "Coupon not found" });
@@ -286,7 +310,8 @@ const getPriceAfterDiscount = async (req, res) => {
 		}
 	}
 
-	const finalPrice = priceBeforeCoupon - priceBeforeCoupon* (existingCoupon.discount / 100);
+	const finalPrice =
+		priceBeforeCoupon - priceBeforeCoupon * (existingCoupon.discount / 100);
 	res.json({ price: finalPrice });
 };
 

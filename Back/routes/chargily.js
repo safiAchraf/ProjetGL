@@ -51,23 +51,17 @@ router.post("/webhook", async (req, res) => {
 		case "checkout.paid":
 			const checkout = event.data;
 			console.log("im here");
-			const reservationId = checkout.metadata[0].reservationId;
-			const [reservation] = await prisma.$queryRaw`
-        SELECT * FROM "Booking" WHERE "id" = ${reservationId}`;
-			if (!reservation) {
-				console.log("Reservation not found");
-				res.sendStatus(404);
-				return;
+			const reservationId = checkout.metadata;
+			for (let i = 0; i < checkout.metadata.length; i++) {
+				const reservationId = checkout.metadata[i].reservationId;
+				const [reservation] = await prisma.$queryRaw`
+		  SELECT * FROM "Reservation" WHERE id = ${reservationId}`;
+				if (reservation) {
+					await prisma.$queryRaw`
+			UPDATE "Reservation" SET "status" = 'paid' WHERE id = ${reservationId}`;
+				}
 			}
-			await prisma.$queryRaw`
-        UPDATE "Booking" SET status = 'PAID' WHERE "id" = ${reservationId}`;
-			console.log("Reservation updated successfully");
 
-			const pointsToAdd = Math.floor(reservation.price * 0.1);
-			await prisma.$queryRaw`
-        UPDATE "Points" SET balance = balance + ${pointsToAdd} 
-        WHERE "customerId" = ${reservation.customerId} AND "salonId" = ${reservation.salonId}`;
-			console.log("Points added successfully");
 			break;
 		case "checkout.failed":
 			const failedCheckout = event.data;

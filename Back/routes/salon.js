@@ -304,7 +304,7 @@ router.delete("/", deleteSalon);
  *       403:
  *         description: Unauthorized to add pictures to this salon
  */
-router.post("/:id/pictures", addSalonPictures);
+router.post("/pictures", addSalonPictures);
 
 
 export default router;

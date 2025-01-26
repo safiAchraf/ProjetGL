@@ -136,9 +136,9 @@ const deleteSalon = async (req, res) => {
 };
 
 const addSalonPictures = async (req, res) => {
-  const { id } = req.params;
+  
   const ownerId = req.user.id;
-  const salon = await prisma.$queryRaw`SELECT * FROM "Salon" WHERE id = ${id}`;
+  const salon = await prisma.$queryRaw`SELECT * FROM "Salon" WHERE ownerId = ${ownerId}`;
   if (salon.length === 0) {
     return res.status(404).json({ error: "Salon not found" });
   }
@@ -192,7 +192,7 @@ const userHaveSalon = async (req, res) => {
   if (!alreadyExists)
     return res.json({ message: "You don't have a salon", data: false });
 
-  const pictures = await prisma.$queryRaw`SELECT * FROM "Picture" WHERE "salonId" = ${alreadyExists[0].id}`;
+  const pictures = await prisma.$queryRaw`SELECT * FROM "Picture" WHERE "salonId" = ${alreadyExists.id}`;
   alreadyExists.pictures = pictures;
 
   

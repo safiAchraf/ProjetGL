@@ -64,8 +64,8 @@ const createSalon = async (req, res) => {
       }
     }
 
-    const pictures = await prisma.$queryRaw`SELECT * FROM "Picture" WHERE "salonId" = ${newSalon.id}`;
-    newSalon.pictures = pictures;
+    const DBpictures = await prisma.$queryRaw`SELECT * FROM "Picture" WHERE "salonId" = ${newSalon.id}`;
+    newSalon.pictures = DBpictures;
     res.status(201).json(newSalon);
   } catch (error) {
     res.status(500).json({ error: error.message });

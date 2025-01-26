@@ -59,8 +59,8 @@ const registerController = async (req, res) => {
 	res
 		.cookie("authorization", token, {
 			httpOnly: true,
-			sameSite: process.env.NODE_ENV === "development" ? "Lax" : "None",
-			secure: process.env.NODE_ENV === "development" ? false : true,
+			sameSite:  "None",
+			secure:  true,
 		})
 		.json({ data: user, message: "user created successfully" })
 		.status(201);

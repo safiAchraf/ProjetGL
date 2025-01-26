@@ -76,14 +76,15 @@ const Success = () => {
               </Card>
 
               <div className="flex flex-col md:flex-row gap-4 justify-center pt-8">
-                <Link
-                  to={checkoutLink}
-                  className="w-full md:w-auto"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Processed with checkout
-                </Link>
+                <Button size="lg" className="w-full  md:w-auto">
+                  <Link
+                    to={checkoutLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Processed with checkout
+                  </Link>
+                </Button>
                 <Button
                   variant="outline"
                   size="lg"

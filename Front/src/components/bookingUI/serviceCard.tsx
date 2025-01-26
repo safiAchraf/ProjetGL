@@ -47,6 +47,7 @@ const ServiceCard = ({ service, isSelected, onSelect }: Props) => {
               </span>
             )}
           </h3>
+
           <p className="text-sm text-gray-500">{service.duration} mins</p>
           <p
             className={`text-sm mt-2 text-gray-700 ${
@@ -65,7 +66,15 @@ const ServiceCard = ({ service, isSelected, onSelect }: Props) => {
           )}
         </div>
         <div className="flex flex-col items-end">
-          <p className="text-sm text-gray-500 mb-1">from ${service.price}</p>
+          <p className="text-sm text-gray-500 mb-1">
+            ${service.price} • {service.pointPrice} pts
+          </p>
+          {service.inHouse && (
+            <div>
+              <p className="text-xs text-gray-500">+ $100 for at home</p>
+              <p className="text-xs text-gray-500">+ 100 pts for at home</p>
+            </div>
+          )}
           <div
             className={`w-6 h-6 rounded-full flex items-center justify-center ${
               isSelected

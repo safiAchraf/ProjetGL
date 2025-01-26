@@ -6,6 +6,16 @@ type BookingContextType = {
   setSelectedSalon: React.Dispatch<React.SetStateAction<Salon>>;
   selectedServices: Service[];
   setSelectedServices: React.Dispatch<React.SetStateAction<Service[]>>;
+  couponCode: string;
+  setCouponCode: React.Dispatch<React.SetStateAction<string>>;
+  price: number;
+  setPrice: React.Dispatch<React.SetStateAction<number>>;
+  points: number;
+  setPoints: React.Dispatch<React.SetStateAction<number>>;
+  selectedDate: Date;
+  setSelectedDate: React.Dispatch<React.SetStateAction<Date>>;
+  selectedTime: string;
+  setSelectedTime: React.Dispatch<React.SetStateAction<string>>;
   inHouseServices: { [key: string]: boolean };
   setInHouseServices: React.Dispatch<
     React.SetStateAction<{
@@ -23,6 +33,10 @@ interface BookingProviderProps {
 export const BookingProvider: React.FC<BookingProviderProps> = ({
   children,
 }) => {
+  const [price, setPrice] = useState<number>(0);
+  const [points, setPoints] = useState<number>(0);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedTime, setSelectedTime] = useState<string>("");
   const [selectedSalon, setSelectedSalon] = useState<Salon>({
     id: "",
     name: "",
@@ -42,15 +56,27 @@ export const BookingProvider: React.FC<BookingProviderProps> = ({
     [key: string]: boolean;
   }>({});
 
+  const [couponCode, setCouponCode] = useState("");
+
   return (
     <BookingContext.Provider
       value={{
         selectedSalon,
+        price,
+        setPrice,
+        points,
+        setPoints,
         setSelectedSalon,
         selectedServices,
         setSelectedServices,
         inHouseServices,
         setInHouseServices,
+        couponCode,
+        setCouponCode,
+        setSelectedDate,
+        setSelectedTime,
+        selectedDate,
+        selectedTime,
       }}
     >
       {children}

@@ -2,7 +2,6 @@
 import { useState } from "react";
 
 /* Components */
-import Carousel from "../carousel";
 import ReviewStars from "../review/ReviewStars";
 import { Link } from "react-scroll";
 
@@ -16,7 +15,7 @@ interface SalonInfoProps {
 }
 
 const SalonInfo = ({ salon }: SalonInfoProps) => {
-  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviews] = useState<Review[]>([]);
   const salonImages = salon.pictures.map((picture) => picture.url);
 
   return (

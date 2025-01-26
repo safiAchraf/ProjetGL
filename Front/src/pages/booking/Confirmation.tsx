@@ -1,6 +1,8 @@
 /* Hooks */
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import useBooking from "../../hooks/useBooking";
+import useAuth from "../../hooks/useAuth";
 
 /* Components */
 import { Button } from "../../components/ui/button";
@@ -13,14 +15,26 @@ import SidePanel from "../../components/bookingUI/sidePanel";
 
 /* Utils */
 import { toast } from "react-toastify";
+import { api } from "../../api/axios";
 
 const Confirmation = () => {
-  const [couponCode, setCouponCode] = useState("");
+  const {
+    selectedServices,
+    couponCode,
+    setCouponCode,
+    price,
+    setPrice,
+    inHouseServices,
+    selectedTime,
+    selectedDate,
+  } = useBooking();
+  const { user } = useAuth();
+  const [couponApplied, setCouponApplied] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
-    "cash" | "points"
-  >("cash");
-  const [userPoints] = useState(1500);
+    "Money" | "Points"
+  >("Money");
 
   const navigate = useNavigate();
 
@@ -32,22 +46,83 @@ const Confirmation = () => {
 
     setIsApplyingCoupon(true);
     try {
+      const serviceIds = selectedServices.map((service) => service.id);
+      const response = await api.post("/nonauth/applyCoupon", {
+        coupon: couponCode,
+        serviceIds,
+        priceBeforeCoupon: price,
+        // PointsBeforeCoupon: Points,
+      });
+
+      if (response.status === 200) setCouponApplied(true);
+
+      setCouponCode(couponCode);
+      setPrice(response.data.price);
+      // setPoints(response.data.Points)
       toast.success("Coupon applied successfully");
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error: unknown) {
-      toast.error("Invalid or expired coupon code");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.log(error);
+      setCouponCode("");
+      toast.error(
+        error.response?.data?.message || "Invalid or expired coupon code"
+      );
     } finally {
       setIsApplyingCoupon(false);
     }
   };
 
-  const handleConfirmBooking = () => {
+  const combineDateAndTime = (date: Date, time: string) => {
+    const [hour, min] = time.split(":").map(Number);
+    const combinedDate = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      hour,
+      min
+    );
+
+    return combinedDate;
+  };
+
+  const handleConfirmBooking = async () => {
     if (!selectedPaymentMethod) {
       toast.error("Please select a payment method");
       return;
     }
 
-    navigate("/booking/success");
+    setIsSubmitting(true);
+    try {
+      // Prepare booking payload
+      const bookingPayload = {
+        serviceIds: selectedServices.map((service) => ({
+          id: service.id,
+          inHouse: inHouseServices[service.id!] || false,
+        })),
+        startTime: combineDateAndTime(selectedDate, selectedTime),
+        paymentType: selectedPaymentMethod,
+        coupon: couponCode || null,
+      };
+
+      // API call
+      const response = await api.post("/api/reservation/", bookingPayload);
+      console.log(response);
+
+      if (response.status === 201) {
+        navigate("/booking/success");
+      } else {
+        throw new Error("Booking failed");
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Booking error:", error);
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to create booking. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -70,10 +145,11 @@ const Confirmation = () => {
                   value={couponCode}
                   onChange={(e) => setCouponCode(e.target.value)}
                   placeholder="Enter coupon code"
+                  disabled={couponApplied}
                 />
                 <Button
                   onClick={handleApplyCoupon}
-                  disabled={isApplyingCoupon}
+                  disabled={isApplyingCoupon || couponApplied}
                   className="gap-2"
                 >
                   {isApplyingCoupon && (
@@ -89,19 +165,19 @@ const Confirmation = () => {
               <h2 className="text-2xl font-semibold mb-4">Payment Method</h2>
               <RadioGroup
                 value={selectedPaymentMethod}
-                onValueChange={(value: "cash" | "points") =>
+                onValueChange={(value: "Money" | "Points") =>
                   setSelectedPaymentMethod(value)
                 }
                 className="space-y-4"
               >
-                {/* Pay with Cash */}
+                {/* Pay with Money */}
                 <label
-                  htmlFor="cash"
+                  htmlFor="Money"
                   className="flex items-center space-x-4 p-4 border rounded-lg hover:bg-accent cursor-pointer"
                 >
-                  <RadioGroupItem value="cash" id="cash" />
+                  <RadioGroupItem value="Money" id="Money" />
                   <div className="flex flex-col space-y-1">
-                    <span className="font-medium">Pay with Cash</span>
+                    <span className="font-medium">Pay with Money</span>
                     <span className="text-muted-foreground text-sm">
                       Pay at the salon during your visit
                     </span>
@@ -110,19 +186,19 @@ const Confirmation = () => {
 
                 {/* Pay with Points */}
                 <label
-                  htmlFor="points"
+                  htmlFor="Points"
                   className="flex items-center space-x-4 p-4 border rounded-lg hover:bg-accent cursor-pointer"
                 >
-                  <RadioGroupItem value="points" id="points" />
+                  <RadioGroupItem value="Points" id="Points" />
                   <div className="flex flex-col space-y-1">
                     <div className="flex items-center gap-2">
                       <span className="font-medium">Pay with Points</span>
                       <span className="text-sm bg-muted px-2 py-1 rounded">
-                        Available: {userPoints} pts
+                        Available: {user?.points || 0} pts
                       </span>
                     </div>
                     <span className="text-muted-foreground text-sm">
-                      Redeem your loyalty points
+                      Redeem your loyalty Points
                     </span>
                   </div>
                 </label>
@@ -136,6 +212,7 @@ const Confirmation = () => {
               <SidePanel
                 currentPage="confirm"
                 onContinue={handleConfirmBooking}
+                isSubmitting={isSubmitting}
               />
             </div>
           </aside>

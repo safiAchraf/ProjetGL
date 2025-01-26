@@ -48,6 +48,7 @@ export type User = {
   phoneNumber: string;
   createdAt: string;
   updatedAt: string;
+  points: number;
 };
 
 export type Reservation = {

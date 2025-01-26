@@ -1,5 +1,5 @@
 /* Hooks */
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import useBooking from "../../hooks/useBooking";
 
@@ -13,10 +13,14 @@ import SidePanel from "../../components/bookingUI/sidePanel";
 import { toast } from "react-toastify";
 
 const SelectTime = () => {
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [selectedTime, setSelectedTime] = useState<string>("");
-
-  const { selectedSalon, selectedServices } = useBooking();
+  const {
+    selectedSalon,
+    selectedServices,
+    selectedDate,
+    selectedTime,
+    setSelectedTime,
+    setSelectedDate,
+  } = useBooking();
   const navigate = useNavigate();
 
   const handleContinue = () => {

@@ -16,12 +16,13 @@ import LoginModal from "../loginModal";
 import { format } from "date-fns";
 
 /* Assets */
-import { MapPin } from "lucide-react";
+import { Loader2, MapPin } from "lucide-react";
 
 interface Props {
   selectedDate?: Date;
   selectedTime?: string;
   currentPage: string;
+  isSubmitting?: boolean;
   onContinue: () => void;
 }
 
@@ -29,11 +30,11 @@ const SidePanel = ({
   selectedDate,
   selectedTime,
   currentPage,
+  isSubmitting,
   onContinue,
 }: Props) => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
   const [isSignupModalOpen, setIsSignupModalOpen] = useState<boolean>(false);
-
   const {
     selectedSalon,
     selectedServices,
@@ -43,13 +44,7 @@ const SidePanel = ({
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { isAuthenticated } = useAuth();
-
-  const calculateTotalPrice = () => {
-    return selectedServices.reduce((sum, service) => {
-      const inHouseCharge = inHouseServices[service.id] ? 10 : 0;
-      return sum + service.price + inHouseCharge;
-    }, 0);
-  };
+  const { price, setPrice, points, setPoints } = useBooking();
 
   const totalDuration = selectedServices.reduce((sum, service) => {
     return sum + service.duration;
@@ -78,6 +73,29 @@ const SidePanel = ({
       navigate("/booking/services");
     }
   }, [navigate, selectedSalon.id, selectedServices.length]);
+
+  useEffect(() => {
+    const calculateTotalPrice = () => {
+      setPrice(
+        selectedServices.reduce((sum, service) => {
+          const inHouseCharge = inHouseServices[service.id!] ? 10 : 0;
+          return sum + service.price + inHouseCharge;
+        }, 0)
+      );
+    };
+
+    const calculatePoints = () => {
+      setPoints(
+        selectedServices.reduce((sum, service) => {
+          const inHousePoints = inHouseServices[service.id!] ? 100 : 0;
+          return sum + service.pointPrice + inHousePoints;
+        }, 0)
+      );
+    };
+
+    calculateTotalPrice();
+    calculatePoints();
+  }, [inHouseServices, selectedServices, setPoints, setPrice]);
 
   return (
     <div className="bg-white shadow-md md:rounded-lg overflow-hidden">
@@ -127,8 +145,9 @@ const SidePanel = ({
                 <div>
                   <p className="text-sm">{service.name}</p>
                   <p className="text-sm text-gray-500">
-                    {service.duration} mins • ${service.price}
-                    {inHouseServices[service.id] && " + $10 (at home)"}
+                    {service.duration} mins • ${service.price} • $
+                    {service.pointPrice} pts
+                    {inHouseServices[service.id!] && " + $100 (at home)"}
                   </p>
                 </div>
 
@@ -142,8 +161,8 @@ const SidePanel = ({
                     </Label>
                     <Checkbox
                       id={`atHome-${service.id}`}
-                      checked={inHouseServices[service.id] || false}
-                      onCheckedChange={() => handleInHouseToggle(service.id)}
+                      checked={inHouseServices[service.id!] || false}
+                      onCheckedChange={() => handleInHouseToggle(service.id!)}
                     />
                   </div>
                 )}
@@ -156,9 +175,13 @@ const SidePanel = ({
       <div className="bg-gray-50 p-4">
         <div className="flex justify-between items-center mb-4">
           <span className="font-semibold">Total</span>
-          <span className="font-semibold text-xl">
-            ${calculateTotalPrice()}
-          </span>
+
+          <p className="flex gap-2">
+            <span className="font-semibold text-xl">${price.toFixed()}</span>|
+            <span className="font-semibold text-xl">
+              {points.toFixed()} pts
+            </span>
+          </p>
         </div>
 
         <p className="text-sm text-gray-500 mb-4">
@@ -170,9 +193,16 @@ const SidePanel = ({
           <Button
             className="w-full"
             onClick={onContinue}
-            disabled={isButtonDisabled()}
+            disabled={isButtonDisabled() || isSubmitting}
           >
-            {pathname.includes("confirmation") ? "Order" : "Continue"}
+            {isSubmitting ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Processing...
+              </>
+            ) : (
+              "Confirm Booking"
+            )}
           </Button>
         ) : (
           <>

@@ -1,5 +1,5 @@
 /* Hooks */
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import useBooking from "../../hooks/useBooking";
 
 /* Components */
@@ -76,13 +76,14 @@ const Success = () => {
               </Card>
 
               <div className="flex flex-col md:flex-row gap-4 justify-center pt-8">
-                <Button
-                  size="lg"
+                <Link
+                  to={checkoutLink}
                   className="w-full md:w-auto"
-                  onClick={() => navigate(checkoutLink)}
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   Processed with checkout
-                </Button>
+                </Link>
                 <Button
                   variant="outline"
                   size="lg"

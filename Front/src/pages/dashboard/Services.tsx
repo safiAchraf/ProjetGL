@@ -25,6 +25,8 @@ import {
 } from "../../components/ui/select";
 import { Badge } from "../../components/ui/badge";
 import { Categories } from "../../types/data";
+import { api } from "../../api/axios";
+import { toast } from "react-toastify";
 
 interface Service {
   id?: string;
@@ -59,10 +61,9 @@ const Services = () => {
     });
   };
 
-  const handleServiceSubmit = (e: React.FormEvent) => {
+  const handleServiceSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newService: Service = {
-      id: Date.now().toString(),
       name: serviceFormData.name,
       description: serviceFormData.description,
       price: serviceFormData.price,
@@ -76,8 +77,14 @@ const Services = () => {
           service.id === editingService.id ? newService : service
         )
       );
+      await api.put(`/api/service/${editingService.id}`, newService);
+      
+      toast.success("Service updated successfully");
+
     } else {
       setServices([...services, newService]);
+      await api.post("/api/service", newService);
+      toast.success("Service created successfully");
     }
 
     setServiceFormData({

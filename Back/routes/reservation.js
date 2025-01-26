@@ -404,7 +404,7 @@ router.get("/:id", getReservationById);
  *       404:
  *         description: Service or coupon not found
  */
-router.post("/:serviceId", createReservation);
+router.post("/", createReservation);
 
 /**
  * @swagger

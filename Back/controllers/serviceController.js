@@ -156,6 +156,11 @@ const getSalonServices = async (req, res) => {
     if (services.length === 0) {
       return res.status(200).json({ msg: "No services found for this salon", data: [] });
     }
+    for (const service of services) {
+      const [category] = await prisma.$queryRaw`SELECT * FROM "Category" WHERE "id" = ${service.categoryId}`;
+      service.category = category.name;
+    }
+
 
     res.status(200).json({ msg: "All services of the salon", data: services });
   } catch (error) {

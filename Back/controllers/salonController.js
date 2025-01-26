@@ -57,10 +57,10 @@ const createSalon = async (req, res) => {
     
     // Insert pictures
     if (pictures && pictures.length > 0) {
-      for (const url of pictures) {
+      for (const pic of pictures) {
         await prisma.$queryRaw`
           INSERT INTO "Picture" (id, url, "salonId", "createdAt", "updatedAt")
-          VALUES (${uuidv4()}, ${url}, ${newSalon.id}, NOW(), NOW())`;
+          VALUES (${uuidv4()}, ${pic.url}, ${newSalon.id}, NOW(), NOW())`;
       }
     }
 

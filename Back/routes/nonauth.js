@@ -8,7 +8,7 @@ import { getSalonReviews } from "../controllers/reviewController.js";
 const router = express.Router();
 
 
-router.get("/applycoupon" , getPriceAfterDiscount);
+router.post("/applyCoupon" , getPriceAfterDiscount);
 /**
  * @swagger
  * /api/nonauth/salons:

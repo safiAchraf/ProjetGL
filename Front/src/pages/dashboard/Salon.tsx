@@ -1,6 +1,7 @@
 /* Hooks */
 import { useState } from "react";
 import { useDropzone } from "react-dropzone";
+import useAuth from "../../hooks/useAuth";
 
 /* Components */
 import { Button } from "../../components/ui/button";
@@ -15,25 +16,12 @@ import { toast } from "react-toastify";
 import type { Salon, Picture } from "../../types/data";
 
 /* Icons */
-import { Trash2, Upload } from "lucide-react";
+import { Loader2, Trash2, Upload } from "lucide-react";
 
 const Salon = () => {
-  const initSalon: Salon = {
-    id: "",
-    name: "",
-    address: "",
-    city: "",
-    createdAt: "",
-    description: "",
-    owner: "",
-    ownerId: "",
-    phoneNumber: "",
-    pictures: [],
-    rating: 0,
-    updatedAt: "",
-  };
-  const [salon, setSalon] = useState<Salon>(initSalon);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
+  const { salon, setSalon, isLoading } = useAuth();
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
@@ -151,6 +139,17 @@ const Salon = () => {
     toast.success("Salon information updated successfully");
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <div className="flex flex-col items-center space-y-4">
+          <Loader2 className="w-8 h-8 animate-spin text-gray-700" />
+          <p className="text-gray-600">Loading salon info...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-6xl mx-auto p-4 space-y-4">
       <h2 className="text-3xl font-bold">Manage Your Salon</h2>
@@ -162,7 +161,7 @@ const Salon = () => {
             <Input
               className="rounded-lg h-12"
               name="name"
-              value={salon.name}
+              value={salon!.name}
               onChange={handleInputChange}
             />
           </div>
@@ -172,7 +171,7 @@ const Salon = () => {
             <Input
               className="rounded-lg h-12"
               name="phoneNumber"
-              value={salon.phoneNumber}
+              value={salon!.phoneNumber}
               onChange={handleInputChange}
             />
           </div>
@@ -183,7 +182,7 @@ const Salon = () => {
           <Textarea
             className="rounded-lg min-h-[120px]"
             name="description"
-            value={salon.description}
+            value={salon!.description}
             onChange={handleInputChange}
           />
         </div>
@@ -194,7 +193,7 @@ const Salon = () => {
             <Input
               className="rounded-lg h-12"
               name="address"
-              value={salon.address}
+              value={salon!.address}
               onChange={handleInputChange}
             />
           </div>
@@ -204,7 +203,7 @@ const Salon = () => {
             <Input
               className="rounded-lg h-12"
               name="city"
-              value={salon.city}
+              value={salon!.city}
               onChange={handleInputChange}
             />
           </div>
@@ -214,7 +213,7 @@ const Salon = () => {
           <Label className="text-sm font-medium">Salon Gallery</Label>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {salon.pictures.map((picture) => (
+            {salon!.pictures.map((picture) => (
               <div key={picture.id} className="relative group">
                 <img
                   src={picture.url}

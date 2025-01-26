@@ -35,7 +35,7 @@ import Orders from "./pages/dashboard/Orders.tsx";
 import Services from "./pages/dashboard/Services.tsx";
 
 /* Create Salon */
-import CreateSalon from "./pages/create.tsx";
+import CreateSalon from "./pages/CreateSalon.tsx";
 
 /* Components */
 import NotFound from "./pages/NotFound.tsx";

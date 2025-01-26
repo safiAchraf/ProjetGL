@@ -1,5 +1,5 @@
 /* Hooks */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useAuth from "../../hooks/useAuth";
 
 /* Components */
@@ -51,6 +51,10 @@ const Header: React.FC = () => {
     { to: "Creations", label: "Creation" },
     { to: "Contacts", label: "Contacts" },
   ];
+
+  useEffect(() => {
+    console.log(salon);
+  }, [salon]);
 
   const UserDropdown = () => (
     <div className="relative">

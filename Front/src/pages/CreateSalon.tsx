@@ -27,7 +27,7 @@ const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET;
 
 const CreateSalon = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, isLoading, user } = useAuth();
+  const { isAuthenticated, isLoading, setSalon, salon } = useAuth();
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [previewImages, setPreviewImages] = useState<string[]>([]);
 
@@ -94,14 +94,14 @@ const CreateSalon = () => {
 
   const onSubmit = async (data: Partial<Salon>) => {
     try {
-      console.log({
+      console.log(data, data.pictures);
+
+      const res = await api.post("/api/salons", {
         ...data,
         pictures: data.pictures?.map((p) => ({ url: p.url })),
       });
-      await api.post("/api/salons", {
-        ...data,
-        pictures: data.pictures?.map((p) => ({ url: p.url })),
-      });
+
+      setSalon(res.data);
 
       toast.success("Salon created successfully!");
       navigate("/dashboard");
@@ -115,6 +115,10 @@ const CreateSalon = () => {
 
   if (!isLoading && !isAuthenticated) {
     return <UnauthorizedAccess />;
+  }
+
+  if (isAuthenticated && salon) {
+    navigate("/dashboard");
   }
 
   if (isLoading) {

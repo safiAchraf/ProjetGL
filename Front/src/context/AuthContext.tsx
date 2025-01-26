@@ -64,6 +64,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   useEffect(() => {
     const getSalon = async () => {
+      try {
+        const response = await api.get("/api/salons");
+        setSalon(response.data);
+      } catch (error) {
+        console.log("Failed to fetch user salon: " + error);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (isAuthenticated && !salon) getSalon();
+  }, [isAuthenticated, salon]);
+
+  useEffect(() => {
+    const getSalon = async () => {
       setIsLoading(true);
       try {
         const response = await api.get("/api/userHaveSalon");

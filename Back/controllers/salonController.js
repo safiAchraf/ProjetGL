@@ -92,7 +92,7 @@ const updateSalon = async (req, res) => {
   }
   const id = salon[0].id;
   try {
-    const updatedSalon = await prisma.$queryRaw`
+    const [updatedSalon] = await prisma.$queryRaw`
       UPDATE "Salon"
       SET 
         name = COALESCE(${name}, name), 

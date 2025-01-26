@@ -193,8 +193,9 @@ const userHaveSalon = async (req, res) => {
     return res.json({ message: "You don't have a salon", data: false });
 
   const pictures = await prisma.$queryRaw`SELECT * FROM "Picture" WHERE "salonId" = ${alreadyExists.id}`;
-  const picturesurls = pictures.map((picture) => picture.url);
-  alreadyExists.pictures = picturesurls;
+  console.log(pictures);
+  
+  alreadyExists.pictures = pictures;
 
   
   return res.json({ message: "Here is your shit", data: alreadyExists });

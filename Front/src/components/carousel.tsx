@@ -95,14 +95,14 @@ const Carousel = ({
   return (
     <div className="w-10/12 mx-auto relative mt-16 mb-6">
       <Slider {...settings}>
-        {images.map((image, index) => (
+        {images.map((url, index) => (
           <div
             key={index}
             data-aos="zoom-in-up"
             data-aos-delay={`${index * 100}`}
           >
             <img
-              src={image}
+              src={url}
               className="w-full h-auto object-center px-2"
               alt={`Salon Image ${index + 1}`}
             />

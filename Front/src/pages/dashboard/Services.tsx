@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "../../components/ui/button";
+import useAuth from "../../hooks/useAuth";
 import {
   Dialog,
   DialogContent,
@@ -58,6 +59,7 @@ const Services = () => {
     inHouse: false,
   };
 
+  const { salon } = useAuth();
   const [formData, setFormData] = useState<Service>(initialFormState);
 
   const handleInputChange = (
@@ -102,7 +104,9 @@ const Services = () => {
     try {
       setDeletingId(id);
       await api.delete(`/api/service/${id}`);
-      await fetchServices();
+      setServices((services) =>
+        services.filter((service) => service.id !== id)
+      );
       toast.success("Service deleted");
     } catch (error) {
       console.error(error);
@@ -120,8 +124,10 @@ const Services = () => {
 
   const fetchServices = useCallback(async () => {
     setIsLoading(true);
+
     try {
-      const { data } = await api.get("/api/service/salon");
+      const { data } = await api.get("/nonauth/services/salon/" + salon!.id);
+      console.log(data);
       setServices(data.data);
     } catch (error) {
       console.error(error);
@@ -130,7 +136,7 @@ const Services = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [salon]);
 
   useEffect(() => {
     if (pathname.includes("services")) fetchServices();

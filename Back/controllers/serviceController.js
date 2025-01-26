@@ -145,11 +145,12 @@ const getService = async (req, res) => {
 
 const getSalonServices = async (req, res) => {
   try {
-    const salonId = req.params.id;
-    const salon = await prisma.$queryRaw`SELECT * FROM "Salon" WHERE "id" = ${salonId}`;
+    const userId = req.user.id;
+    const [salon] = await prisma.$queryRaw`SELECT * FROM "Salon" WHERE "ownerId" = ${userId}`;
     if (salon.length === 0) {
       return res.status(404).json({ error: "Salon not found" });
     }
+    const salonId = salon.id;
     const services = await prisma.$queryRaw`SELECT * FROM "Service" WHERE "salonId" = ${salonId}`;
 
     if (services.length === 0) {

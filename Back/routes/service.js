@@ -222,7 +222,7 @@ router.get("/salon/:salonId/category/:category", getSalonServicesByCategory);
  *       404:
  *         description: Salon not found or no services found for this salon
  */
-router.get("/salon/:id", getSalonServices);
+router.get("/salon", getSalonServices);
 
 /**
  * @swagger

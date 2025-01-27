@@ -63,7 +63,6 @@ const registerController = async (req, res) => {
 			httpOnly: true,
 			sameSite: "None",
 			secure: true,
-			domain: "projet-gl-jet.vercel.app", // Add your Vercel domain
 			maxAge: 24 * 60 * 60 * 1000, // e.g., 24 hours in milliseconds
 		})
 		.json({ data: user, message: "user created successfully" })

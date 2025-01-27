@@ -174,8 +174,8 @@ const createReservation = async (req, res) => {
 		  amount: totalPrice,
 		  currency: "dzd",
 		  metadata: reservations.map((r) => ({ reservationId: r.id })),
-		  success_url: "http://localhost:3000/success",
-		  failure_url: "http://localhost:3000/failure",
+		  success_url: "https://gl-backend-32cy.onrender.com/success",
+		  failure_url: "https://gl-backend-32cy.onrender.com/failure",
 		});
   
 		return res.status(201).json({

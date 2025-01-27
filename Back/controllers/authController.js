@@ -27,8 +27,7 @@ const loginController = async (req, res) => {
 			httpOnly: true,
 			sameSite: "None",
 			secure: true,
-			domain: "projet-gl-jet.vercel.app", // Add your Vercel domain
-			maxAge: 24 * 60 * 60 * 1000, // e.g., 24 hours in milliseconds
+			maxAge: 24 * 60 * 60 * 1000, 
 		})
 		.json({ data: user, message: "login successfully" });
 };
@@ -63,7 +62,7 @@ const registerController = async (req, res) => {
 			httpOnly: true,
 			sameSite: "None",
 			secure: true,
-			maxAge: 24 * 60 * 60 * 1000, // e.g., 24 hours in milliseconds
+			maxAge: 24 * 60 * 60 * 1000, 
 		})
 		.json({ data: user, message: "user created successfully" })
 		.status(201);

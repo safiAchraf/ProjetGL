@@ -25,8 +25,10 @@ const loginController = async (req, res) => {
 	res
 		.cookie("authorization", token, {
 			httpOnly: true,
-			sameSite: process.env.NODE_ENV === "development" ? "Lax" : "None",
-			secure: process.env.NODE_ENV === "development" ? false : true,
+			sameSite: "None",
+			secure: true,
+			domain: "projet-gl-jet.vercel.app", // Add your Vercel domain
+			maxAge: 24 * 60 * 60 * 1000, // e.g., 24 hours in milliseconds
 		})
 		.json({ data: user, message: "login successfully" });
 };
@@ -59,8 +61,10 @@ const registerController = async (req, res) => {
 	res
 		.cookie("authorization", token, {
 			httpOnly: true,
-			sameSite:  "None",
-			secure:  true,
+			sameSite: "None",
+			secure: true,
+			domain: "projet-gl-jet.vercel.app", // Add your Vercel domain
+			maxAge: 24 * 60 * 60 * 1000, // e.g., 24 hours in milliseconds
 		})
 		.json({ data: user, message: "user created successfully" })
 		.status(201);
@@ -89,8 +93,6 @@ const checkAuth = async (req, res) => {
 	} catch (error) {
 		return res.status(401).json({ message: "Unauthorized" });
 	}
-}
+};
 
-
-
-export { loginController, registerController, logoutController , checkAuth };
+export { loginController, registerController, logoutController, checkAuth };

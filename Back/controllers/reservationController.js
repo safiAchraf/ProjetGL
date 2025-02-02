@@ -10,7 +10,7 @@ const client = new Chargily.ChargilyClient({
 });
 
 function toTitleCase(word) {
-  return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+	return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
 }
 const getCancelledReservations = async (req, res) => {
 	try {
@@ -31,7 +31,7 @@ const reservationHistory = async (req, res) => {
 	const userId = req.user.id;
 	try {
 		const customerReservations = await prisma.$queryRaw`
-      SELECT * FROM "Booking" WHERE "customerId" = ${userId} LIMIT 10`;
+      SELECT * FROM "Booking" WHERE "customerId" = ${userId} LIMIT 5`;
 		if (customerReservations.length === 0) {
 			return res
 				.status(403)
@@ -41,10 +41,10 @@ const reservationHistory = async (req, res) => {
 			const service = prisma.$queryRaw`SELECT * FROM "Service" WHERE id = ${reservation.serviceId}`;
 			return {
 				id: reservation.id,
-				client : "client",
+				client: "client",
 				service: service.name,
-				amount : reservation.price,
-				bookDate : reservation.startTime,
+				amount: reservation.price,
+				bookDate: reservation.startTime,
 				status: toTitleCase(reservation.status),
 			};
 		});
@@ -68,14 +68,31 @@ const getAllReservations = async (req, res) => {
 
 const getAllReservationsByUser = async (req, res) => {
 	const customerId = req.user.id;
+  
 	try {
-		const reservations = await prisma.$queryRaw`
-      SELECT * FROM "Booking" WHERE "customerId" = ${customerId}`;
-		res.json({ message: "All reservations", data: reservations });
+	  const reservations = await prisma.$queryRaw`
+		SELECT 
+		  *
+		FROM "Booking"
+		JOIN "Service" ON "Booking"."serviceId" = "Service".id
+		WHERE "Booking"."customerId" = ${customerId}
+	  `;
+  
+	  // Map to frontend format
+	  const FrontReservations = reservations.map((reservation) => ({
+		id: reservation.id,
+		service: reservation.service_name,
+		amount: reservation.price,
+		bookDate: reservation.startTime,  
+		status: reservation.status.charAt(0).toUpperCase() + 
+			   reservation.status.slice(1).toLowerCase()
+	  }));
+  
+	  res.json({ message: "All reservations", data: FrontReservations });
 	} catch (error) {
-		res.status(500).json({ error: error.message });
+	  res.status(500).json({ error: error.message });
 	}
-};
+  };
 
 const getReservationById = async (req, res) => {
 	const { id } = req.params;
@@ -95,120 +112,139 @@ const getReservationById = async (req, res) => {
 const createReservation = async (req, res) => {
 	const { startTime, coupon, paymentType, serviceIds } = req.body;
 	const customerId = req.user.id;
-  
-	if (!startTime || !paymentType  || serviceIds.length === 0) {
-	  return res.status(400).json({ error: "Missing required fields or invalid serviceIds" });
+
+	if (!startTime || !paymentType || serviceIds.length === 0) {
+		return res
+			.status(400)
+			.json({ error: "Missing required fields or invalid serviceIds" });
 	}
-  
+
 	if (paymentType !== "Points" && paymentType !== "Money") {
-	  return res.status(400).json({ error: "Invalid payment type" });
+		return res.status(400).json({ error: "Invalid payment type" });
 	}
-  
+
 	const startDateTime = new Date(startTime);
 	if (startDateTime < new Date()) {
-	  return res.status(400).json({ error: "You can't book a reservation in the past" });
+		return res
+			.status(400)
+			.json({ error: "You can't book a reservation in the past" });
 	}
-  
+
 	try {
-	  // Fetch all services at once
-	  const serviceIdsArray = serviceIds.map((s) => s.id);
-	  const services = await prisma.$queryRaw`
+		// Fetch all services at once
+		const serviceIdsArray = serviceIds.map((s) => s.id);
+		const services = await prisma.$queryRaw`
 		SELECT * FROM "Service" WHERE id = ANY(${serviceIdsArray})`;
-  
-	  if (services.length !== serviceIds.length) {
-		return res.status(404).json({ error: "One or more services not found" });
-	  }
-  
-	  const salonId = services[0].salonId; // Assuming all services belong to the same salon
-	  let totalPrice = 0;
-	  let totalPointPrice = 0;
-  
-	  for (const serviceId of serviceIds) {
-		const service = services.find((s) => s.id === serviceId.id);
-		const endDateTime = new Date(startDateTime.getTime() + service.duration * 60000);
-  
-		// Check for conflicting reservations
-		const [existingReservation] = await prisma.$queryRaw`
+
+		if (services.length !== serviceIds.length) {
+			return res.status(404).json({ error: "One or more services not found" });
+		}
+
+		const salonId = services[0].salonId; // Assuming all services belong to the same salon
+		let totalPrice = 0;
+		let totalPointPrice = 0;
+
+		for (const serviceId of serviceIds) {
+			const service = services.find((s) => s.id === serviceId.id);
+			const endDateTime = new Date(
+				startDateTime.getTime() + service.duration * 60000
+			);
+
+			// Check for conflicting reservations
+			const [existingReservation] = await prisma.$queryRaw`
 		  SELECT * FROM "Booking" 
 		  WHERE "startTime" = ${startDateTime} AND "endTime" = ${endDateTime} AND "serviceId" = ${service.id}`;
-		if (existingReservation) {
-		  return res.status(400).json({ error: `Service ${service.id} is already booked for this time` });
+			if (existingReservation) {
+				return res
+					.status(400)
+					.json({
+						error: `Service ${service.id} is already booked for this time`,
+					});
+			}
+
+			totalPrice += service.price + (serviceId.inHouse ? 100 : 0);
+			totalPointPrice += service.pointPrice;
 		}
-  
-		totalPrice += service.price + (serviceId.inHouse ? 100 : 0);
-		totalPointPrice += service.pointPrice;
-	  }
-  
-	  // Handle payment with Points
-	  if (paymentType === "Points") {
-		const [points] = await prisma.$queryRaw`
+
+		// Handle payment with Points
+		if (paymentType === "Points") {
+			const [points] = await prisma.$queryRaw`
 		  SELECT * FROM "Points" WHERE "customerId" = ${customerId} AND "salonId" = ${salonId}`;
-  
-		if (!points || points.balance < totalPointPrice) {
-		  return res.status(400).json({ error: "You don't have enough points" });
-		}
-  
-		await prisma.$queryRaw`
+
+			if (!points || points.balance < totalPointPrice) {
+				return res.status(400).json({ error: "You don't have enough points" });
+			}
+
+			await prisma.$queryRaw`
 		  UPDATE "Points" SET balance = balance - ${totalPointPrice} 
 		  WHERE "customerId" = ${customerId} AND "salonId" = ${salonId}`;
-	  }
-  
-	  // Handle payment with Money and coupon
-	  if (paymentType === "Money" && coupon) {
-		const [existingCoupon] = await prisma.$queryRaw`
+		}
+
+		// Handle payment with Money and coupon
+		if (paymentType === "Money" && coupon) {
+			const [existingCoupon] = await prisma.$queryRaw`
 		  SELECT * FROM "Coupon" WHERE code = ${coupon}`;
-		if (!existingCoupon) {
-		  return res.status(404).json({ error: "Coupon not found" });
+			if (!existingCoupon) {
+				return res.status(404).json({ error: "Coupon not found" });
+			}
+
+			if (existingCoupon.salonId !== salonId) {
+				return res
+					.status(400)
+					.json({ error: "Coupon not valid for this salon" });
+			}
+
+			totalPrice -= totalPrice * (existingCoupon.discount / 100);
 		}
-  
-		if (existingCoupon.salonId !== salonId) {
-		  return res.status(400).json({ error: "Coupon not valid for this salon" });
-		}
-  
-		totalPrice -= totalPrice * (existingCoupon.discount / 100);
-	  }
-  
-	  // Create reservations
-	  const reservations = [];
-	  for (const serviceId of serviceIds) {
-		const service = services.find((s) => s.id === serviceId.id);
-		const endDateTime = new Date(startDateTime.getTime() + service.duration * 60000);
-  
-		const [newReservation] = await prisma.$queryRaw`
+
+		// Create reservations
+		const reservations = [];
+		for (const serviceId of serviceIds) {
+			const service = services.find((s) => s.id === serviceId.id);
+			const endDateTime = new Date(
+				startDateTime.getTime() + service.duration * 60000
+			);
+
+			const [newReservation] = await prisma.$queryRaw`
 		  INSERT INTO "Booking" (id, "startTime", "endTime", "status", "customerId", "serviceId", "price", "salonId", "coupon", "paymentType", "createdAt", "updatedAt", "inHouse")
-		  VALUES (${uuidv4()}, ${startDateTime}, ${endDateTime}, 'PENDING', ${customerId}, ${service.id}, ${service.price}, ${salonId}, ${coupon}, ${paymentType}::"PaymentType", NOW(), NOW(), ${serviceId.inHouse})
+		  VALUES (${uuidv4()}, ${startDateTime}, ${endDateTime}, 'PENDING', ${customerId}, ${
+				service.id
+			}, ${
+				service.price
+			}, ${salonId}, ${coupon}, ${paymentType}::"PaymentType", NOW(), NOW(), ${
+				serviceId.inHouse
+			})
 		  RETURNING *`;
-  
-		reservations.push(newReservation);
-	  }
-  
-	  // Handle checkout for Money
-	  if (paymentType === "Money") {
-		const checkout = await client.createCheckout({
-		  amount: totalPrice,
-		  currency: "dzd",
-		  metadata: reservations.map((r) => ({ reservationId: r.id })),
-		  success_url: "https://projet-gl-jet.vercel.app",
-		  failure_url: "https://projet-gl-jet.vercel.app",
+
+			reservations.push(newReservation);
+		}
+
+		// Handle checkout for Money
+		if (paymentType === "Money") {
+			const checkout = await client.createCheckout({
+				amount: totalPrice,
+				currency: "dzd",
+				metadata: reservations.map((r) => ({ reservationId: r.id })),
+				success_url: "https://projet-gl-jet.vercel.app",
+				failure_url: "https://projet-gl-jet.vercel.app",
+			});
+
+			return res.status(201).json({
+				message: "Reservations created",
+				checkout: checkout.checkout_url,
+				reservations,
+			});
+		}
+
+		res.status(201).json({
+			message: "Reservations created",
+			reservations,
 		});
-  
-		return res.status(201).json({
-		  message: "Reservations created",
-		  checkout: checkout.checkout_url,
-		  reservations,
-		});
-	  }
-  
-	  res.status(201).json({
-		message: "Reservations created",
-		reservations,
-	  });
 	} catch (error) {
-	  console.error(error);
-	  res.status(500).json({ error: error.message });
+		console.error(error);
+		res.status(500).json({ error: error.message });
 	}
-  };
-  
+};
 
 const updateReservation = async (req, res) => {
 	const { id } = req.params;

@@ -36,6 +36,7 @@ import { Reservation } from "../../types/data";
 /* Icons */
 import { ArrowLeft, ArrowUpDown, Search, Trash2 } from "lucide-react";
 import { Button } from "../../components/ui/button";
+import { api } from "../../api/axios";
 
 const defaults: Reservation[] = [
   {
@@ -309,7 +310,16 @@ const History = () => {
   const totalPages = Math.ceil(sortedReservations.length / itemsPerPage);
 
   useEffect(() => {
-    setReservations(defaults);
+    const fetchReservations = async () => {
+      try {
+        const { data } = await api.get("api/reservation/history");
+        setReservations(data.data);
+      } catch (error) {
+        console.error("Error fetching reservations", error);
+      }
+    }
+    fetchReservations();
+
   }, []);
 
   return (

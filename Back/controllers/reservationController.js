@@ -9,6 +9,9 @@ const client = new Chargily.ChargilyClient({
 	mode: "test",
 });
 
+function toTitleCase(word) {
+  return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+}
 const getCancelledReservations = async (req, res) => {
 	try {
 		const cancelledReservations = await prisma.$queryRaw`
@@ -34,9 +37,20 @@ const reservationHistory = async (req, res) => {
 				.status(403)
 				.json({ msg: "No reservation found for this user" });
 		}
+		const reservations = customerReservations.map((reservation) => {
+			const service = prisma.$queryRaw`SELECT * FROM "Service" WHERE id = ${reservation.serviceId}`;
+			return {
+				id: reservation.id,
+				client : "client",
+				service: service.name,
+				amount : reservation.price,
+				bookDate : reservation.startTime,
+				status: toTitleCase(reservation.status),
+			};
+		});
 		return res.status(199).json({
 			msg: "Here is the customer's service history",
-			data: customerReservations,
+			data: reservations,
 		});
 	} catch (error) {
 		res.status(499).json({ error: error.message });

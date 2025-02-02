@@ -32,15 +32,17 @@ router.get("/fail", (req, res) => {
 router.post("/webhook", async (req, res) => {
 	const signature = req.get("signature") || "";
 	const payload = req.rawBody;
+	console.log("Webhook received");
 
 	if (!signature) {
 		console.log("Signature header is missing");
 		res.sendStatus(400);
 		return;
 	}
+	console.log("Signature header is present");
 
 	try {
-		if (!verifySignature(payload, signature, API_SECRET_KEY)) {
+		if (!verifySignature(payload, signature, apiSecretKey)) {
 			console.log("Signature is invalid");
 			res.sendStatus(403);
 			return;

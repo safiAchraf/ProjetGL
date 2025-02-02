@@ -57,7 +57,7 @@ export type Reservation = {
   services: string[];
   bookDate: string;
   amount: number;
-  status: "Pending" | "Confirmed" | "Cancelled" | "Completed";
+  status: "Pending" | "Paid";
 };
 
 export type Categories = "Hair" | "Skin Care" | "Nails" | "Makeup" | "Massage";

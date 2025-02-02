@@ -174,8 +174,8 @@ const createReservation = async (req, res) => {
 		  amount: totalPrice,
 		  currency: "dzd",
 		  metadata: reservations.map((r) => ({ reservationId: r.id })),
-		  success_url: "https://gl-backend-32cy.onrender.com/success",
-		  failure_url: "https://gl-backend-32cy.onrender.com/failure",
+		  success_url: "https://projet-gl-jet.vercel.app",
+		  failure_url: "https://projet-gl-jet.vercel.app",
 		});
   
 		return res.status(201).json({

@@ -2,14 +2,9 @@ import bodyParser from "body-parser";
 import express from "express";
 import { verifySignature } from "@chargily/chargily-pay";
 import prisma from "../prisma/client.js";
-import Chargily from "@chargily/chargily-pay";
 
 const apiSecretKey = process.env.CHARGILY_SECRET_KEY;
 
-const client = new Chargily.ChargilyClient({
-	api_key: apiSecretKey,
-	mode: "test",
-});
 
 const router = express.Router();
 

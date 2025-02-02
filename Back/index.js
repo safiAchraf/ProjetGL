@@ -65,12 +65,13 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
+app.use("/chargily", chargilyRouter);
+
 app.get("/", (req, res) => {
   res.json("Hello World");
 });
 app.use("/nonauth", nonAuth);
 
-app.use("/api/chargily", chargilyRouter);
 app.use("/api/auth", authRouter);
 app.use(jwtVerify);
 app.use("/api/user", userRouter);

@@ -81,7 +81,7 @@ const getAllReservationsByUser = async (req, res) => {
 	  // Map to frontend format
 	  const FrontReservations = reservations.map((reservation) => ({
 		id: reservation.id,
-		service: reservation.service_name,
+		services: reservation.name,
 		amount: reservation.price,
 		bookDate: reservation.startTime,  
 		status: reservation.status.charAt(0).toUpperCase() + 

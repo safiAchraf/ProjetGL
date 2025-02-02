@@ -149,7 +149,7 @@ const History = () => {
   useEffect(() => {
     const fetchReservations = async () => {
       try {
-        const { data } = await api.get("/api/reservation/history");
+        const { data } = await api.get("/api/reservation/user");
         setReservations(data.data);
       } catch (error) {
         console.error("Error fetching reservations", error);
@@ -367,26 +367,30 @@ const History = () => {
           </TableHeader>
 
           <TableBody>
-            {currentItems.map((reservation) => (
-              <TableRow key={reservation.id} className="hover:bg-gray-50">
-                <TableCell className="max-w-[200px]">
-                  {reservation.services.join(", ")}
-                </TableCell>
-                <TableCell>{formatDateTime(reservation.bookDate)}</TableCell>
-                <TableCell>${reservation.amount.toFixed(2)}</TableCell>
-                <TableCell>
-                  <StatusBadge status={reservation.status} />
+            {currentItems.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={4}
+                  className="h-24 text-center text-gray-500 align-middle"
+                >
+                  No appointments found matching your criteria
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              currentItems.map((reservation) => (
+                <TableRow key={reservation.id} className="hover:bg-gray-50">
+                  <TableCell className="max-w-[200px]">
+                    {reservation.services.join(", ")}
+                  </TableCell>
+                  <TableCell>{formatDateTime(reservation.bookDate)}</TableCell>
+                  <TableCell>${reservation.amount.toFixed(2)}</TableCell>
+                  <TableCell>
+                    <StatusBadge status={reservation.status} />
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
-
-          {/* Empty State */}
-          {currentItems.length === 0 && (
-            <div className="p-6 text-center text-gray-500">
-              No appointments found matching your criteria
-            </div>
-          )}
         </Table>
       </div>
     </div>

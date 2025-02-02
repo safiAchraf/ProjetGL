@@ -149,7 +149,7 @@ const History = () => {
   useEffect(() => {
     const fetchReservations = async () => {
       try {
-        const { data } = await api.get("api/reservation/history");
+        const { data } = await api.get("/api/reservation/history");
         setReservations(data.data);
       } catch (error) {
         console.error("Error fetching reservations", error);

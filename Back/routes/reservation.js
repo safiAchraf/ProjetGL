@@ -10,9 +10,13 @@ import {
   getCancelledReservations,
   reservationHistory,
   getAvailableHours,
+  deleteAllUserReservations
 } from "../controllers/reservationController.js";
 
 const router = express.Router();
+
+
+router.delete("/user", deleteAllUserReservations);
 
 /**
  * @swagger

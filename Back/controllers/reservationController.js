@@ -355,6 +355,16 @@ const getPriceAfterDiscount = async (req, res) => {
 		priceBeforeCoupon - priceBeforeCoupon * (existingCoupon.discount / 100);
 	res.json({ price: finalPrice });
 };
+const deleteAllUserReservations = async (req, res) => {
+	const userId = req.user.id;
+	try {
+		await prisma.$queryRaw`
+	  DELETE FROM "Booking" WHERE "customerId" = ${userId}`;
+		res.json({ message: "All user reservations deleted successfully" });
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
+};
 
 export {
 	getAllReservations,
@@ -368,4 +378,5 @@ export {
 	reservationHistory,
 	getAvailableHours,
 	getPriceAfterDiscount,
+	deleteAllUserReservations,
 };

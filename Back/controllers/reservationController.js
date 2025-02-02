@@ -31,7 +31,7 @@ const reservationHistory = async (req, res) => {
 	const userId = req.user.id;
 	try {
 		const customerReservations = await prisma.$queryRaw`
-      SELECT * FROM "Booking" WHERE "customerId" = ${userId}`;
+      SELECT * FROM "Booking" WHERE "customerId" = ${userId} LIMIT 10`;
 		if (customerReservations.length === 0) {
 			return res
 				.status(403)

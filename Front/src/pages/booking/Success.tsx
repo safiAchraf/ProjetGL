@@ -89,7 +89,7 @@ const Success = () => {
                   variant="outline"
                   size="lg"
                   className="w-full md:w-auto"
-                  onClick={() => navigate("/dashboard/orders")}
+                  onClick={() => navigate("/dashboard/history")}
                 >
                   View my bookings
                 </Button>

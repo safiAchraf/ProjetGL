@@ -28,36 +28,9 @@ interface RecentOrdersProps {
   viewAllLink?: string;
 }
 
-const defaultOrders: Reservation[] = [
-  {
-    id: "1293DSA39",
-    client: "MEDAOUI Sara",
-    services: ["Haircut"],
-    bookDate: "January 20, 2022",
-    amount: 799.0,
-    status: "Pending",
-  },
-  {
-    id: "U2349SD12",
-    client: "MEDAOUI Sara",
-    services: ["Massage", "Haircut"],
-    bookDate: "January 20, 2022",
-    amount: 149.99,
-    status: "Confirmed",
-  },
-  {
-    id: "F2349SU38",
-    client: "MEDAOUI Sara",
-    services: ["Nail care"],
-    bookDate: "January 20, 2022",
-    amount: 1099.99,
-    status: "Cancelled",
-  },
-];
-
 const DashboardReviews = ({
   title = "Recent Books",
-  orders = defaultOrders,
+  orders,
   className,
   newOrdersCount = 10,
   viewAllLink = "/dashboard/reservations",
@@ -101,20 +74,26 @@ const DashboardReviews = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {orders.map((order) => (
-              <TableRow key={order.id}>
-                <TableCell className="text-[#8e9091]">{order.id}</TableCell>
-                <TableCell>{order.client}</TableCell>
-                <TableCell>{order.services.join(", ")}</TableCell>
-                <TableCell className="text-[#8e9091]">
-                  {order.bookDate}
-                </TableCell>
-                <TableCell>${order.amount.toFixed(2)}</TableCell>
-                <TableCell>
-                  <StatusBadge status={order.status} />
-                </TableCell>
+            {!orders || orders.length === 0 ? (
+              <TableRow>
+                <TableCell>No Orders</TableCell>
               </TableRow>
-            ))}
+            ) : (
+              orders.map((order) => (
+                <TableRow key={order.id}>
+                  <TableCell className="text-[#8e9091]">{order.id}</TableCell>
+                  <TableCell>{order.client}</TableCell>
+                  <TableCell>{order.services.join(", ")}</TableCell>
+                  <TableCell className="text-[#8e9091]">
+                    {order.bookDate}
+                  </TableCell>
+                  <TableCell>${order.amount.toFixed(2)}</TableCell>
+                  <TableCell>
+                    <StatusBadge status={order.status} />
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

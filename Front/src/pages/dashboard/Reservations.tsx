@@ -34,171 +34,8 @@ import {
   Loader2,
 } from "lucide-react";
 
-const defaultData: Reservation[] = [
-  {
-    id: "1",
-    client: "Emily Johnson",
-    services: ["Haircut", "Beard Trim"],
-    bookDate: "2024-03-15T09:30:00",
-    amount: 65.0,
-    status: "Pending",
-  },
-  {
-    id: "2",
-    client: "Michael Chen",
-    services: ["Full Color", "Deep Conditioning"],
-    bookDate: "2024-03-16T14:15:00",
-    amount: 185.5,
-    status: "Confirmed",
-  },
-  {
-    id: "3",
-    client: "Sarah Williams",
-    services: ["Hot Stone Massage"],
-    bookDate: "2024-03-17T16:45:00",
-    amount: 120.0,
-    status: "Cancelled",
-  },
-  {
-    id: "4",
-    client: "David Miller",
-    services: ["Manicure", "Pedicure"],
-    bookDate: "2024-03-18T11:00:00",
-    amount: 75.25,
-    status: "Pending",
-  },
-  {
-    id: "5",
-    client: "Olivia Davis",
-    services: ["Haircut", "Scalp Treatment"],
-    bookDate: "2024-03-19T15:30:00",
-    amount: 95.0,
-    status: "Confirmed",
-  },
-  {
-    id: "6",
-    client: "James Wilson",
-    services: ["Facial", "Eyebrow Shaping"],
-    bookDate: "2024-03-20T10:45:00",
-    amount: 135.75,
-    status: "Pending",
-  },
-  {
-    id: "7",
-    client: "Sophia Martinez",
-    services: ["Body Scrub", "Massage"],
-    bookDate: "2024-03-21T13:15:00",
-    amount: 210.0,
-    status: "Confirmed",
-  },
-  {
-    id: "8",
-    client: "Liam Anderson",
-    services: ["Hair Extensions"],
-    bookDate: "2024-03-22T17:30:00",
-    amount: 300.0,
-    status: "Pending",
-  },
-  {
-    id: "9",
-    client: "Emma Taylor",
-    services: ["Makeup Application"],
-    bookDate: "2024-03-23T12:00:00",
-    amount: 85.5,
-    status: "Cancelled",
-  },
-  {
-    id: "10",
-    client: "Noah Brown",
-    services: ["Keratin Treatment"],
-    bookDate: "2024-03-24T14:45:00",
-    amount: 150.0,
-    status: "Confirmed",
-  },
-  {
-    id: "11",
-    client: "Ava Garcia",
-    services: ["Waxing", "Skin Treatment"],
-    bookDate: "2024-03-25T16:30:00",
-    amount: 90.0,
-    status: "Pending",
-  },
-  {
-    id: "12",
-    client: "William Rodriguez",
-    services: ["Haircut", "Shave"],
-    bookDate: "2024-03-26T09:15:00",
-    amount: 55.0,
-    status: "Confirmed",
-  },
-  {
-    id: "13",
-    client: "Isabella Hernandez",
-    services: ["Full Body Massage"],
-    bookDate: "2024-03-27T18:00:00",
-    amount: 175.0,
-    status: "Pending",
-  },
-  {
-    id: "14",
-    client: "Mason Lopez",
-    services: ["Hair Coloring", "Blow Dry"],
-    bookDate: "2024-03-28T10:30:00",
-    amount: 145.0,
-    status: "Cancelled",
-  },
-  {
-    id: "15",
-    client: "Mia Gonzalez",
-    services: ["Lash Extensions"],
-    bookDate: "2024-03-29T15:45:00",
-    amount: 110.0,
-    status: "Confirmed",
-  },
-  {
-    id: "16",
-    client: "Benjamin Perez",
-    services: ["Beard Trim", "Facial"],
-    bookDate: "2024-03-30T11:15:00",
-    amount: 80.0,
-    status: "Pending",
-  },
-  {
-    id: "17",
-    client: "Charlotte Torres",
-    services: ["Pedicure", "Nail Art"],
-    bookDate: "2024-04-01T14:00:00",
-    amount: 65.0,
-    status: "Confirmed",
-  },
-  {
-    id: "18",
-    client: "Elijah Flores",
-    services: ["Hot Towel Shave"],
-    bookDate: "2024-04-02T16:30:00",
-    amount: 45.0,
-    status: "Pending",
-  },
-  {
-    id: "19",
-    client: "Amelia Rivera",
-    services: ["Haircut", "Highlights"],
-    bookDate: "2024-04-03T10:45:00",
-    amount: 125.0,
-    status: "Cancelled",
-  },
-  {
-    id: "20",
-    client: "Lucas Scott",
-    services: ["Deep Tissue Massage"],
-    bookDate: "2024-04-04T13:15:00",
-    amount: 195.0,
-    status: "Confirmed",
-  },
-];
-
 const Reservations = () => {
-  const [reservations, setReservations] = useState<Reservation[]>(defaultData);
+  const [reservations, setReservations] = useState<Reservation[]>([]);
   const [fakeLoading, setFakeLoading] = useState(true);
   const { isLoading } = useAuth();
 
@@ -456,7 +293,7 @@ const Reservations = () => {
                         size="sm"
                         className="text-green-600 hover:bg-green-50 border-green-100 hover:text-green-600"
                         onClick={() =>
-                          handleUpdateStatus(reservation.id, "Confirmed")
+                          handleUpdateStatus(reservation.id, "Paid")
                         }
                       >
                         <CheckCircle2 className="w-4 h-4 mr-2" />
@@ -467,7 +304,7 @@ const Reservations = () => {
                         size="sm"
                         className="text-red-600 hover:text-red-600 hover:bg-red-50 border-red-100"
                         onClick={() =>
-                          handleUpdateStatus(reservation.id, "Cancelled")
+                          handleUpdateStatus(reservation.id, "Pending")
                         }
                       >
                         <XCircle className="w-4 h-4 mr-2" />
